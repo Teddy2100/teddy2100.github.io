@@ -1,0 +1,31 @@
+<script>
+console.log("RECORDINGS LOADED");
+var ajaxrunner=$.getJSON(urls("recordings"),function(recording_data){
+ var pvrlist={},sorted=[];$.each(recording_data,function(key,json){
+  var program=json.event.name?json.event.name:"error getting program name";
+  var programimg=json.event.icon?json.event.icon:urls("")+json.event.image;
+  if(!pvrlist[program]){pvrlist[program]={image:programimg,items:[]};sorted.push(program);}  
+  pvrlist[program].items[pvrlist[program].items.length]=json.event;sorted.sort();
+ });
+ 
+ $.each(sorted,function(k,name){var data=pvrlist[name];
+  var card=$("<ee-recording></ee-recording>");
+   console.log(pvrlist[name]);
+  
+  card.attr({"src":data.image,"title":name});
+  
+   //card.html(name+" ("+data.items.length+")");
+  $("#mainContainer").append(card);
+ });  
+   
+ /*$("#mainContainer").append("<hr>");
+ $.each(recording_data,function(k,json){var card=$("<ee-recording><span>TEST</span></ee-recording>"); 
+  card.attr("src",json.event.icon?json.event.icon:"http://"+useip+json.event.image);
+  card.attr("title",json.event.name).attr("video",json.id);
+  //card.append("<span>TEST</span>");
+  $("#mainContainer").append(card).toast();
+ });*/
+}).error(function(){
+ alert("ERROR CONNECTING");
+});
+</script>

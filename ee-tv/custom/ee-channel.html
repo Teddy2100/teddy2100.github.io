@@ -1,0 +1,25 @@
+<dom-module id="ee-channel">
+ <style>
+ 
+  :host{@apply(--shadow-transition);@apply(--shadow-elevation-2dp);max-width:600px;}
+  :host{-webkit-user-select:none;-webkit-tap-highlight-color:rgba(255,255,255,0);cursor:default;}
+  :host{display:block;position:relative;background:var(--ee-front);margin:10px auto;border-radius:6px;}
+ 
+  img{display:inline;border-radius:4px;margin-top:5px;margin-left:5px;border:1px solid var(--ee-border);width:120px;height:60px;}
+  div{display:inline;position:absolute;left:130px;right:0px;padding:5px;font-size:25px;}
+  paper-material{margin:10px;background:var(--ee-front);border-radius:6px;}   
+  paper-icon-button{position:absolute;bottom:5px;right:5px;}  
+  
+  @media screen and (max-width:640px){
+   img{width:90px;height:45px;}
+   div{left:100px;font-size:20px;}
+  }
+ </style>
+ <template>
+  <img src="{{src}}"/><div>{{title}}</div>
+  <paper-icon-button icon="picture-in-picture"/>
+ </template>
+</dom-module>
+<script>
+Polymer({is:'ee-channel'});
+</script>

@@ -1,0 +1,46 @@
+<dom-module id="ee-channel">
+ <style>
+  :host{@apply(--shadow-transition);@apply(--shadow-elevation-2dp);max-width:600px;}
+  :host{-webkit-user-select:none;-webkit-tap-highlight-color:rgba(255,255,255,0);cursor:default;}
+  :host{display:block;position:relative;background:var(--ee-front);margin:10px auto;border-radius:6px;}
+ 
+  img{display:inline;border-radius:4px;margin-top:5px;margin-left:5px;border:1px solid var(--ee-border);width:120px;height:60px;}
+  div{display:inline;position:absolute;left:130px;right:0px;padding:5px;font-size:25px;}
+  paper-material{margin:10px;background:var(--ee-front);border-radius:6px;}   
+  paper-icon-button{position:absolute;bottom:5px;right:5px;}  
+  
+  @media screen and (max-width:640px){
+   img{width:90px;height:45px;}
+   div{left:100px;font-size:20px;}
+  }
+ </style>
+ <template>
+  <img src="{{src}}"/><div>{{title}}</div>
+  <paper-icon-button on-click="push" icon="picture-in-picture"/>
+ </template>
+</dom-module>
+
+<paper-dialog id="actions" style="width:200px;">
+ <h1 style="padding:10px 10px 0px 10px;text-align:center;">Watch on?</h1>
+ <div class="buttons">
+  <paper-button dialog-dismiss>Phone</paper-button>
+  <paper-button dialog-confirm autofocus>TV</paper-button>
+ </div>
+</paper-dialog>
+
+<script>
+console.log("CHANNELS LOADED");
+try{Polymer({is:'ee-channel',push:function(){
+ document.getElementById("actions").open();
+ alert("PUSH:"+this.zap); 
+}});}catch(e){}
+
+$.getJSON(urls("channels"),function(channel_data){
+ $.each(channel_data,function(k,json){var card=$("<ee-channel/>");
+  card.attr({"title":json.name,"src":urls("channel_logos")+json.zap,"zap":json.zap});
+  $("#mainContainer").append(card).toast();
+ });
+}).error(function(){
+ alert("ERROR CONNECTING");
+});
+</script>

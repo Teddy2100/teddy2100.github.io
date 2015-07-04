@@ -1,0 +1,56 @@
+<style is="custom-style">
+:root{
+ --ee-back:#3E3E3E;
+ --ee-front:#009C9C;
+ --ee-border:#00AEAA;
+ --ee-text:#FFE600;
+}
+
+
+@font-face{font-family:'Nobblee';src:url('../images/nobblee.woff');}
+h1,h2{color:var(--ee-text);font-family:'Nobblee','Roboto',sans-serif;margin:0px!important;}
+paper-toolbar{background:var(--ee-front);color:var(--ee-text);font-family:'Nobblee','Roboto',sans-serif;}
+table[size='fullScreen']{position:absolute;top:0px;bottom:0px;left:0px;right:0px;height:100%!important;width:100%!important;}
+body{background:var(--ee-back);color:var(--ee-text);-webkit-user-select:none;-webkit-tap-highlight-color:rgba(255,255,255,0);cursor:default;}
+paper-progress code{position:absolute;font-size:12px;top:-20px;width:100%;text-align:center;padding:2px;color:#000000;overflow:hidden;}
+paper-progress{position:absolute;bottom:0px;width:252px;height:18px;border:1px solid black;box-sizing:border-box;margin:2px;}
+paper-progress span{position:absolute;font-size:12px;top:0px;width:100%;text-align:center;padding:2px;color:#000000;}
+paper-toast-stack paper-toast{position:relative!important;width:100%;margin-left:-12px;margin-top:12px;}
+paper-toast-stack paper-toast{text-align:center;text-transform:uppercase;color:#FFE600;}
+paper-toast-stack{position:fixed;bottom:0px;left:268px;right:12px;margin:0px;}
+paper-header-panel > div{padding:0px 10px;color:var(--ee-text);}
+paper-material,paper-menu{background:var(--paper-grey-50);}
+paper-dialog{z-index:99!important;background:var(--ee-front);}
+
+
+#mainContainer::-webkit-scrollbar{width: 8px;}
+#mainContainer{background:linear-gradient(#3e3e3e 25%,#000000 100%);}
+#mainContainer::-webkit-scrollbar-thumb{background-color:var(--ee-front);border-radius:2px;}
+#gui-status span{border-radius:50px;position:absolute;top:0px;bottom:0px;left:0px;right:0px;border:1px solid var(--ee-text);margin:6px;}
+#gui-status span.orange{background:radial-gradient(ellipse at center, #EAB775 0%,#ED8A00 100%)!important;}
+#gui-status span.green{background:radial-gradient(ellipse at center, #7FFF7F 0%,#00CF00 100%)!important;}
+#gui-status span.blue{background:radial-gradient(ellipse at center, #7F7FFF 0%,#0000CF 100%)!important;}
+#gui-status span.red{background:radial-gradient(ellipse at center, #FF7F7F 0%,#CF0000 100%)!important;}
+#drawer-fake{z-index:9999;position:absolute;top:0px;bottom:0px;right:0px;width:0px;font-size:0px;}
+
+
+[size='fullScreen']{
+ position:absolute;top:0px;bottom:0px;left:0px;right:0px;
+ height:100%;width:100%;box-sizing:border-box;
+}
+
+@media screen and (max-height:340px){
+ ee-header-logo{display:none;}
+}
+
+@media screen and (max-width:640px){
+ paper-toast-stack{left:12px;}
+}
+
+paper-spinner{
+ --paper-spinner-layer-1-color:color:var(--ee-text);
+ --paper-spinner-layer-2-color:color:var(--ee-text);
+ --paper-spinner-layer-3-color:color:var(--ee-text);
+ --paper-spinner-layer-4-color:color:var(--ee-text);
+}
+</style>
