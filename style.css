@@ -1,9 +1,10 @@
 body{margin:0px;}
 h1, h2, h3{font-weight:300;}
 html{font:16px/1 'Open Sans','Helvetica Neue',Helvetica,Arial,sans-serif;}
+img[shaddow]{-webkit-box-shadow:0 0 1.5em rgba(0,0,0,1);-moz-box-shadow:0 0 1.5em rgba(0,0,0,1);box-shadow:0 0 1.5em rgba(0,0,0,1);}
 
 header{
- background-color:#E1E1E1;
+ background-color:#E1E1E1;text-align:center;
  background-image:-webkit-gradient(radial,center center,0,center center,100%,color-stop(0%,rgba(235,235,235,.7)),color-stop(50%,rgba(200,200,200,.3)),color-stop(100%,rgba(30,30,30,.25)));
  background-image:-webkit-radial-gradient(center,ellipse cover,rgba(235,235,235,.7) 0,rgba(200,200,200,.3) 50%,rgba(30,30,30,.25) 100%);
  background-image:-moz-radial-gradient(center,ellipse cover,rgba(235,235,235,.7) 0,rgba(200,200,200,.3) 50%,rgba(30,30,30,.25) 100%);
@@ -11,22 +12,22 @@ header{
  background-image:-o-radial-gradient(center,ellipse cover,rgba(235,235,235,.7) 0,rgba(200,200,200,.3) 50%,rgba(30,30,30,.25) 100%);
  background-image:radial-gradient(ellipse at center,rgba(235,235,235,.7) 0,rgba(200,200,200,.3) 50%,rgba(30,30,30,.25) 100%);
  filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#B3EBEBEB', endColorstr='#401E1E1E', GradientType=1);
- background-repeat:repeat;height:300px;padding-top:.6em
+ background-repeat:repeat;height:22em;padding-top:0.6em;
 }
 
 section{
- background-color: #2C66B8;
+ background-color:#e50c0c;
 }
 
 section article{
- border-bottom: solid 0.3125em #00478F;
- border-top: solid 0.3125em #00478F;
+ border-bottom: solid 0.3125em #cc0b0b;
+ border-top: solid 0.3125em #cc0b0b;
 }
 
 section article h2{
- background-color: #4A7CC2;
- border-bottom: solid .104em #7198C1;
- border-top: solid .104em #7198C1;
+ background-color: #ff3e3e;
+ border-bottom: solid .104em #ff5656;
+ border-top: solid .104em #ff5656;
  -webkit-box-shadow: 0 0 .8333em rgba(0,0,0,.4);
  -moz-box-shadow: 0 0 .8333em rgba(0,0,0,.4);
  box-shadow: 0 0 .8333em rgba(0,0,0,.4);
@@ -54,8 +55,9 @@ footer{
  background-image: -o-linear-gradient(top,#C8C8C8 0,#FFF 100%);
  background-image: linear-gradient(to bottom,#C8C8C8 0,#FFF 100%);
  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#c8c8c8', endColorstr='#ffffff', GradientType=0);
- border-top:1px solid #F0F0F0;height:52px;
+ border-top:1px solid #F0F0F0;height:5em;
  box-sizing:border-box;
 }
 
+.avatar{width:320px;height:320px;border-radius:320px;border:solid 0.3125em #cc0b0b;margin-top:3em;}
 .guthublink img{height:32px;float:right;margin:10px;}
