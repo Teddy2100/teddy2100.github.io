@@ -1,0 +1,61 @@
+body{margin:0px;}
+h1, h2, h3{font-weight:300;}
+html{font:16px/1 'Open Sans','Helvetica Neue',Helvetica,Arial,sans-serif;}
+
+header{
+ background-color:#E1E1E1;
+ background-image:-webkit-gradient(radial,center center,0,center center,100%,color-stop(0%,rgba(235,235,235,.7)),color-stop(50%,rgba(200,200,200,.3)),color-stop(100%,rgba(30,30,30,.25)));
+ background-image:-webkit-radial-gradient(center,ellipse cover,rgba(235,235,235,.7) 0,rgba(200,200,200,.3) 50%,rgba(30,30,30,.25) 100%);
+ background-image:-moz-radial-gradient(center,ellipse cover,rgba(235,235,235,.7) 0,rgba(200,200,200,.3) 50%,rgba(30,30,30,.25) 100%);
+ background-image:-ms-radial-gradient(center,ellipse cover,rgba(235,235,235,.7) 0,rgba(200,200,200,.3) 50%,rgba(30,30,30,.25) 100%);
+ background-image:-o-radial-gradient(center,ellipse cover,rgba(235,235,235,.7) 0,rgba(200,200,200,.3) 50%,rgba(30,30,30,.25) 100%);
+ background-image:radial-gradient(ellipse at center,rgba(235,235,235,.7) 0,rgba(200,200,200,.3) 50%,rgba(30,30,30,.25) 100%);
+ filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#B3EBEBEB', endColorstr='#401E1E1E', GradientType=1);
+ background-repeat:repeat;height:300px;padding-top:.6em
+}
+
+section{
+ background-color: #2C66B8;
+}
+
+section article{
+ border-bottom: solid 0.3125em #00478F;
+ border-top: solid 0.3125em #00478F;
+}
+
+section article h2{
+ background-color: #4A7CC2;
+ border-bottom: solid .104em #7198C1;
+ border-top: solid .104em #7198C1;
+ -webkit-box-shadow: 0 0 .8333em rgba(0,0,0,.4);
+ -moz-box-shadow: 0 0 .8333em rgba(0,0,0,.4);
+ box-shadow: 0 0 .8333em rgba(0,0,0,.4);
+ clear: both;
+ color: #FFF;
+ margin-bottom: 0.5em;
+ margin-top: 0.9375em;
+ padding: 0.1875em 0;
+ text-align: center;
+ text-shadow: 0 -1px rgba(0,0,0,.5);
+ font-size:3em;
+ line-height:1.3;
+}
+
+section article h2:last-of-type{
+ margin-bottom: 0.9375em;
+}
+
+footer{
+ background-color: #C8C8C8;
+ background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0%,#C8C8C8),color-stop(100%,#FFF));
+ background-image: -webkit-linear-gradient(top,#C8C8C8 0,#FFF 100%);
+ background-image: -moz-linear-gradient(top,#C8C8C8 0,#FFF 100%);
+ background-image: -ms-linear-gradient(top,#C8C8C8 0,#FFF 100%);
+ background-image: -o-linear-gradient(top,#C8C8C8 0,#FFF 100%);
+ background-image: linear-gradient(to bottom,#C8C8C8 0,#FFF 100%);
+ filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#c8c8c8', endColorstr='#ffffff', GradientType=0);
+ border-top:1px solid #F0F0F0;height:52px;
+ box-sizing:border-box;
+}
+
+.guthublink img{height:32px;float:right;margin:10px;}
