@@ -69,11 +69,11 @@ var scheme="http://",host="",hostlist=[],attempt=0,paths={"":"",
  "zap":"/Live/Channels/zap?zap=", //CHANGE TV CHANNEL
  "info":"/UPnP/Device/getInfo"
 };
-
+ 
 $(document).on("ready",function(){
  $("#mainContainer").removeClass("style-scope");
  $("paper-item[file*='.']").loadSelected({delayLoad:true});
- $(document).ajaxStart(function(){$("paper-spinner").attr("active","");})
+ $(document).ajaxStart(function(){$("paper-spinner").attr("active","");});
  $(document).ajaxStop(function(){$("paper-spinner").removeAttr("active");});
    
  $("paper-item:contains('URL')").on("click",function(page){

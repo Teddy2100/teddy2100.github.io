@@ -1,3 +1,7 @@
+$.ajaxSetup({
+ timeout:2000
+});
+
 $.fn.extend({
  loadSelected:function(delay){
   $(this).on("click",function(event){
