@@ -11,26 +11,32 @@ echo Update Finished
 echo.
 
 echo.
-echo Removing Unwanted Components
-rmdir "./bower_components/iron-component-page" /s /q
-rmdir "./bower_components/iron-doc-viewer" /s /q
-rmdir "./bower_components/hydrolysis" /s /q
-echo Removal Finished
-echo.
+set merge=true
+echo Merging Polymer Modules
+setlocal EnableDelayedExpansion
+for /d %%D in (bower_components/*) do (for /r %%F in (%%D/*.html) do (if NOT "%%~nF"=="index" (
+ if "%%D"=="iron-component-page" (set "merge=false")
+ if "%%D"=="iron-doc-viewer" (set "merge=false" )
+ if "%%D"=="hydrolysis" (set "merge=false" )
+ if "%%D"=="web-animations-js" (set "merge=false" )
 
-echo.
-echo Merging Polymer Files
-for /d %%D in (bower_components/*) do (for /r %%F in (%%D/*.html) do (
- if NOT "%%~nF"=="index" if NOT "%%D"=="web-animations-js" if NOT "%%D"=="hydrolysis" (
+ if !merge!==false (echo Module: ./%%D/%%~nF.html ~ SKIPPED) else (
   echo ^<link rel='import' href='./%%D/%%~nF.html'/^> >> bower_components/polymer-full.html
+  echo Module: ./%%D/%%~nF.html ~ MERGED
  )
-))
+ set "merge=true"
+)))
 echo Merge Finished
+endlocal
 echo.
 
 echo.
 echo Creating Vulcanize Files
-call vulcanize --inline-scripts --inline-css --strip-comments bower_components/polymer-full.html > bower_components/vulcanized-full.html
-call vulcanize --inline-css --strip-comments bower_components/polymer-full.html > bower_components/vulcanized-min.html
+ call vulcanize --inline-scripts --inline-css --strip-comments bower_components/polymer-full.html > bower_components/vulcanized-full.html
+echo Created: vulcanized-full.html
+ call vulcanize --inline-css --strip-comments bower_components/polymer-full.html > bower_components/vulcanized-min.html
+echo Created: vulcanized-min.html
 echo Files Vulcanized
 echo.
+
+pause
