@@ -15,16 +15,16 @@
  <link rel="import" href="../bower_components/vulcanized-full.html" name="Polymer"/>
  <link rel="import" href="./images/main-style.css" name="Custom Styles"/>
  
- <link rel="import" href="./custom/ee-header-logo.html"/>
  <link rel="import" href="./custom/ee-recording.html"/>
+ <link rel="import" href="./custom/ee-channel.html"/>
  <link rel="manifest" href="./app-manifest.json"/>
 </head>
 <body>
 <gui-module id="ee-tv-gui">
  <paper-drawer-panel id="page">
   <paper-material id="drawer" elevation="5" drawer>
-   <ee-header-logo></ee-header-logo>  
-   <paper-menu class="list">
+   <img src="./images/logo.png" class="" alt="" title=""/>
+   <paper-menu class="list" style="padding:0px;">
     <paper-item file="remote.html">Remote</paper-item>
     <paper-item file="channels.html">Channels</paper-item>
     <paper-item file="recordings.html">Recordings</paper-item>
@@ -39,7 +39,7 @@
      <paper-spinner id="gui-status" active></paper-spinner>
    </paper-toolbar>
    <div size="fullScreen"><table width="100%" height="100%"><tr><th align="center">
-    <h1 style="font-size:50px;">FINDING YOUR EE TV</h1>
+    <h1 style="font-size:50px;">FINDING YOUR<br>EE TV</h1>
     <paper-spinner style="width:75px;height:75px;margin:20px;" active></paper-spinner>
     <h2 style="font-size:25px;">Please Wait</h2>
    </th></tr></table></div>
@@ -53,7 +53,7 @@
 </gui-module>
 
 <script type="text/javascript">
-var unix=parseInt(new Date().getTime()),start=0;
+var unix=parseInt(new Date().getTime()),start=1;
 var scheme="http://",host="",hostlist=[],attempt=0,paths={"":"",
  "recordings":"/PVR/Records/getList?type=regular&avoidHD=0&tvOnly=0",
  "remote_keys":"/RemoteControl/KeyHandling/sendKey?avoidLongPress=1&key=",
@@ -72,7 +72,8 @@ var scheme="http://",host="",hostlist=[],attempt=0,paths={"":"",
  
 $(document).on("ready",function(){
  $("#mainContainer").removeClass("style-scope");
- $("paper-item[file*='.']").loadSelected({delayLoad:true});
+ $("paper-item[file*='.']").loadSelected({delay:500});
+ $("paper-spinner").prepend($("<span/>").addClass("orange"));
  $(document).ajaxStart(function(){$("paper-spinner").attr("active","");});
  $(document).ajaxStop(function(){$("paper-spinner").removeAttr("active");});
    
@@ -80,19 +81,17 @@ $(document).on("ready",function(){
   var link="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4";
   var pushlink=encodeURIComponent(prompt("Enter URL You Want To Watch",link));
   if(pushlink.match("http")){$.get(urls("play_video")+pushlink);}
-  document.querySelector("paper-drawer-panel").closeDrawer(); 
+  document.querySelector("paper-drawer-panel").closeDrawer();
  });
  
  $(window).on("load",function(){
-  hostlist=["192.168.1.240","192.168.1.245"];
+  hostlist=["192.168.1.240","192.168.10.187"];
   urls=function(key){return scheme+host+paths[key];};
   attempt=0;$(window).trigger("connect");
  });
  
- $(window).on("connect",function(){
-  $("paper-spinner span").remove();console.clear();
-  $("paper-spinner").prepend($("<span/>").addClass("orange"));
-  if(hostlist.length==0){alert("EE TV NOT FOUND");return;}else{attempt++;}
+ $(window).on("connect",function(){console.clear();
+  if(hostlist.length==0){return $(window).trigger("notv");}else{attempt++;}
   $.getJSON("http://"+hostlist[0]+"/UPnP/Device/getInfo?nc="+unix,function(info_data){
    var powerOn="http://"+hostlist[0]+"/RemoteControl/KeyHandling/sendKey?avoidLongPress=1&key=on_off";
    if(!info_data.pvr.available){$.get(powerOn,function(){$().sleep(2500,function(){$(window).trigger("connect");});});}
@@ -106,14 +105,21 @@ $(document).on("ready",function(){
   var ajaxrunner=$.getJSON(urls("info"),function(info_data){
    var used=parseInt(info_data.pvr.status.disk.usedSpace/1024/1024);
 			var total=parseInt(info_data.pvr.status.disk.totalSpace/1024/1024);
-   $("paper-spinner span").removeAttr("class").addClass(info_data.pvr.available?"green":"red");   
-   $("paper-progress").attr("value",info_data.pvr.status.disk.percent).removeAttr("indeterminate");  
-   $("paper-progress").append("<span><b>"+used+"GB</b> of <b>"+total+"GB</b></span>"); 
+   $("paper-progress").attr("value",info_data.pvr.status.disk.percent).removeAttr("indeterminate");
+   $("paper-progress").append("<span><b>"+used+"GB</b> of <b>"+total+"GB</b></span>");
    $("paper-progress").append("<code>Connected via: "+host+"</code>");
+   $("paper-spinner span").removeAttr("class").addClass("green");
    if(!info_data.pvr.available){$(window).trigger("load");}
    $("paper-item").eq(start).click();
   });
- }); 
+ });
+ 
+ $(window).on("notv",function(){
+  $("paper-spinner span").removeAttr("class").addClass("red");
+  $("#mainContainer h2").first().html("<a href='./'>Try Again</a>");
+  $("#mainContainer h1").first().html("EE TV<br>NOT FOUND");
+  $("#mainContainer paper-spinner").html("&nbsp;");
+ });
 });
 </script>
 </body>

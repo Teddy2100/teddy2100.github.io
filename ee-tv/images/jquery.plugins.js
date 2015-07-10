@@ -3,13 +3,12 @@ $.ajaxSetup({
 });
 
 $.fn.extend({
- loadSelected:function(delay){
+ loadSelected:function(setup){
   $(this).on("click",function(event){
-   var loadOtherFile=$(this).attr("file");
-   var uniqueStamp=unix?unix:new Date().getTime();
    document.querySelector("paper-drawer-panel").closeDrawer();
    $("#gui-title-bar").html("EE TV : "+$(this).text().toUpperCase());
-   $().sleep(500,function(){$.get(loadOtherFile+"?nc="+uniqueStamp,function(html){
+   var loadFile=$(this).attr("file"),us=unix?unix:new Date().getTime();
+   $().sleep(setup.delay,function(){$.get(loadFile+"?nc="+us,function(html){
     $("#mainContainer").html(html);
    });});return $(this);
   });
@@ -19,7 +18,7 @@ $.fn.extend({
   if(obj){var toast=$("<paper-toast/>");
    var colors={alert:"#CC0000",done:"#31B404"};
     toast.addClass("paper-toast-open").attr({id:x,text:obj.text});   
-    toast.css({"background":colors[obj.type]?colors[obj.type]:"#323232"});
+    toast.css({"background":colors[obj.type]?colors[obj.type]:"#009C9C"});
    $("paper-toast-stack").append(toast).css({"bottom":"-50px"}).sleep(0,function(){
     $("paper-toast-stack").animate({"bottom":"0px"}).sleep(5000,function(){
      $("#"+x).fadeOut("250",function(){$(this).remove();});
