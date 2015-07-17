@@ -12,14 +12,14 @@
  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
  <script type="text/javascript" src="./images/jquery.plugins.js" name="Custom Plugins"></script> 
  <link rel="import" href="../bower_components/vulcanized-full.html" name="Polymer"/>
- <link rel="import" href="./images/main-style.css" name="Custom Styles"/>
- 
+ <link rel="import" href="./images/main-style.css" name="Custom Styles"/> 
  <link rel="import" href="./custom/ee-recording.html"/>
  <link rel="import" href="./custom/ee-channel.html"/>
  <link rel="manifest" href="./app-manifest.json"/>
 </head>
-<body>
-<gui-module id="ee-tv-gui">
+<body unresolved class="fullbleed layout vertical">
+
+<template is="dom-bind" id="ee-tv-gui">
  <paper-drawer-panel id="page">
   <paper-material id="drawer" elevation="5" drawer>
    <img src="./images/logo.png" class="" alt="" title=""/>
@@ -27,7 +27,7 @@
     <paper-item file="remote.html">Remote</paper-item>
     <paper-item file="channels.html">Channels</paper-item>
     <paper-item file="recordings.html">Recordings</paper-item>
-    <paper-item>Play URL</paper-item>
+    <paper-item>Play URLs</paper-item>
    </paper-menu>
    <paper-progress max="100" class="green" indeterminate></paper-progress>
   </paper-material>
@@ -47,12 +47,12 @@
  <paper-material id="drawer-fake" elevation="5">
   **FAKE DRAWER : DO NOT USE**
  </paper-material>
- <paper-toast-stack>
- </paper-toast-stack>
-</gui-module>
+ <paper-toast-stack></paper-toast-stack> 
+</template>
 
 <script type="text/javascript">
-var unix=parseInt(new Date().getTime()),start=1;
+var app=document.querySelector("#ee-tv-gui");
+var unix=parseInt(new Date().getTime()),start=1,tv_data="";
 var scheme="http://",host="",hostlist=[],attempt=0,paths={"":"",
  "recordings":"/PVR/Records/getList?type=regular&avoidHD=0&tvOnly=0",
  "remote_keys":"/RemoteControl/KeyHandling/sendKey?avoidLongPress=1&key=",
@@ -94,23 +94,21 @@ $(document).on("ready",function(){
   $.getJSON("http://"+hostlist[0]+"/UPnP/Device/getInfo?nc="+unix,function(info_data){
    var powerOn="http://"+hostlist[0]+"/RemoteControl/KeyHandling/sendKey?avoidLongPress=1&key=on_off";
    if(!info_data.pvr.available){$.get(powerOn,function(){$().sleep(2500,function(){$(window).trigger("connect");});});}
-   else{$(window).trigger("init",{"host":this.url.split("/")[2],"attempt":attempt});}
+   else{tv_data=info_data;$(window).trigger("init",{"host":this.url.split("/")[2],"attempt":attempt});}
   }).error(function(e){hostlist.shift();$(window).trigger("connect");});
  });
 
  $(window).on("init",function(e,data){
   if(data.host){host=atob(btoa(data.host));}
   $("paper-menu,iron-pages").prop("selected",start);
-  var ajaxrunner=$.getJSON(urls("info"),function(info_data){
-   var used=parseInt(info_data.pvr.status.disk.usedSpace/1024/1024);
-			var total=parseInt(info_data.pvr.status.disk.totalSpace/1024/1024);
-   $("paper-progress").attr("value",info_data.pvr.status.disk.percent).removeAttr("indeterminate");
-   $("paper-progress").append("<span><b>"+used+"GB</b> of <b>"+total+"GB</b></span>");
-   $("paper-progress").append("<code>Connected via: "+host+"</code>");
-   $("paper-spinner span").removeAttr("class").addClass("green");
-   if(!info_data.pvr.available){$(window).trigger("load");}
-   $("paper-item").eq(start).click();
-  });
+  var used=parseInt(tv_data.pvr.status.disk.usedSpace/1024/1024);
+		var total=parseInt(tv_data.pvr.status.disk.totalSpace/1024/1024);
+  $("paper-progress").attr("value",tv_data.pvr.status.disk.percent).removeAttr("indeterminate");
+  $("paper-progress").append("<span><b>"+used+"GB</b> of <b>"+total+"GB</b></span>");
+  $("paper-progress").append("<code>Connected via: "+host+"</code>");
+  $("paper-spinner span").removeAttr("class").addClass("green");
+  if(!tv_data.pvr.available){$(window).trigger("load");}
+  $("paper-item").eq(start).click();
  });
  
  $(window).on("notv",function(){
