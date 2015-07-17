@@ -18,16 +18,15 @@
  <link rel="manifest" href="./app-manifest.json"/>
 </head>
 <body unresolved>
-
 <template is="dom-bind" id="ee-tv-gui">
- <paper-drawer-panel id="page">
+ <paper-drawer-panel force-narrow id="page">
   <paper-material id="drawer" elevation="5" drawer>
    <img src="./images/logo.png" class="" alt="" title=""/>
    <paper-menu class="list" style="padding:0px;">
     <paper-item file="remote.html">Remote</paper-item>
     <paper-item file="channels.html">Channels</paper-item>
     <paper-item file="recordings.html">Recordings</paper-item>
-    <paper-item>Play URLs</paper-item>
+    <paper-item>Play URL</paper-item>
    </paper-menu>
    <paper-progress max="100" class="green" indeterminate></paper-progress>
   </paper-material>
@@ -47,9 +46,9 @@
  <paper-material id="drawer-fake" elevation="5">
   **FAKE DRAWER : DO NOT USE**
  </paper-material>
- <paper-toast-stack></paper-toast-stack> 
+ <paper-toast-stack>
+ </paper-toast-stack> 
 </template>
-
 <script type="text/javascript">
 var app=document.querySelector("#ee-tv-gui");
 var unix=parseInt(new Date().getTime()),start=1,tv_data="";
@@ -75,6 +74,14 @@ $(document).on("ready",function(){
  $("paper-spinner").prepend($("<span/>").addClass("orange"));
  $(document).ajaxStart(function(){$("paper-spinner").attr("active","");});
  $(document).ajaxStop(function(){$("paper-spinner").removeAttr("active");});
+   
+ $("body").on("click",function(){
+  var size=$("paper-drawer-panel").prop("selected");
+  var offset=(size=="main")?"12px":"268px";
+  $("paper-toast-stack").animate({
+   "left":offset
+  });
+ });
    
  $("paper-item:contains('URL')").on("click",function(page){
   var link="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4";
