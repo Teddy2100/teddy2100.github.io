@@ -1,0 +1,9 @@
+C:\Documents and Settings\upsuser\Application Data\npm
+
+npm install --global gulp
+npm install --global bower
+npm install --global vulcanize
+npm install --global html-minifier
+
+npm install --save-dev gulp
+npm install --save-dev gulp-gh-pages
