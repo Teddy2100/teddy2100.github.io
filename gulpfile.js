@@ -3,7 +3,7 @@ var ghPages=require('gulp-gh-pages');
 var options={branch:"master",cacheDir:".page"};
  
 gulp.task("deploy",function(){
- var folders=["./**/*","!node_modules/**","!required/**","!.git/**"];
+ var folders=["./**/*","!./.git/**","!./node_modules/**","!./required/**"];
  return gulp.src(folders,{dot:true}).pipe(ghPages(options));
 });
 
