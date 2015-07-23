@@ -71,14 +71,10 @@ $(document).on("ready",function(){
  $("paper-spinner").prepend($("<span/>").addClass("orange"));
  $(document).ajaxStart(function(){$("paper-spinner").attr("active","");});
  $(document).ajaxStop(function(){$("paper-spinner").removeAttr("active");});
-   
- $("body").on("click",function(){
-  var size=$("paper-drawer-panel").prop("selected");
-  var offset=(size=="main")?"12px":"268px";
-  $("paper-toast-stack").animate({
-   "left":offset
-  });
- });
+ 
+ var menu=document.querySelector("paper-drawer-panel");
+  menu.closeDrawer=function(){$("paper-toast-stack").animate({"left":"12px"});this.selected="main";};
+  menu.openDrawer=function(){$("paper-toast-stack").animate({"left":"268px"});this.selected="drawer";};
    
  $("paper-item:contains('URL')").on("click",function(page){
   var link="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4";
