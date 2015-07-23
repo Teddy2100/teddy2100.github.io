@@ -89,7 +89,7 @@ $(document).on("ready",function(){
   attempt=0;$(window).trigger("connect");
  });
  
- $(window).on("connect",function(){//console.clear();
+ $(window).on("connect",function(){console.clear();
   if(hostlist.length==0){return $(window).trigger("notv");}else{attempt++;}
   $.getJSON("http://"+hostlist[0]+"/UPnP/Device/getInfo?nc="+unix,function(info_data){
    var powerOn="http://"+hostlist[0]+"/RemoteControl/KeyHandling/sendKey?avoidLongPress=1&key=on_off";

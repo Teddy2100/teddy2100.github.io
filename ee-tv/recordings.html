@@ -3,21 +3,47 @@
  div.recording{background-size:cover;position:relative;box-sizing:border-box;}
  div.recording{font-family:'NobbleeLight','Roboto',sans-serif!important;cursor:pointer;}
  div.recording{display:inline-block;margin:8px;border-radius:8px;border:2px solid var(--ee-front);}
- div.fader{width:100%;height:100%;background:linear-gradient(to bottom,rgba(0,0,0,0.00) 60%,rgba(0,0,0,0.75) 90%);} 
+ div.fader{width:100%;height:100%;background:linear-gradient(to bottom,rgba(0,0,0,0.00) 60%,rgba(0,0,0,0.75) 90%);}
+ paper-dialog paper-button{font-family:'NobbleeLight','Roboto',sans-serif;font-size:20px;color:var(--ee-text);white-space:nowrap;}
+ div.scroller::-webkit-scrollbar-thumb{background-color:var(--ee-front);border:2px solid #3E3E3E;border-radius:2px;}
+ div.scroller paper-button{margin:0px;margin-top:5px;}div.scroller paper-button:first-of-type{margin-top:0px;}
  div.fader p{position:absolute;left:0px;right:0px;bottom:0px;margin:0px;font-size:40px;padding:5px 10px;} 
  div.fader{border-bottom-right-radius:6px;border-bottom-left-radius:6px;box-sizing:border-box;} 
- div.fader p{white-space:nowrap;overflow:hidden;text-overflow: ellipsis;}
+ div.fader p{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;}
+ paper-dialog{overflow:hidden;border:2px solid var(--ee-front);border-radius:4px;}
+ div.scroller{overflow:auto;box-sizing:border-box;max-height:300px;padding:5px;}
+ div.holder{position:relative;padding:0px;margin:0px;background:#3E3E3E;}
+ div.buttons,div.holder,div.scroller{box-sizing:border-box;}
+ paper-dialog paper-button:hover{background:#008E8E;}
+ div.buttons paper-button{margin:5px 5px 5px 0px;}
+ div.scroller::-webkit-scrollbar{width:10px;}
+ div.scroller paper-button{width:100%;}
+ div.buttons{padding:0px!important;}
+ paper-dialog{max-width:500px;}
+ 
  @media screen and (max-width:640px){
   div.recording{width:340px;height:220px;}
   div.fader p{font-size:25px;}
  }
 </style>
+<paper-dialog id="uiDialog" modal>
+ <div class="holder"><div class="scroller" id="dialogData">PLEASE WAIT!!</div></div>
+ <div class="buttons"><paper-button dialog-confirm autofocus>Close</paper-button></div>
+</paper-dialog>
 <center id="uiContainer">
  LOADING
 </center>
 <script>
 console.log("RECORDINGS LOADED");
 $("#uiContainer").empty();//CLEAN CONTAINER
+
+$(window).on("resize",function(){
+ setTimeout(function(){
+  var height=parseInt($("#uiDialog").css("max-height"));
+  var buttons=$("#uiDialog div[class='buttons']").height();
+  $("#dialogData").css("max-height",height-buttons);
+ },250);  
+});
  
 var ajaxrunner=$.getJSON(urls("recordings"),function(recording_data){
  var pvrlist={},sorted=[];$.each(recording_data,function(key,json){
@@ -30,26 +56,38 @@ var ajaxrunner=$.getJSON(urls("recordings"),function(recording_data){
  $.each(sorted,function(k,name){var data=pvrlist[name];
   var fader=$("<div/>").addClass("fader").html("<p>"+name.toUpperCase()+"</p>");
   var holder=$("<div/>").css("background-image","url("+data.image+")").addClass("recording");
-   holder.on("click",function(obj){showRecordings(data);})
+   holder.attr("id",data.items[0].startTime);
+   holder.on("click",function(obj){showRecordings(data);});
   $("#uiContainer").append(holder.append(fader));
  });
    
- /*$("#mainContainer").append("<hr>");
- $.each(recording_data,function(k,json){var card=$("<ee-recording><span>TEST</span></ee-recording>"); 
-  card.attr("src",json.event.icon?json.event.icon:"http://"+useip+json.event.image);
-  card.attr("title",json.event.name).attr("video",json.id);
-  //card.append("<span>TEST</span>");
-  $("#mainContainer").append(card).toast();
- });*/
+ var elems=$("#uiContainer").children("div").get();
+  elems.sort(function(a,b){return parseInt(a.id)>parseInt(b.id);});
+ $("#uiContainer").append(elems);
 }).error(function(){
  alert("ERROR CONNECTING");
 });
 
 function showRecordings(obj){
- if(obj.items.length!=1){alert('SERIES');}else{
-  $.get(urls("play_recording")+obj.items[0].id,function(){
-   $().toast({text:"PLAYING: "+obj.items[0].name});
-  });
+ if(obj.items.length==1){playRecording(obj.items[0].id,obj.items[0].name);}else{
+  $("#dialogData").empty();$.each(obj.items,function(k,v){//SERIES RECORDINGS
+   var rec=$("<paper-button noink raised/>").attr("id",v.event.startTime);
+    rec.on("click",function(){playRecording(v.id,v.event.episodeInfo)});
+   $("paper-material",rec).text(v.event.episodeInfo);
+   //$("paper-material",rec).text(v.event.text);
+   $("#dialogData").append(rec);
+  });  
+  var elems=$("#dialogData").children("paper-button").get();
+   elems.sort(function(a,b){return parseInt(a.id)>b.id;});
+  $("#dialogData").append(elems);  
+  $("#uiDialog").get(0).open();
  }
+}
+
+function playRecording(id,name){
+ $.get(urls("play_recording")+id,function(){
+  $().toast({text:"PLAYING: "+name});
+  $("#uiDialog").get(0).close();
+ });
 }
 </script>

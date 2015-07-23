@@ -26,7 +26,6 @@ paper-dialog{z-index:99!important;background:var(--ee-front);}
 paper-material,paper-menu{background:var(--paper-grey-50);}
 paper-item{cursor:pointer;}
 
-
 #drawer::-webkit-scrollbar{width:10px;}
 #mainContainer::-webkit-scrollbar{width:10px;}
 #drawer::-webkit-scrollbar-thumb{background-color:var(--ee-front);border-radius:2px;}
