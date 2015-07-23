@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en" data-framework="polymer">
+<head>
+ <meta charset="utf-8">
+ <title>EE TV GUI</title>
+ <meta name="language" content="english"/>
+ <meta name="theme-color" content="#009C9C">
+ <meta http-equiv="Cache-control" content="public"> 
+ <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+ <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+ <script type="text/javascript" src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+ <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+ <script type="text/javascript" src="./images/jquery.plugins.js" name="Custom Plugins"></script> 
+ <link rel="import" href="../bower_components/vulcanized-full.html" name="Polymer"/>
+ <link rel="import" href="./images/main-style.css" name="Custom Styles"/> 
+ <link rel="import" href="./custom/ee-recording.html"/>
+ <link rel="import" href="./custom/ee-channel.html"/>
+ <link rel="manifest" href="./app-manifest.json"/>
+</head>
+<body unresolved>
+<template is="dom-bind" id="ee-tv-gui">
+ <paper-drawer-panel force-narrow id="page">
+  <paper-material id="drawer" elevation="5" drawer>
+   <img src="./images/logo.png" class="" alt="" title=""/>
+   <paper-menu class="list" style="padding:0px;">
+    <paper-item file="remote.html">Remote</paper-item>
+    <paper-item file="channels.html">Channels</paper-item>
+    <paper-item file="recordings.html">Recordings</paper-item>
+    <paper-item>Play URL</paper-item>
+   </paper-menu>
+   <paper-progress max="100" class="green" indeterminate></paper-progress>
+  </paper-material>
+  <paper-header-panel id="main" mode="standard" main>
+   <paper-toolbar mode="none">
+     <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
+     <span id="gui-title-bar" class="title">EE TV : CONNECTING</span>
+     <paper-spinner id="gui-status" active></paper-spinner>
+   </paper-toolbar>
+   <div size="fullScreen"><table width="100%" height="100%"><tr><th align="center">
+    <h1 style="font-size:50px;">FINDING YOUR<br>EE TV</h1>
+    <paper-spinner style="width:75px;height:75px;margin:20px;" active></paper-spinner>
+    <h2 style="font-size:25px;">Please Wait</h2>
+   </th></tr></table></div>
+  </paper-header-panel>
+ </paper-drawer-panel>
+ <paper-material id="drawer-fake" elevation="5">
+  **FAKE DRAWER : DO NOT USE**
+ </paper-material>
+ <paper-toast-stack>
+ </paper-toast-stack> 
+</template>
+<script type="text/javascript">
+var app=document.querySelector("#ee-tv-gui");
+var unix=parseInt(new Date().getTime()),start=1,tv_data="";
+var scheme="http://",host="",hostlist=[],attempt=0,paths={"":"",
+ "recordings":"/PVR/Records/getList?type=regular&avoidHD=0&tvOnly=0",
+ "remote_keys":"/RemoteControl/KeyHandling/sendKey?avoidLongPress=1&key=",
+ "channels":"/Live/Channels/getList?tvOnly=0&avoidHD=0&allowHidden=0&fields=name,id,zap,isDVB,hidden,rank,isHD,logo",
+ "play_video":"/Live/External/play?position=0&url=", //PLAYS FROM INTERNET ON TV
+ "play_recording":"/PVR/Records/play?recordId=", //PLAYS FROM PVR ON TV
+ "get_download_session_id":"/PVR/Records/session?recordId=",
+ "download_file_by_session_id":"/PVR/Records/getVideo?sessionId=",
+ "find_programme":"/EPG/Programs/find?fieldName=name&fieldValue=", // &zap=
+ "channel_logos":"/Live/Channels/getLogo?zap=",
+ "cancel_timer":"/EPG/Timers/delete?timerId=",
+ "timers":"/EPG/Timers/getConfig",
+ "zap":"/Live/Channels/zap?zap=", //CHANGE TV CHANNEL
+ "info":"/UPnP/Device/getInfo"
+};
+ 
+$(document).on("ready",function(){
+ $("#mainContainer").removeClass("style-scope");
+ $("paper-item[file*='.']").loadSelected({delay:500});
+ $("paper-spinner").prepend($("<span/>").addClass("orange"));
+ $(document).ajaxStart(function(){$("paper-spinner").attr("active","");});
+ $(document).ajaxStop(function(){$("paper-spinner").removeAttr("active");});
+   
+ $("body").on("click",function(){
+  var size=$("paper-drawer-panel").prop("selected");
+  var offset=(size=="main")?"12px":"268px";
+  $("paper-toast-stack").animate({
+   "left":offset
+  });
+ });
+   
+ $("paper-item:contains('URL')").on("click",function(page){
+  var link="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4";
+  var pushlink=encodeURIComponent(prompt("Enter URL You Want To Watch",link));
+  if(pushlink.match("http")){$.get(urls("play_video")+pushlink);}
+  document.querySelector("paper-drawer-panel").closeDrawer();
+ });
+ 
+ $(window).on("load",function(){
+  hostlist=["192.168.1.240","192.168.10.187"];
+  urls=function(key){return scheme+host+paths[key];};
+  attempt=0;$(window).trigger("connect");
+ });
+ 
+ $(window).on("connect",function(){console.clear();
+  if(hostlist.length==0){return $(window).trigger("notv");}else{attempt++;}
+  $.getJSON("http://"+hostlist[0]+"/UPnP/Device/getInfo?nc="+unix,function(info_data){
+   var powerOn="http://"+hostlist[0]+"/RemoteControl/KeyHandling/sendKey?avoidLongPress=1&key=on_off";
+   if(!info_data.pvr.available){$.get(powerOn,function(){$().sleep(2500,function(){$(window).trigger("connect");});});}
+   else{tv_data=info_data;$(window).trigger("init",{"host":this.url.split("/")[2],"attempt":attempt});}
+  }).error(function(e){hostlist.shift();$(window).trigger("connect");});
+ });
+
+ $(window).on("init",function(e,data){
+  if(data.host){host=atob(btoa(data.host));}
+  $("paper-menu,iron-pages").prop("selected",start);
+  var used=parseInt(tv_data.pvr.status.disk.usedSpace/1024/1024);
+		var total=parseInt(tv_data.pvr.status.disk.totalSpace/1024/1024);
+  $("paper-progress").attr("value",tv_data.pvr.status.disk.percent).removeAttr("indeterminate");
+  $("paper-progress").append("<span><b>"+used+"GB</b> of <b>"+total+"GB</b></span>");
+  $("paper-progress").append("<code>Connected via: "+host+"</code>");
+  $("paper-spinner span").removeAttr("class").addClass("green");
+  if(!tv_data.pvr.available){$(window).trigger("load");}
+  $("paper-item").eq(start).click();
+ });
+ 
+ $(window).on("notv",function(){
+  $("paper-spinner span").removeAttr("class").addClass("red");
+  $("#mainContainer h2").first().html("<a href='./'>Try Again</a>");
+  $("#mainContainer h1").first().html("EE TV<br>NOT FOUND");
+  $("#mainContainer paper-spinner").html("&nbsp;");
+ });
+});
+</script>
+</body>
+</html>

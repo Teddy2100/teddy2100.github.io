@@ -1,0 +1,29 @@
+<style is="custom-style">
+ div.channel{font-family:'NobbleeLight','Roboto',sans-serif!important;cursor:pointer;}
+ div.channel{display:inline-block;margin:8px;border-radius:8px;border:2px solid var(--ee-front);}
+ div.channel{background:url('./images/static.png');width:120px;height:60px;line-height:60px;font-size:50px;position:relative;}
+ div.channel img{position:absolute;top:0px;left:0px;box-sizing:border-box;width:100%;height:100%;border-radius:6px;}
+</style>
+<center id="uiContainer">
+ LOADING
+</center>
+<script>
+console.log("CHANNELS LOADED");
+$("#uiContainer").empty();//CLEAN CONTAINER
+
+$.getJSON(urls("channels"),function(channel_data){$.each(channel_data,function(k,json){
+ var logo=$("<img/>").attr("src",urls("channel_logos")+json.zap);
+ var holder=$("<div/>").addClass("channel").text(json.zap);
+  logo.attr("onerror","this.src='./images/space.png';");   
+  holder.on("click",function(obj){zapChannel(json);});
+ $("#uiContainer").append(holder.append(logo));
+})}).error(function(){
+ alert("ERROR CONNECTING");
+});
+
+function zapChannel(obj){
+ $.get(urls("zap")+obj.zap,function(){
+  $().toast({text:"PLAYING: "+obj.name});
+ });
+}
+</script>

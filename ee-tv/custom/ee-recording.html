@@ -1,0 +1,48 @@
+<dom-module id="ee-recording">
+ <style>
+  :host td{vertical-align:top;height:100%;}
+  :host table,pre{font-family:'Roboto',sans-serif;}
+  :host th{line-height:15px;font-size:15px;height:16px;}
+  :host table{width:100%;border-spacing:4px;line-height:0px;}
+  :host{@apply(--shadow-transition);@apply(--shadow-elevation-2dp);max-width:600px;}
+  :host{-webkit-user-select:none;-webkit-tap-highlight-color:rgba(255,255,255,0);cursor:default;}
+  :host{display:block;position:relative;background:var(--ee-front);margin:10px auto;border-radius:6px;}
+  
+  :host pre{font-size:15px;line-height:15px;border-radius:4px;border:1px solid var(--ee-border);min-height:78px;margin:0px;background:var(--paper-grey-100);}
+  :host img{border-radius:4px;border:1px solid var(--ee-border);width:150px;height:100px;}
+  
+  paper-icon-button{position:absolute;bottom:5px;right:5px;color:red;}  
+  
+  @media screen and (max-width:640px){
+   :host img{width:100px;height:65px;}
+   :host pre{min-height:44px;}
+  }
+ </style>
+ <template>
+  <table>
+   <tr><td rowspan="2"><img src="{{src}}"/></td><th width="100%">{{title}}</th></tr>
+   <tr><td><pre id="ee-content"><content></content></pre></td></tr>
+  </table>  
+  <paper-icon-button icon="file-download" on-click="getvideo"></paper-icon-button>
+ </template>
+</dom-module>
+
+<script>
+Polymer({
+ is:'ee-recording',
+ ready:function(){
+  if(this.video==""){
+   $("paper-icon-button").hide();
+  }
+ },
+ getvideo:function(e,b,i){
+  $("paper-spinner").attr("active",1);
+  var url=ip+"/PVR/Records/session?recordId=";
+  $.getJSON(url+$(this).attr("video"),function(json){
+   console.log("MP4",ip+"/PVR/Records/getVideo?sessionId="+json.id);
+   location.href=ip+"/PVR/Records/getVideo?sessionId="+json.id;
+   $("paper-spinner").removeAttr("active");
+  });
+ }
+});
+</script>
