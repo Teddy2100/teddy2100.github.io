@@ -4,7 +4,7 @@ var options={branch:"master",cacheDir:".page"};
  
 gulp.task("deploy",function(){
  var folders=["./**/*","!node_modules/**","!required/**","!.git/**"];
- return gulp.src(folders).pipe(ghPages(options));
+ return gulp.src(folders,{dot:true}).pipe(ghPages(options));
 });
 
 gulp.task("default",function(){
