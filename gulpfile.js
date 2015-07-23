@@ -5,10 +5,10 @@ var options={branch:'master',cacheDir:'.git/www'};
  
 gulp.task('deploy',function(){
  var folders=['./**/*','!node_modules/**','!required/**'];
- return gulp.src(['./**/*','!\.git/**']).pipe(exclude())
+ return gulp.src(['./**/*','!^.git/**']).pipe(exclude())
   .pipe(ghPages(options));
 });
 
 gulp.task('default',function(){
- console.log('TEST');
+ console.log('No Auto Run Setup');
 });
