@@ -5,15 +5,13 @@
  <title>EE TV GUI</title>
  <meta name="language" content="english"/>
  <meta name="theme-color" content="#009C9C">
- <meta http-equiv="Cache-control" content="public"> 
  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
  <script type="text/javascript" src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
  <script type="text/javascript" src="./images/jquery.plugins.js" name="Custom Plugins"></script> 
- <link rel="import" href="../bower_components/vulcanized-full.html" name="Polymer"/>
+ <link rel="import" href="../bower_components/vulcanized-min.html" name="Polymer"/>
  <link rel="import" href="./images/main-style.css" name="Custom Styles"/> 
- <link rel="import" href="./custom/ee-recording.html"/>
  <link rel="manifest" href="./app-manifest.json"/>
 </head>
 <body unresolved>
@@ -124,51 +122,6 @@ $(document).on("ready",function(){
   $("#mainContainer paper-spinner").html("&nbsp;");
  });
 });
-
-window.import=function(obj){
- var base=document.querySelector("base[href]");
- var links=document.querySelectorAll("link[rel='import']");
- for(var l=0;l<=links.length;l++){if(l<links.length){
-  console.log("FOUND",links[l].href);
-
-   //if(links[l].href.indexOf(obj)){
-
-   //}
-
-  continue;
- }else{
-  console.log("NEW",rel_to_abs(obj));
- }};
-};
-
-window.import("./custom/ee-channel.html");
-
-
-function rel_to_abs(url){
- var base_url=document.querySelector("base[href]"); 
- if(url==undefined){alert("Invalid use of function.");return "url argument not found";}
- if(/^(https?|file|ftps?|mailto|javascript|data:image\/[^;]{2,9};):/i.test(url)){return url;}
- if(base_url){base_url=base_url.href;}else{base_url=location.href.match(/^(.+)\/?(?:#.+)?$/)[0]+"/";}
- 
-    if(url.substring(0,2) == "//")
-        return location.protocol + url;
-    else if(url.charAt(0) == "/")
-        return location.protocol + "//" + location.host + url;
-    else if(url.substring(0,2) == "./")
-        url = "." + url;
-    else if(/^\s*$/.test(url))
-        return ""; //Empty = Return nothing
-    else url = "../" + url;
-
-
-    url = base_url + url;
-    var i=0
-    while(/\/\.\.\//.test(url = url.replace(/[^\/]+\/+\.\.\//g,"")));
-
-    /* Escape certain characters to prevent XSS */
-  url=url.replace(/\.$/,"").replace(/\/\./g,"").replace(/"/g,"%22").replace(/'/g,"%27").replace(/</g,"%3C").replace(/>/g,"%3E");
- return url;
-}
 </script>
 </body>
 </html>
