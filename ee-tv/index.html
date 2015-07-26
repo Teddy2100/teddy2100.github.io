@@ -55,9 +55,9 @@
  </paper-dialog>
 </template>
 <script type="text/javascript">
+var unix=parseInt(new Date().getTime()),start=1;
 var urls=function(key){return scheme+host+paths[key];};
-var unix=parseInt(new Date().getTime()),start=1,tv_data="";
-var scheme="http://",host="192.168.1.1",hostlist=[],attempt=0,paths={"":"",
+var scheme="http://",host="192.168.1.1",tv_data="",paths={"":"",
  "recordings":"/PVR/Records/getList?type=regular&avoidHD=0&tvOnly=0",
  "remote_keys":"/RemoteControl/KeyHandling/sendKey?avoidLongPress=1&key=",
  "channels":"/Live/Channels/getList?tvOnly=0&avoidHD=0&allowHidden=0&fields=name,id,zap,isDVB,hidden,rank,isHD,logo",
