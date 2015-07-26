@@ -7,18 +7,17 @@
  <meta name="theme-color" content="#009C9C">
  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
- <script type="text/javascript" src="../bower_components/jquery/dist/jquery.min.js"></script>
  <script type="text/javascript" src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
- <script type="text/javascript" src="./images/jquery.plugins.js" name="Custom Plugins"></script> 
- <link rel="import" href="../bower_components/vulcanized-min.html" name="Polymer"/>
- <link rel="import" href="./images/main-style.css" name="Custom Styles"/> 
+ <script type="text/javascript" src="../bower_components/jquery/dist/jquery.min.js"></script>
+ <link rel="import" href="../bower_components/vulcanized-full.html"/>
  <link rel="manifest" href="./app-manifest.json"/>
+ <link rel="import" href="./app-setup.html"/> 
 </head>
-<body unresolved>
+<body>
 <template is="dom-bind" id="ee-tv-gui">
  <paper-drawer-panel force-narrow id="page">
   <paper-material id="drawer" elevation="5" drawer>
-   <img src="./images/logo.png" class="" alt="" title=""/>
+   <img src="./images/logo.png" alt="Logo" title="Logo"/>
    <paper-menu class="list" style="padding:0px;">
     <paper-item file="remote.html">Remote</paper-item>
     <paper-item file="channels.html">Channels</paper-item>
@@ -89,7 +88,7 @@ $(document).on("ready",function(){
   attempt=0;$(window).trigger("connect");
  });
  
- $(window).on("connect",function(){console.clear();
+ $(window).on("connect",function(){
   if(hostlist.length==0){return $(window).trigger("notv");}else{attempt++;}
   $.getJSON("http://"+hostlist[0]+"/UPnP/Device/getInfo?nc="+unix,function(info_data){
    var powerOn="http://"+hostlist[0]+"/RemoteControl/KeyHandling/sendKey?avoidLongPress=1&key=on_off";
@@ -109,6 +108,7 @@ $(document).on("ready",function(){
   $("paper-spinner span").removeAttr("class").addClass("green");
   if(!tv_data.pvr.available){$(window).trigger("load");}
   $("paper-item").eq(start).click();
+  //console.clear();
  });
  
  $(window).on("notv",function(){
@@ -118,6 +118,14 @@ $(document).on("ready",function(){
   $("#mainContainer paper-spinner").html("&nbsp;");
  });
 });
+
+if("serviceWorker" in navigator){
+ navigator.serviceWorker.register("./worker.js").then(function(reg){
+  console.log("Registration succeeded. Scope is "+reg.scope);
+ }).catch(function(error){
+  console.log("Registration failed with "+error);
+ });
+};
 </script>
 </body>
 </html>
