@@ -45,39 +45,55 @@ $.fn.extend({
 </script>
 <style is="custom-style">
 :root{
- --ee-back:#3E3E3E;
- --ee-front:#009C9C;
- --ee-border:#00AEAA;
- --ee-text:#FFE600;
+ --primary-text-color:#FFE600;
+ --dark-primary-color:#008E8E;
+ --default-primary-color:#009C9C;
+ --primary-background-color:#3E3E3E;
+ --secondary-background-color:#000000;
+
+ --paper-spinner-layer-1-color:var(--primary-text-color);
+ --paper-spinner-layer-2-color:var(--primary-text-color);
+ --paper-spinner-layer-3-color:var(--primary-text-color);
+ --paper-spinner-layer-4-color:var(--primary-text-color); 
+ --paper-input-container-input:{text-align:center;color:var(--text-primary-color);}
+ --paper-input-container-label:{text-align:center;color:var(--default-primary-color);}
+ --paper-toolbar:{color:var(--primary-text-color);font-family:'Nobblee','Roboto',sans-serif;}
+ --paper-item:{color:var(--secondary-background-color);}
 }
 
+@font-face{font-family:'Nobblee';src:url('./images/nobblee_regular.ttf'),url('./images/nobblee_regular.woff');}
+@font-face{font-family:'NobbleeLight';src:url('./images/nobblee_light.ttf'),url('./images/nobblee_light.woff');}
+
+paper-dialog .holder th:{padding-top:5px;} paper-dialog div.buttons{padding:0px!important;}
+paper-dialog div.buttons paper-button{margin:2px 0px 0px 2px;} paper-dialog paper-button:hover{background:var(--dark-primary-color);}
+paper-dialog{overflow:hidden;border:2px solid var(--default-primary-color);background:var(--default-primary-color);border-radius:4px;max-width:500px;}
+paper-dialog .holder{position:relative;padding:0px;margin:0px;border-radius:2px;background:var(--primary-background-color);color:var(--primary-text-color);}
+paper-dialog .holder th{color:var(--primary-text-color);text-align:center;font-family:'NobbleeLight','Roboto',sans-serif!important;font-size:25px;}
+paper-dialog paper-button{color:var(--primary-text-color);white-space:nowrap;font-family:'NobbleeLight','Roboto',sans-serif;font-size:20px;}
+ 
 a{color:#FF0000;text-decoration:none;}
-
-@font-face{font-family:'Nobblee';src:url('./images/nobblee_regular.woff'),url('./images/nobblee_regular.ttf');}
-@font-face{font-family:'NobbleeLight';src:url('./images/nobblee_light.woff'),url('./images/nobblee_light.ttf');}
-
-h1,h2,.title{color:var(--ee-text);font-family:'Nobblee','Roboto',sans-serif!important;margin:0px!important;}
-paper-toolbar{background:var(--ee-front);color:var(--ee-text);font-family:'Nobblee','Roboto',sans-serif!important;}
+h1,h2,.title{color:var(--primary-text-color);font-family:'Nobblee','Roboto',sans-serif!important;margin:0px!important;}
 table[size='fullScreen']{position:absolute;top:0px;bottom:0px;left:0px;right:0px;height:100%!important;width:100%!important;}
-body{background:var(--ee-back);color:var(--ee-text);-webkit-user-select:none;-webkit-tap-highlight-color:rgba(255,255,255,0);cursor:default;}
+body{background:var(--ee-back);color:var(--text-primary-color);-webkit-user-select:none;-webkit-tap-highlight-color:rgba(255,255,255,0);cursor:default;}
 paper-progress code{position:absolute;font-size:12px;top:-20px;width:100%;text-align:center;padding:2px;color:#000000;overflow:hidden;}
 paper-progress{position:fixed;bottom:0px;width:252px;height:18px;border:1px solid black;box-sizing:border-box;margin:2px;}
 paper-progress span{position:absolute;font-size:12px;top:0px;width:100%;text-align:center;padding:2px;color:#000000;}
 paper-toast-stack paper-toast{position:relative!important;width:100%;margin-left:-12px;margin-top:12px;}
 paper-toast-stack paper-toast{text-align:center;text-transform:uppercase;color:#FFE600;}
 paper-toast-stack{position:fixed;bottom:0px;left:12px;right:12px;margin:0px;}
-paper-header-panel > div{padding:0px 10px;color:var(--ee-text);}
-paper-dialog{z-index:99!important;background:var(--ee-front);}
+paper-header-panel > div{padding:0px 10px;color:var(--text-primary-color);}
+paper-dialog{z-index:99!important;background:var(--default-primary-color);}
 paper-material,paper-menu{background:var(--paper-grey-50);}
+paper-toast-stack{z-index:999;}
 paper-item{cursor:pointer;}
 
 #drawer::-webkit-scrollbar{width:10px;}
 #mainContainer::-webkit-scrollbar{width:10px;}
-#drawer::-webkit-scrollbar-thumb{background-color:var(--ee-front);border-radius:2px;}
-#mainContainer::-webkit-scrollbar-thumb{background-color:var(--ee-front);border-radius:2px;}
-#mainContainer{background:linear-gradient(#3e3e3e 25%,#000000 100%);text-align:center;padding:10px!important;}
-#gui-status span{border-radius:50px;position:absolute;top:0px;bottom:0px;left:0px;right:0px;border:1px solid var(--ee-text);margin:6px;}
-#gui-status span.orange{background:radial-gradient(ellipse at center, #EAB775 0%,#ED8A00 100%)!important;}
+#drawer::-webkit-scrollbar-thumb{background-color:var(--default-primary-color);border-radius:2px;}
+#mainContainer::-webkit-scrollbar-thumb{background-color:var(--default-primary-color);border-radius:2px;}
+#mainContainer{background:linear-gradient(var(--primary-background-color) 25%,var(--secondary-background-color) 100%);text-align:center;padding:10px!important;}
+#gui-status span{border-radius:50px;position:absolute;top:0px;bottom:0px;left:0px;right:0px;border:1px solid var(--text-primary-color);margin:6px;}
+#gui-status span.orange{background:radial-gradient(ellipse at center, #EAB775 0%,#ED8A00 100%)!important;}
 #gui-status span.green{background:radial-gradient(ellipse at center, #7FFF7F 0%,#00CF00 100%)!important;}
 #gui-status span.blue{background:radial-gradient(ellipse at center, #7F7FFF 0%,#0000CF 100%)!important;}
 #gui-status span.red{background:radial-gradient(ellipse at center, #FF7F7F 0%,#CF0000 100%)!important;}
@@ -91,12 +107,5 @@ paper-item{cursor:pointer;}
 
 @media screen and (max-height:380px){
  #drawer img:first-of-type{display:none;}
-}
-
-paper-spinner{
- --paper-spinner-layer-1-color:color:var(--ee-text);
- --paper-spinner-layer-2-color:color:var(--ee-text);
- --paper-spinner-layer-3-color:color:var(--ee-text);
- --paper-spinner-layer-4-color:color:var(--ee-text);
 }
 </style>

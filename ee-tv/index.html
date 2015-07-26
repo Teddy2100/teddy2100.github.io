@@ -9,12 +9,14 @@
  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
  <script type="text/javascript" src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
  <script type="text/javascript" src="../bower_components/jquery/dist/jquery.min.js"></script>
+ <script type="text/javascript" src="./images/jquery.cookie.js"></script>
  <link rel="import" href="../bower_components/vulcanized-full.html"/>
  <link rel="manifest" href="./app-manifest.json"/>
  <link rel="import" href="./app-setup.html"/> 
 </head>
 <body>
-<template is="dom-bind" id="ee-tv-gui">
+<template is="dom-bind" id="tv-gui">
+ <paper-toast-stack></paper-toast-stack> 
  <paper-drawer-panel force-narrow id="page">
   <paper-material id="drawer" elevation="5" drawer>
    <img src="./images/logo.png" alt="Logo" title="Logo"/>
@@ -30,25 +32,32 @@
    <paper-toolbar mode="none">
      <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
      <span id="gui-title-bar" class="title">EE TV : CONNECTING</span>
-     <paper-spinner id="gui-status" active></paper-spinner>
+     <paper-spinner id="gui-status"></paper-spinner>
    </paper-toolbar>
-   <div size="fullScreen"><table width="100%" height="100%"><tr><th align="center">
-    <h1 style="font-size:50px;">FINDING YOUR<br>EE TV</h1>
-    <paper-spinner style="width:75px;height:75px;margin:20px;" active></paper-spinner>
-    <h2 style="font-size:25px;">Please Wait</h2>
-   </th></tr></table></div>
   </paper-header-panel>
  </paper-drawer-panel>
  <paper-material id="drawer-fake" elevation="5">
   **FAKE DRAWER : DO NOT USE**
  </paper-material>
- <paper-toast-stack>
- </paper-toast-stack> 
+ <paper-dialog id="connect" modal>
+  <table class="holder"><tr><th colspan="100">CONNECT ON IP</th></tr><tr>
+   <td><paper-input size="3" maxlength="3" label="192" pattern="^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$" no-label-float auto-validate></paper-input></td>
+   <td style="font-size:30px;">.</td>
+   <td><paper-input size="3" maxlength="3" label="168" pattern="^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$" no-label-float auto-validate></paper-input></td>
+   <td style="font-size:30px;">.</td>
+   <td><paper-input size="3" maxlength="3" label="1" pattern="^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$" no-label-float auto-validate></paper-input></td>
+   <td style="font-size:30px;">.</td>
+   <td><paper-input size="3" maxlength="3" label="1" pattern="^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$" no-label-float auto-validate></paper-input></td>
+  </tr></table>
+  <div class="buttons">
+   <paper-button autofocus>CONNECT</paper-button>
+  </div>
+ </paper-dialog>
 </template>
 <script type="text/javascript">
-var app=document.querySelector("#ee-tv-gui");
+var urls=function(key){return scheme+host+paths[key];};
 var unix=parseInt(new Date().getTime()),start=1,tv_data="";
-var scheme="http://",host="",hostlist=[],attempt=0,paths={"":"",
+var scheme="http://",host="192.168.1.1",hostlist=[],attempt=0,paths={"":"",
  "recordings":"/PVR/Records/getList?type=regular&avoidHD=0&tvOnly=0",
  "remote_keys":"/RemoteControl/KeyHandling/sendKey?avoidLongPress=1&key=",
  "channels":"/Live/Channels/getList?tvOnly=0&avoidHD=0&allowHidden=0&fields=name,id,zap,isDVB,hidden,rank,isHD,logo",
@@ -65,52 +74,54 @@ var scheme="http://",host="",hostlist=[],attempt=0,paths={"":"",
 };
  
 $(document).on("ready",function(){
+ if($.cookie("host")){host=$.cookie("host");}
  $("#mainContainer").removeClass("style-scope");
  $("paper-item[file*='.']").loadSelected({delay:500});
  $("paper-spinner").prepend($("<span/>").addClass("orange"));
  $(document).ajaxStart(function(){$("paper-spinner").attr("active","");});
  $(document).ajaxStop(function(){$("paper-spinner").removeAttr("active");});
- 
+ var inputs=document.querySelector("#connect").querySelectorAll("paper-input");
+
  var menu=document.querySelector("paper-drawer-panel");
   menu.closeDrawer=function(){$("paper-toast-stack").animate({"left":"12px"});this.selected="main";};
   menu.openDrawer=function(){$("paper-toast-stack").animate({"left":"268px"});this.selected="drawer";};
-   
+
  $("paper-item:contains('URL')").on("click",function(page){
   var link="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4";
   var pushlink=encodeURIComponent(prompt("Enter URL You Want To Watch",link));
   if(pushlink.match("http")){$.get(urls("play_video")+pushlink);}
   document.querySelector("paper-drawer-panel").closeDrawer();
  });
- 
- $(window).on("load",function(){
-  hostlist=["192.168.1.240","192.168.10.187"];
-  urls=function(key){return scheme+host+paths[key];};
-  attempt=0;$(window).trigger("connect");
+
+ $("paper-button:contains('CONNECT')").on("click",function(event){
+  var t=[];$(inputs).each(function(k,v){t[k]=v.value?v.value:v.label;});host=t.join(".");  
+  var powerOn="http://"+host+"/RemoteControl/KeyHandling/sendKey?avoidLongPress=1&key=on_off";
+  $.getJSON("http://"+host+"/UPnP/Device/getInfo?nc="+parseInt(new Date().getTime()),function(info_data){
+   if(!info_data.pvr.available){$.get(powerOn,function(){$().sleep(5000,function(){$(window).trigger("connect");});});}
+   if(info_data.pvr.available){tv_data=info_data;$(window).trigger("connect");}
+  }).error(function(e){$().toast({text:"FAILED TO CONNECT TO "+host,type:"alert"});});
  });
- 
- $(window).on("connect",function(){
-  if(hostlist.length==0){return $(window).trigger("notv");}else{attempt++;}
-  $.getJSON("http://"+hostlist[0]+"/UPnP/Device/getInfo?nc="+unix,function(info_data){
-   var powerOn="http://"+hostlist[0]+"/RemoteControl/KeyHandling/sendKey?avoidLongPress=1&key=on_off";
-   if(!info_data.pvr.available){$.get(powerOn,function(){$().sleep(2500,function(){$(window).trigger("connect");});});}
-   else{tv_data=info_data;$(window).trigger("init",{"host":this.url.split("/")[2],"attempt":attempt});}
-  }).error(function(e){hostlist.shift();$(window).trigger("connect");});
+  
+ $(window).on("load",function(){
+  $(host.split(".")).each(function(k,v){inputs[k].label=v});
+  document.querySelector("#connect").open();
  });
 
- $(window).on("init",function(e,data){
-  if(data.host){host=atob(btoa(data.host));}
+ $(window).on("connect",function(e,data){
   $("paper-menu,iron-pages").prop("selected",start);
   var used=parseInt(tv_data.pvr.status.disk.usedSpace/1024/1024);
 		var total=parseInt(tv_data.pvr.status.disk.totalSpace/1024/1024);
+  $().sleep(1000,function(){$("paper-item").eq(start).trigger("click");});
   $("paper-progress").attr("value",tv_data.pvr.status.disk.percent).removeAttr("indeterminate");
   $("paper-progress").append("<span><b>"+used+"GB</b> of <b>"+total+"GB</b></span>");
   $("paper-progress").append("<code>Connected via: "+host+"</code>");
   $("paper-spinner span").removeAttr("class").addClass("green");
-  if(!tv_data.pvr.available){$(window).trigger("load");}
-  $("paper-item").eq(start).click();
-  //console.clear();
+  document.querySelector("#connect").close();
+  $().toast({text:"CONNECT TO "+host});  
+  $.cookie("host",host,{expires:7});
+  console.clear();
  });
- 
+   
  $(window).on("notv",function(){
   $("paper-spinner span").removeAttr("class").addClass("red");
   $("#mainContainer h2").first().html("<a href='./'>Try Again</a>");
@@ -119,6 +130,7 @@ $(document).on("ready",function(){
  });
 });
 
+/* DISABLE OFFLINE SUPPORT
 if("serviceWorker" in navigator){
  navigator.serviceWorker.register("./worker.js").then(function(reg){
   console.log("Registration succeeded. Scope is "+reg.scope);
@@ -126,6 +138,7 @@ if("serviceWorker" in navigator){
   console.log("Registration failed with "+error);
  });
 };
+*/
 </script>
 </body>
 </html>

@@ -2,24 +2,20 @@
  div.recording{max-width:530px;max-height:340px;width:530px;height:340px;}
  div.recording{background-size:cover;position:relative;box-sizing:border-box;}
  div.recording{font-family:'NobbleeLight','Roboto',sans-serif!important;cursor:pointer;}
- div.recording{display:inline-block;margin:8px;border-radius:8px;border:2px solid var(--ee-front);}
+ div.recording{display:inline-block;margin:8px;border-radius:8px;border:2px solid var(--default-primary-color);}
  div.fader{width:100%;height:100%;background:linear-gradient(to bottom,rgba(0,0,0,0.00) 60%,rgba(0,0,0,0.75) 90%);}
- paper-dialog paper-button{font-family:'NobbleeLight','Roboto',sans-serif;font-size:20px;color:var(--ee-text);white-space:nowrap;}
- div.scroller::-webkit-scrollbar-thumb{background-color:var(--ee-front);border:2px solid #3E3E3E;border-radius:2px;}
+ div.scroller::-webkit-scrollbar-thumb{background-color:var(--default-primary-color);border:2px solid #3E3E3E;border-radius:2px;}
+ div.fader p{position:absolute;left:0px;right:0px;bottom:0px;margin:0px;font-size:40px;padding:5px 10px;color:var(--primary-text-color);} 
  div.scroller paper-button{margin:0px;margin-top:5px;}div.scroller paper-button:first-of-type{margin-top:0px;}
- div.fader p{position:absolute;left:0px;right:0px;bottom:0px;margin:0px;font-size:40px;padding:5px 10px;} 
  div.fader{border-bottom-right-radius:6px;border-bottom-left-radius:6px;box-sizing:border-box;} 
  div.fader p{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;}
- paper-dialog{overflow:hidden;border:2px solid var(--ee-front);border-radius:4px;}
  div.scroller{overflow:auto;box-sizing:border-box;max-height:300px;padding:5px;}
  div.holder{position:relative;padding:0px;margin:0px;background:#3E3E3E;}
  div.buttons,div.holder,div.scroller{box-sizing:border-box;}
- paper-dialog paper-button:hover{background:#008E8E;}
  div.buttons paper-button{margin:5px 5px 5px 0px;}
  div.scroller::-webkit-scrollbar{width:10px;}
  div.scroller paper-button{width:100%;}
  div.buttons{padding:0px!important;}
- paper-dialog{max-width:500px;}
  
  @media screen and (max-width:640px){
   div.recording{width:340px;height:220px;}

@@ -20,7 +20,7 @@ $.fn.extend({
     toast.addClass("paper-toast-open").attr({id:x,text:obj.text});   
     toast.css({"background":colors[obj.type]?colors[obj.type]:"#009C9C"});
    $("paper-toast-stack").append(toast).css({"bottom":"-50px"}).sleep(0,function(){
-    $("paper-toast-stack").animate({"bottom":"0px"}).sleep(5000,function(){
+    $("paper-toast-stack").animate({"bottom":"0px"}).sleep(50000,function(){
      $("#"+x).fadeOut("250",function(){$(this).remove();});
     });
    });
