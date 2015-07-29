@@ -12,7 +12,6 @@
 <script>
 console.log("CHANNELS LOADED");
 $("#uiContainer").empty();//CLEAN CONTAINER
-
 $.getJSON(urls("channels"),function(channel_data){$.each(channel_data,function(k,json){
  var logo=$("<img/>").attr("src",urls("channel_logos")+json.zap);
  var holder=$("<div/>").addClass("channel").text(json.zap);
