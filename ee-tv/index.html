@@ -16,7 +16,7 @@
  <link rel="manifest" href="./app-manifest.json"/>
  <link rel="import" href="./app-setup.html"/>
 </head>
-<body>
+<body unresolved>
 <template is="dom-bind" id="tv-gui">
  <paper-toast-stack></paper-toast-stack> 
  <paper-drawer-panel force-narrow id="page">
@@ -34,15 +34,20 @@
    <paper-toolbar mode="none">
      <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
      <span id="gui-title-bar" class="title">EE TV : CONNECTING</span>
-     <paper-spinner id="gui-status"></paper-spinner>
+     <paper-icon-button icon="refresh"></paper-icon-button>
    </paper-toolbar>
+   <neon-animated-pages selected="0" entry-animation="slide-from-right-animation" exit-animation="slide-left-animation">
+    <neon-animatable page="remote.html"></neon-animatable>
+    <neon-animatable page="channels.html"></neon-animatable>
+    <neon-animatable page="recordings.html"></neon-animatable>
+   </neon-animated-pages>
   </paper-header-panel>
  </paper-drawer-panel>
  <paper-material id="drawer-fake" elevation="5">
   **FAKE DRAWER : DO NOT USE**
  </paper-material>
- <paper-dialog id="connect" modal>
-  <table class="holder"><tr><th colspan="100">CONNECT ON IP</th></tr><tr>
+ <paper-dialog id="connect" entry-animation="scale-up-animation" exit-animation="fade-out-animation" modal>
+  <table class="holder" style="min-width:240px;"><tr><th colspan="100" nowrap>CONNECT ON IP</th></tr><tr>
    <td><paper-input type="tel" size="3" maxlength="3" label="192" pattern="^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$" no-label-float auto-validate></paper-input></td>
    <td style="font-size:30px;">.</td>
    <td><paper-input type="tel" size="3" maxlength="3" label="168" pattern="^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$" no-label-float auto-validate></paper-input></td>
@@ -78,10 +83,8 @@ var scheme="http://",host="192.168.1.1",tv_data="",paths={"":"",
 $(document).on("ready",function(){
  if($.cookie("host")){host=$.cookie("host");}
  $("#mainContainer").removeClass("style-scope");
- $("paper-item[file*='.']").loadSelected({delay:500});
- $("paper-spinner").prepend($("<span/>").addClass("orange"));
- $(document).ajaxStart(function(){$("paper-spinner").attr("active","");});
- $(document).ajaxStop(function(){$("paper-spinner").removeAttr("active");});
+ $(document).ajaxStart(function(){$("[icon='refresh']").addClass("spin");});
+ $(document).ajaxStop(function(){$("[icon='refresh']").removeClass("spin");});
  var inputs=document.querySelector("#connect").querySelectorAll("paper-input");
 
  var menu=document.querySelector("paper-drawer-panel");
@@ -96,51 +99,54 @@ $(document).on("ready",function(){
  });
 
  $("paper-button:contains('CONNECT')").on("click",function(event){
-  var t=[];$(inputs).each(function(k,v){t[k]=v.value?v.value:v.label;});host=t.join(".");  
+  var t=[];$(inputs).each(function(k,v){t[k]=v.value?v.value:v.label;});host=t.join(".");
   var powerOn="http://"+host+"/RemoteControl/KeyHandling/sendKey?avoidLongPress=1&key=on_off";
   $.getJSON("http://"+host+"/UPnP/Device/getInfo?nc="+parseInt(new Date().getTime()),function(info_data){
-   if(!info_data.pvr.available){$.get(powerOn,function(){$().sleep(5000,function(){$(window).trigger("connect");});});}
-   if(info_data.pvr.available){tv_data=info_data;$(window).trigger("connect");}
+   if(!info_data.pvr.available){$.get(powerOn,function(){$().sleep(5000,function(){$(window).trigger("connected");});});}
+   if(info_data.pvr.available){tv_data=info_data;$(window).trigger("connected");}
   }).error(function(e){$().toast({text:"FAILED TO CONNECT TO "+host,type:"alert"});});
  });
   
+ $("[icon='refresh']").on("click",function(){
+  var pageHandle=$("neon-animatable[class='iron-selected']");
+  $.get(pageHandle.attr("page")+"?nc="+new Date().getTime(),function(d){
+   console.log("RELOADED",$(this)[0].url);
+   $(pageHandle).html(d);
+  }); 
+ });
+  
  $(window).on("load",function(){
+  document.querySelector("paper-menu").selected=page;
+  document.querySelector("neon-animated-pages").selected=start;
   $(host.split(".")).each(function(k,v){inputs[k].label=v});
   document.querySelector("#connect").open();
  });
 
- $(window).on("connect",function(e,data){
-  $("paper-menu,iron-pages").prop("selected",start);
+ $(window).on("connected",function(e,data){
   var used=parseInt(tv_data.pvr.status.disk.usedSpace/1024/1024);
 		var total=parseInt(tv_data.pvr.status.disk.totalSpace/1024/1024);
-  $().sleep(1000,function(){$("paper-item").eq(start).trigger("click");});
+  $(window).toast({text:"CONNECT TO "+host}).trigger("display",start);
+  $("paper-item[file]").on("click",function(){$(window).trigger("display",$(this).index())});
+  $("neon-animatable").each(function(k,v){$.get($(this).attr("page"),function(d){$(v).html(d);})});
   $("paper-progress").attr("value",tv_data.pvr.status.disk.percent).removeAttr("indeterminate");
   $("paper-progress").append("<span><b>"+used+"GB</b> of <b>"+total+"GB</b></span>");
   $("paper-progress").append("<code>Connected via: "+host+"</code>");
-  $("paper-spinner span").removeAttr("class").addClass("green");
-  document.querySelector("#connect").close();
-  $().toast({text:"CONNECT TO "+host});  
-  $.cookie("host",host,{expires:7});
-  console.clear();
+  $.cookie("host",host,{expires:7});console.clear();
  });
-   
- $(window).on("notv",function(){
-  $("paper-spinner span").removeAttr("class").addClass("red");
-  $("#mainContainer h2").first().html("<a href='./'>Try Again</a>");
-  $("#mainContainer h1").first().html("EE TV<br>NOT FOUND");
-  $("#mainContainer paper-spinner").html("&nbsp;");
+ 
+ $(window).on("display",function(e,page){
+  var pageHandle=document.querySelector("neon-animated-pages");
+  var pageName=document.querySelectorAll("paper-item")[page].innerHTML;
+   if(page==0){$("[icon='refresh']").hide();}else{$("[icon='refresh']").show();}
+   pageHandle.entryAnimation="slide-from-"+(page<pageHandle.selected?"left":"right")+"-animation";
+   pageHandle.exitAnimation="slide-"+(page<pageHandle.selected?"right":"left")+"-animation";
+  document.querySelector("#gui-title-bar").innerHTML="EE TV : "+pageName.toUpperCase();
+  document.querySelector("paper-drawer-panel").closeDrawer();
+  document.querySelector("paper-menu").selected=page;
+  document.querySelector("#connect").close();
+  pageHandle.selected=page;
  });
 });
-
-/* DISABLE OFFLINE SUPPORT
-if("serviceWorker" in navigator){
- navigator.serviceWorker.register("./worker.js").then(function(reg){
-  console.log("Registration succeeded. Scope is "+reg.scope);
- }).catch(function(error){
-  console.log("Registration failed with "+error);
- });
-};
-*/
 </script>
 </body>
 </html>

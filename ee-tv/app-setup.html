@@ -4,16 +4,6 @@ $.ajaxSetup({
 });
 
 $.fn.extend({
- loadSelected:function(setup){
-  $(this).on("click",function(event){
-   document.querySelector("paper-drawer-panel").closeDrawer();
-   $("#gui-title-bar").html("EE TV : "+$(this).text().toUpperCase());
-   var loadFile=$(this).attr("file"),us=unix?unix:new Date().getTime();
-   $().sleep(setup.delay,function(){$.get(loadFile+"?nc="+us,function(html){
-    $("#mainContainer").html(html);
-   });});return $(this);
-  });
- },
  toast:function(obj){
   var x="PT"+new Date().getTime();
   if(obj){var toast=$("<paper-toast/>");
@@ -64,6 +54,11 @@ $.fn.extend({
 @font-face{font-family:'Nobblee';src:url('./images/nobblee_regular.ttf'),url('./images/nobblee_regular.woff');}
 @font-face{font-family:'NobbleeLight';src:url('./images/nobblee_light.ttf'),url('./images/nobblee_light.woff');}
 
+paper-icon-button[icon=menu]{margin-right:8px;}
+paper-toolbar::shadow #topBar{padding:0px 8px!important;}
+paper-icon-button[icon='menu']::shadow #icon{width:32px;height:32px;}
+paper-icon-button[icon='refresh']::shadow #icon{width:32px;height:32px;}
+
 paper-dialog .holder th{padding-top:5px;} paper-dialog div.buttons{padding:0px!important;}
 paper-dialog div.buttons paper-button{margin:2px 0px 0px 2px;} paper-dialog paper-button:hover{background:var(--dark-primary-color);}
 paper-dialog{overflow:hidden;border:2px solid var(--default-primary-color);background:var(--default-primary-color);border-radius:4px;max-width:500px;}
@@ -105,7 +100,7 @@ paper-item{cursor:pointer;}
  height:100%;width:100%;box-sizing:border-box;
 }
 
-@media screen and (max-height:380px){
+@media screen and (max-height:400px){
  #drawer img:first-of-type{display:none;}
 }
 </style>

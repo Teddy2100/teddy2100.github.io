@@ -1,4 +1,7 @@
 <style is="custom-style">
+
+ paper-icon-button[icon='delete']{color:red;position:absolute;top:0px;right:0px;}
+
  div.recording{max-width:530px;max-height:340px;width:530px;height:340px;}
  div.recording{background-size:cover;position:relative;box-sizing:border-box;}
  div.recording{font-family:'NobbleeLight','Roboto',sans-serif!important;cursor:pointer;}
@@ -22,16 +25,17 @@
   div.fader p{font-size:25px;}
  }
 </style>
-<paper-dialog id="uiDialog" modal>
+<paper-dialog id="uiDialog" entry-animation="scale-up-animation" modal>
  <div class="holder"><div class="scroller" id="dialogData">PLEASE WAIT!!</div></div>
  <div class="buttons"><paper-button dialog-confirm autofocus>Close</paper-button></div>
 </paper-dialog>
-<center id="uiContainer">
+<center id="uiContainer" page="recordings.html">
  LOADING
 </center>
 <script>
 console.log("RECORDINGS LOADED");
-$("#uiContainer").empty();//CLEAN CONTAINER
+var page=$("#uiContainer[page='recordings.html']");
+page.empty();//CLEAN CONTAINER
 
 $(window).on("resize",function(){
  setTimeout(function(){
@@ -52,14 +56,15 @@ var ajaxrunner=$.getJSON(urls("recordings"),function(recording_data){
  $.each(sorted,function(k,name){var data=pvrlist[name];
   var fader=$("<div/>").addClass("fader").html("<p>"+name.toUpperCase()+"</p>");
   var holder=$("<div/>").css("background-image","url("+data.image+")").addClass("recording");
+  var bin=$("<paper-icon-button/>").attr("icon","delete").on("click",function(obj){alert();return false;});
    holder.attr("id",data.items[0].startTime);
    holder.on("click",function(obj){showRecordings(data);});
-  $("#uiContainer").append(holder.append(fader));
+  page.append(holder.append(fader).append(bin));
  });
    
- var elems=$("#uiContainer").children("div").get();
+ var elems=page.children("div").get();
   elems.sort(function(a,b){return parseInt(a.id)>parseInt(b.id);});
- $("#uiContainer").append(elems);
+ page.append(elems);
 }).error(function(){
  alert("ERROR CONNECTING");
 });
