@@ -25,8 +25,8 @@
    <paper-menu class="list" style="padding:0px;">
     <paper-item file="remote.html"><iron-icon icon="notification:tap-and-play"></iron-icon>Remote</paper-item>
     <paper-item file="channels.html"><iron-icon icon="apps"></iron-icon>Channels</paper-item>
-    <paper-item file="recordings.html">Recordings</paper-item>
-    <paper-item>Play URL</paper-item>
+    <paper-item file="recordings.html"><iron-icon icon="notification:ondemand-video"></iron-icon>Recordings</paper-item>
+    <paper-item><iron-icon icon="editor:insert-link"></iron-icon>Play URL</paper-item>
    </paper-menu>
    <paper-progress max="100" class="green" indeterminate></paper-progress>
   </paper-material>
@@ -47,7 +47,7 @@
   **FAKE DRAWER : DO NOT USE**
  </paper-material>
  <paper-dialog id="connect" entry-animation="scale-up-animation" exit-animation="fade-out-animation" modal>
-  <table class="holder" style="min-width:240px;"><tr><th colspan="100" nowrap>CONNECT ON IP</th></tr><tr>
+  <table class="holder" style="min-width:240px;"><tr><th colspan="100" nowrap>CONNECT VIA</th></tr><tr>
    <td><paper-input type="tel" size="3" maxlength="3" label="192" pattern="^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$" no-label-float auto-validate></paper-input></td>
    <td style="font-size:30px;">.</td>
    <td><paper-input type="tel" size="3" maxlength="3" label="168" pattern="^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$" no-label-float auto-validate></paper-input></td>
@@ -83,14 +83,13 @@ var scheme="http://",host="192.168.1.1",tv_data="",paths={"":"",
 $(document).on("ready",function(){
  if($.cookie("host")){host=$.cookie("host");}
  $("#mainContainer").removeClass("style-scope");
+ var menu=document.querySelector("paper-drawer-panel");
  $(document).ajaxStart(function(){$("[icon='refresh']").addClass("spin");});
  $(document).ajaxStop(function(){$("[icon='refresh']").removeClass("spin");});
  var inputs=document.querySelector("#connect").querySelectorAll("paper-input");
-
- var menu=document.querySelector("paper-drawer-panel");
   menu.closeDrawer=function(){$("paper-toast-stack").animate({"left":"12px"});this.selected="main";};
   menu.openDrawer=function(){$("paper-toast-stack").animate({"left":"268px"});this.selected="drawer";};
-
+  
  $("paper-item:contains('URL')").on("click",function(page){
   var link="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4";
   var pushlink=encodeURIComponent(prompt("Enter URL You Want To Watch",link));
@@ -118,6 +117,7 @@ $(document).on("ready",function(){
  $(window).on("load",function(){
   document.querySelector("paper-menu").selected=page;
   document.querySelector("neon-animated-pages").selected=start;
+  $("svg[preserveAspectRatio]").removeAttr("preserveAspectRatio");
   $(host.split(".")).each(function(k,v){inputs[k].label=v});
   document.querySelector("#connect").open();
  });
@@ -125,8 +125,8 @@ $(document).on("ready",function(){
  $(window).on("connected",function(e,data){
   var used=parseInt(tv_data.pvr.status.disk.usedSpace/1024/1024);
 		var total=parseInt(tv_data.pvr.status.disk.totalSpace/1024/1024);
-  $(window).toast({text:"CONNECT TO "+host}).trigger("display",start);
-  $("paper-item[file]").on("click",function(){$(window).trigger("display",$(this).index())});
+  $(window).toast({text:"CONNECT TO "+host}).trigger("display",start);  
+  $("paper-item[file]").on("click",function(){$(window).trigger("display",$(this).index())});  
   $("neon-animatable").each(function(k,v){$.get($(this).attr("page"),function(d){$(v).html(d);})});
   $("paper-progress").attr("value",tv_data.pvr.status.disk.percent).removeAttr("indeterminate");
   $("paper-progress").append("<span><b>"+used+"GB</b> of <b>"+total+"GB</b></span>");
@@ -136,7 +136,7 @@ $(document).on("ready",function(){
  
  $(window).on("display",function(e,page){
   var pageHandle=document.querySelector("neon-animated-pages");
-  var pageName=document.querySelectorAll("paper-item")[page].innerHTML;
+  var pageName=document.querySelectorAll("paper-item")[page].innerText;
    if(page==0){$("[icon='refresh']").hide();}else{$("[icon='refresh']").show();}
    pageHandle.entryAnimation="slide-from-"+(page<pageHandle.selected?"left":"right")+"-animation";
    pageHandle.exitAnimation="slide-"+(page<pageHandle.selected?"right":"left")+"-animation";
@@ -146,6 +146,10 @@ $(document).on("ready",function(){
   document.querySelector("#connect").close();
   pageHandle.selected=page;
  });
+});
+
+$(window).bind("load resize",function(){
+
 });
 </script>
 </body>

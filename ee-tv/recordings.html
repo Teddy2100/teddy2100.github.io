@@ -1,5 +1,4 @@
 <style is="custom-style">
-
  paper-icon-button[icon='delete']{color:red;position:absolute;top:0px;right:0px;}
 
  div.recording{max-width:530px;max-height:340px;width:530px;height:340px;}
@@ -60,11 +59,7 @@ var ajaxrunner=$.getJSON(urls("recordings"),function(recording_data){
    holder.attr("id",data.items[0].startTime);
    holder.on("click",function(obj){showRecordings(data);});
   page.append(holder.append(fader).append(bin));
- });
-   
- var elems=page.children("div").get();
-  elems.sort(function(a,b){return parseInt(a.id)>parseInt(b.id);});
- page.append(elems);
+ });page.tagSort({sort:"div",by:"id"});
 }).error(function(){
  alert("ERROR CONNECTING");
 });

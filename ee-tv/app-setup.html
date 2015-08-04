@@ -4,6 +4,14 @@ $.ajaxSetup({
 });
 
 $.fn.extend({
+ tagSort:function(options){
+  var order=[],holder=$(this);
+  $.each(holder.children(options.sort).get(),function(k,v){
+   order.push($(v).attr(options.by));
+  });order.sort();$.each(order,function(k,v){
+   $("["+options.by+"='"+v+"']").appendTo(holder);
+  });return holder;
+	},
  toast:function(obj){
   var x="PT"+new Date().getTime();
   if(obj){var toast=$("<paper-toast/>");
@@ -54,6 +62,7 @@ $.fn.extend({
 @font-face{font-family:'Nobblee';src:url('./images/nobblee_regular.ttf'),url('./images/nobblee_regular.woff');}
 @font-face{font-family:'NobbleeLight';src:url('./images/nobblee_light.ttf'),url('./images/nobblee_light.woff');}
 
+paper-item iron-icon{margin-right:10px;}
 paper-icon-button[icon=menu]{margin-right:8px;}
 paper-toolbar::shadow #topBar{padding:0px 8px!important;}
 paper-icon-button[icon='menu']::shadow #icon{width:32px;height:32px;}
