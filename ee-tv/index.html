@@ -79,77 +79,66 @@ var scheme="http://",host="192.168.1.1",tv_data="",paths={"":"",
  "zap":"/Live/Channels/zap?zap=", //CHANGE TV CHANNEL
  "info":"/UPnP/Device/getInfo"
 };
- 
-$(document).on("ready",function(){
- if($.cookie("host")){host=$.cookie("host");}
- $("#mainContainer").removeClass("style-scope");
- var menu=document.querySelector("paper-drawer-panel");
+
+$(document).on("WebComponentsReady",function(){
+ $("div#mainContainer").removeClass("style-scope");
+ if($.cookie("host")!=undefined){host=$.cookie("host");}
+ $("svg[preserveAspectRatio]").removeAttr("preserveAspectRatio");
  $(document).ajaxStart(function(){$("[icon='refresh']").addClass("spin");});
  $(document).ajaxStop(function(){$("[icon='refresh']").removeClass("spin");});
- var inputs=document.querySelector("#connect").querySelectorAll("paper-input");
-  menu.closeDrawer=function(){$("paper-toast-stack").animate({"left":"12px"});this.selected="main";};
-  menu.openDrawer=function(){$("paper-toast-stack").animate({"left":"268px"});this.selected="drawer";};
-  
+ $("#connect")[0]._onIronResize=function(){if(this.opened){this.resetFit();this.refit();}};
+ $("paper-button:contains('CONNECT')").on("click",function(event){$(window).trigger("attempt");});
+ $(host.split(".")).each(function(k,v){$("#connect paper-input")[k].label=v;});$("#connect")[0].open();
+ $("paper-drawer-panel")[0].closeDrawer=function(){$("paper-toast-stack").animate({"left":"12px"});this.selected="main";};
+ $("paper-drawer-panel")[0].openDrawer=function(){$("paper-toast-stack").animate({"left":"268px"});this.selected="drawer";};
+ 
  $("paper-item:contains('URL')").on("click",function(page){
   var link="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4";
   var pushlink=encodeURIComponent(prompt("Enter URL You Want To Watch",link));
   if(pushlink.match("http")){$.get(urls("play_video")+pushlink);}
-  document.querySelector("paper-drawer-panel").closeDrawer();
+  $("paper-drawer-panel")[0].closeDrawer();
  });
 
- $("paper-button:contains('CONNECT')").on("click",function(event){
-  var t=[];$(inputs).each(function(k,v){t[k]=v.value?v.value:v.label;});host=t.join(".");
-  var powerOn="http://"+host+"/RemoteControl/KeyHandling/sendKey?avoidLongPress=1&key=on_off";
-  $.getJSON("http://"+host+"/UPnP/Device/getInfo?nc="+parseInt(new Date().getTime()),function(info_data){
-   if(!info_data.pvr.available){$.get(powerOn,function(){$().sleep(5000,function(){$(window).trigger("connected");});});}
-   if(info_data.pvr.available){tv_data=info_data;$(window).trigger("connected");}
-  }).error(function(e){$().toast({text:"FAILED TO CONNECT TO "+host,type:"alert"});});
- });
-  
  $("[icon='refresh']").on("click",function(){
   var pageHandle=$("neon-animatable[class='iron-selected']");
   $.get(pageHandle.attr("page")+"?nc="+new Date().getTime(),function(d){
    console.log("RELOADED",$(this)[0].url);
    $(pageHandle).html(d);
   }); 
- });
-  
- $(window).on("load",function(){
-  document.querySelector("paper-menu").selected=page;
-  document.querySelector("neon-animated-pages").selected=start;
-  $("svg[preserveAspectRatio]").removeAttr("preserveAspectRatio");
-  $(host.split(".")).each(function(k,v){inputs[k].label=v});
-  document.querySelector("#connect").open();
- });
-
- $(window).on("connected",function(e,data){
-  var used=parseInt(tv_data.pvr.status.disk.usedSpace/1024/1024);
-		var total=parseInt(tv_data.pvr.status.disk.totalSpace/1024/1024);
-  $(window).toast({text:"CONNECT TO "+host}).trigger("display",start);  
-  $("paper-item[file]").on("click",function(){$(window).trigger("display",$(this).index())});  
-  $("neon-animatable").each(function(k,v){$.get($(this).attr("page"),function(d){$(v).html(d);})});
-  $("paper-progress").attr("value",tv_data.pvr.status.disk.percent).removeAttr("indeterminate");
-  $("paper-progress").append("<span><b>"+used+"GB</b> of <b>"+total+"GB</b></span>");
-  $("paper-progress").append("<code>Connected via: "+host+"</code>");
-  $.cookie("host",host,{expires:7});console.clear();
- });
- 
- $(window).on("display",function(e,page){
-  var pageHandle=document.querySelector("neon-animated-pages");
-  var pageName=document.querySelectorAll("paper-item")[page].innerText;
-   if(page==0){$("[icon='refresh']").hide();}else{$("[icon='refresh']").show();}
-   pageHandle.entryAnimation="slide-from-"+(page<pageHandle.selected?"left":"right")+"-animation";
-   pageHandle.exitAnimation="slide-"+(page<pageHandle.selected?"right":"left")+"-animation";
-  document.querySelector("#gui-title-bar").innerHTML="EE TV : "+pageName.toUpperCase();
-  document.querySelector("paper-drawer-panel").closeDrawer();
-  document.querySelector("paper-menu").selected=page;
-  document.querySelector("#connect").close();
-  pageHandle.selected=page;
- });
+ });  
 });
 
-$(window).bind("load resize",function(){
+$(window).on("attempt",function(e){
+ var t=[],inputs=$("#connect paper-input");
+ $(inputs).each(function(k,v){t[k]=v.value?v.value:v.label;});host=t.join(".");
+ var powerOn="http://"+host+"/RemoteControl/KeyHandling/sendKey?avoidLongPress=1&key=on_off";
+ $.getJSON("http://"+host+"/UPnP/Device/getInfo?nc="+parseInt(new Date().getTime()),function(info_data){
+  if(!info_data.pvr.available){$.get(powerOn,function(){$().sleep(5000,function(){$(window).trigger("connected");});});}
+  if(info_data.pvr.available){tv_data=info_data;$(window).trigger("connected",["ready"]);}
+ }).error(function(e){$().toast({text:"FAILED TO CONNECT TO "+host,type:"alert"});});
+});
 
+$(window).on("connected",function(e,data){
+ var used=parseInt(tv_data.pvr.status.disk.usedSpace/1024/1024);
+ var total=parseInt(tv_data.pvr.status.disk.totalSpace/1024/1024);
+ $(window).toast({text:"CONNECT TO "+host}).trigger("display",start);  
+ $("paper-item[file]").on("click",function(){$(window).trigger("display",$(this).index())});  
+ $("neon-animatable").each(function(k,v){$.get($(this).attr("page"),function(d){$(v).html(d);})});
+ $("paper-progress").attr("value",tv_data.pvr.status.disk.percent).removeAttr("indeterminate");
+ $("paper-progress").append("<span><b>"+used+"GB</b> of <b>"+total+"GB</b></span>");
+ $("paper-progress").append("<code>Connected via: "+host+"</code>");
+ $.cookie("host",host,{expires:7});console.clear();
+});
+
+$(window).on("display",function(e,page){
+ var pageHandle=$("neon-animated-pages")[0];
+ var pageName=$("paper-item")[page].innerText;
+ if(page==0){$("[icon='refresh']").hide();}else{$("[icon='refresh']").show();}
+  pageHandle.exitAnimation="slide-"+(page<pageHandle.selected?"right":"left")+"-animation";
+  pageHandle.entryAnimation="slide-from-"+(page<pageHandle.selected?"left":"right")+"-animation";
+ $("#gui-title-bar")[0].innerHTML="EE TV : "+$("paper-item")[page].innerText.toUpperCase();
+ $("paper-drawer-panel")[0].closeDrawer();$("paper-menu")[0].selected=page;
+ $("#connect")[0].close();$("neon-animated-pages")[0].selected=page;
 });
 </script>
 </body>
