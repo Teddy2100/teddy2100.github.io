@@ -76,9 +76,14 @@ var scheme="http://",host="192.168.1.1",tv_data="",paths={"":"",
  "channel_logos":"/Live/Channels/getLogo?zap=",
  "cancel_timer":"/EPG/Timers/delete?timerId=",
  "timers":"/EPG/Timers/getConfig",
+ "play":"/Live/Channels/get?zap=", //PLAY TV CHANNEL
  "zap":"/Live/Channels/zap?zap=", //CHANGE TV CHANNEL
  "info":"/UPnP/Device/getInfo"
 };
+
+/*$(document).on("neon-animation-finish",function(){
+ console.log("animation finished");
+});*/
 
 $(document).on("WebComponentsReady",function(){
  $("div#mainContainer").removeClass("style-scope");
@@ -86,11 +91,21 @@ $(document).on("WebComponentsReady",function(){
  $("svg[preserveAspectRatio]").removeAttr("preserveAspectRatio");
  $(document).ajaxStart(function(){$("[icon='refresh']").addClass("spin");});
  $(document).ajaxStop(function(){$("[icon='refresh']").removeClass("spin");});
- $("#connect")[0]._onIronResize=function(){if(this.opened){this.resetFit();this.refit();}};
  $("paper-button:contains('CONNECT')").on("click",function(event){$(window).trigger("attempt");});
  $(host.split(".")).each(function(k,v){$("#connect paper-input")[k].label=v;});$("#connect")[0].open();
  $("paper-drawer-panel")[0].closeDrawer=function(){$("paper-toast-stack").animate({"left":"12px"});this.selected="main";};
  $("paper-drawer-panel")[0].openDrawer=function(){$("paper-toast-stack").animate({"left":"268px"});this.selected="drawer";};
+ 
+ /*$("#connect")[0]._onIronResize=function(){
+  if(this._squelchNextResize){this._squelchNextResize=false;return;}
+  if(this.opened){this.resetFit();this.refit();}
+ };*/
+ 
+ $("neon-animated-pages")[0]._onNeonAnimationFinish=function(){
+  if(this._squelchNextFinishEvent){this._squelchNextFinishEvent=false;return;}
+  this._completeSelectedChanged(event.detail.fromPage,event.detail.toPage);
+  $("paper-drawer-panel")[0].closeDrawer();
+ };
  
  $("paper-item:contains('URL')").on("click",function(page){
   var link="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4";
@@ -137,8 +152,8 @@ $(window).on("display",function(e,page){
   pageHandle.exitAnimation="slide-"+(page<pageHandle.selected?"right":"left")+"-animation";
   pageHandle.entryAnimation="slide-from-"+(page<pageHandle.selected?"left":"right")+"-animation";
  $("#gui-title-bar")[0].innerHTML="EE TV : "+$("paper-item")[page].innerText.toUpperCase();
- $("paper-drawer-panel")[0].closeDrawer();$("paper-menu")[0].selected=page;
- $("#connect")[0].close();$("neon-animated-pages")[0].selected=page;
+ $("paper-menu")[0].selected=page;$("neon-animated-pages")[0].selected=page;
+ $("#connect")[0].close();//$("paper-drawer-panel")[0].closeDrawer();
 });
 </script>
 </body>
