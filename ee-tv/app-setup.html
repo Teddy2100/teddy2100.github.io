@@ -4,10 +4,12 @@ $.ajaxSetup({
 });
 
 $.extend({
- dialog:function(element){
+ dialog:function(element){try{
   if(!element){return $("neon-animatable[class='iron-selected'] paper-dialog")[0];}
   else{return $(element)[0];}
- }
+ }catch(e){
+  console.log("Not Dialogs Found");
+ }}
 });
 
 $.fn.extend({

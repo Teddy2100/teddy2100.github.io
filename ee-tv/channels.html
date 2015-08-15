@@ -23,7 +23,8 @@ $("#uiContainer").empty();//CLEAN CONTAINER
 
 $.getJSON(urls("channels"),function(channel_data){$.each(channel_data,function(k,json){
  var holder=$("<div/>").addClass("channel").text(json.zap).on("click",function(){
-  $.dialog().zapid=json.zap;$.dialog().zapname=json.name;$.dialog().open();
+  $.dialog().zapid=json.zap;$.dialog().zapname=json.name;$.dialog().open();  
+  if(history.pushState){history.pushState("dialog",null,"./#watchon");}  
  }),logo=$("<img/>").attr("src",urls("channel_logos")+json.zap);
   logo.attr("onerror","this.src='./images/space.png';");
  $("#uiContainer").append(holder.append(logo));
@@ -32,6 +33,7 @@ $.getJSON(urls("channels"),function(channel_data){$.each(channel_data,function(k
 });
 
 function playChannel(){
+ if(history.pushState){window.history.back(-1);}
  location.href=urls("play")+$.dialog().zapid;
  $.dialog().close();
 }
@@ -39,6 +41,7 @@ function playChannel(){
 function zapChannel(){
  $.get(urls("zap")+$.dialog().zapid,function(){
   $().toast({text:"PLAYING: "+$.dialog().zapname});
+  if(history.pushState){window.history.back(-1);}
   $.dialog().close();
  });
 }

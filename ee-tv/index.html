@@ -81,10 +81,6 @@ var scheme="http://",host="192.168.1.1",tv_data="",paths={"":"",
  "info":"/UPnP/Device/getInfo"
 };
 
-/*$(document).on("neon-animation-finish",function(){
- console.log("animation finished");
-});*/
-
 $(document).on("WebComponentsReady",function(){
  $("div#mainContainer").removeClass("style-scope");
  if($.cookie("host")!=undefined){host=$.cookie("host");}
@@ -96,10 +92,18 @@ $(document).on("WebComponentsReady",function(){
  $("paper-drawer-panel")[0].closeDrawer=function(){$("paper-toast-stack").animate({"left":"12px"});this.selected="main";};
  $("paper-drawer-panel")[0].openDrawer=function(){$("paper-toast-stack").animate({"left":"268px"});this.selected="drawer";};
  
+ 
+ 
+
+ 
  /*$("#connect")[0]._onIronResize=function(){
   if(this._squelchNextResize){this._squelchNextResize=false;return;}
   if(this.opened){this.resetFit();this.refit();}
  };*/
+ 
+ $(document).on("IronResize",function(){
+  alert();
+ });
  
  $("neon-animated-pages")[0]._onNeonAnimationFinish=function(){
   if(this._squelchNextFinishEvent){this._squelchNextFinishEvent=false;return;}
@@ -120,7 +124,7 @@ $(document).on("WebComponentsReady",function(){
    console.log("RELOADED",$(this)[0].url);
    $(pageHandle).html(d);
   }); 
- });  
+ });
 });
 
 $(window).on("attempt",function(e){
@@ -154,6 +158,18 @@ $(window).on("display",function(e,page){
  $("#gui-title-bar")[0].innerHTML="EE TV : "+$("paper-item")[page].innerText.toUpperCase();
  $("paper-menu")[0].selected=page;$("neon-animated-pages")[0].selected=page;
  $("#connect")[0].close();//$("paper-drawer-panel")[0].closeDrawer();
+});
+
+$(window).on("resize",function(){
+ $("paper-dialog").each(function(k){
+  if(this.opened){this.resetFit();this.refit();}
+ });
+});
+
+$(window).on("popstate",function(e,pop){
+ if($.dialog() && $.dialog().opened){
+  $.dialog().close();
+ }return;
 });
 </script>
 </body>
