@@ -8,10 +8,12 @@
  @media screen and (max-width:640px){div.channel{width:98px;height:49px;line-height:52px;}}
 </style>
 <paper-dialog entry-animation="scale-up-animation" exit-animation="fade-out-animation" modal>
- <table class="holder" style="min-width:240px;"><tr><th colspan="100" nowrap>WATCH ON</th></tr></table>
+ <table class="holder" style="min-width:240px;"><tr><th colspan="100" nowrap>WATCH ON</th></tr>
+  <tr><td><paper-item onclick="zapChannel();"><iron-icon icon="hardware:tv"></iron-icon>EE TV</paper-item></td></tr>
+  <tr><td><paper-item onclick="playChannel();"><iron-icon icon="hardware:smartphone"></iron-icon>DEVICE</paper-item></td></tr>
+ </table>
  <div class="buttons">
-  <paper-button onclick="zapChannel();" style="position:absolute;left:0px;" autofocus>TV</paper-button>
-  <paper-button onclick="playChannel();">DEVICE</paper-button>
+  <paper-item-icon-button icon="close" dialog-confirm autofocus>Close</paper-item-icon-button>
  </div>
 </paper-dialog>
 <center id="uiContainer" page="channels.html">
@@ -24,7 +26,7 @@ $("#uiContainer").empty();//CLEAN CONTAINER
 $.getJSON(urls("channels"),function(channel_data){$.each(channel_data,function(k,json){
  var holder=$("<div/>").addClass("channel").text(json.zap).on("click",function(){
   $.dialog().zapid=json.zap;$.dialog().zapname=json.name;$.dialog().open();  
-  if(history.pushState){history.pushState("dialog",null,"./#watchon");}  
+  //if(history.pushState){history.pushState("dialog",null,"./#watchon");}  
  }),logo=$("<img/>").attr("src",urls("channel_logos")+json.zap);
   logo.attr("onerror","this.src='./images/space.png';");
  $("#uiContainer").append(holder.append(logo));
@@ -33,7 +35,7 @@ $.getJSON(urls("channels"),function(channel_data){$.each(channel_data,function(k
 });
 
 function playChannel(){
- if(history.pushState){window.history.back(-1);}
+ //if(history.pushState){window.history.back(-1);}
  location.href=urls("play")+$.dialog().zapid;
  $.dialog().close();
 }
@@ -41,7 +43,7 @@ function playChannel(){
 function zapChannel(){
  $.get(urls("zap")+$.dialog().zapid,function(){
   $().toast({text:"PLAYING: "+$.dialog().zapname});
-  if(history.pushState){window.history.back(-1);}
+  //if(history.pushState){window.history.back(-1);}
   $.dialog().close();
  });
 }

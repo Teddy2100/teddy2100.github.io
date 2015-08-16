@@ -13,6 +13,7 @@
  <script type="text/javascript" src="../bower_components/jquery/dist/jquery.min.js"></script>
  <script type="text/javascript" src="./images/jquery.cookie.js"></script>
  <link rel="import" href="../bower_components/vulcanized-full.html"/>
+ <link rel="import" href="./elements/paper-item-icon-button.html"/>
  <link rel="manifest" href="./app-manifest.json"/>
  <link rel="import" href="./app-setup.html"/>
 </head>
@@ -57,7 +58,7 @@
    <td><paper-input type="tel" size="3" maxlength="3" label="1" pattern="^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$" no-label-float auto-validate></paper-input></td>
   </tr></table>
   <div class="buttons">
-   <paper-button autofocus>CONNECT</paper-button>
+   <paper-item-icon-button icon="icons:power-settings-new" autofocus>CONNECT</paper-item-icon-button>
   </div>
  </paper-dialog>
 </template>
@@ -87,23 +88,16 @@ $(document).on("WebComponentsReady",function(){
  $("svg[preserveAspectRatio]").removeAttr("preserveAspectRatio");
  $(document).ajaxStart(function(){$("[icon='refresh']").addClass("spin");});
  $(document).ajaxStop(function(){$("[icon='refresh']").removeClass("spin");});
+ $("paper-menu,neon-animated-pages").each(function(){this.selected=parseInt(start);});
  $("paper-button:contains('CONNECT')").on("click",function(event){$(window).trigger("attempt");});
  $(host.split(".")).each(function(k,v){$("#connect paper-input")[k].label=v;});$("#connect")[0].open();
  $("paper-drawer-panel")[0].closeDrawer=function(){$("paper-toast-stack").animate({"left":"12px"});this.selected="main";};
  $("paper-drawer-panel")[0].openDrawer=function(){$("paper-toast-stack").animate({"left":"268px"});this.selected="drawer";};
  
- 
- 
-
- 
- /*$("#connect")[0]._onIronResize=function(){
-  if(this._squelchNextResize){this._squelchNextResize=false;return;}
+ $("paper-dialog").each(function(e){this._onNeonAnimationFinish=function(){
+  if(this.opened){this._finishRenderOpened();}else{this._finishRenderClosed();}
   if(this.opened){this.resetFit();this.refit();}
- };*/
- 
- $(document).on("IronResize",function(){
-  alert();
- });
+ }}); 
  
  $("neon-animated-pages")[0]._onNeonAnimationFinish=function(){
   if(this._squelchNextFinishEvent){this._squelchNextFinishEvent=false;return;}
@@ -156,8 +150,8 @@ $(window).on("display",function(e,page){
   pageHandle.exitAnimation="slide-"+(page<pageHandle.selected?"right":"left")+"-animation";
   pageHandle.entryAnimation="slide-from-"+(page<pageHandle.selected?"left":"right")+"-animation";
  $("#gui-title-bar")[0].innerHTML="EE TV : "+$("paper-item")[page].innerText.toUpperCase();
- $("paper-menu")[0].selected=page;$("neon-animated-pages")[0].selected=page;
- $("#connect")[0].close();//$("paper-drawer-panel")[0].closeDrawer();
+ $("paper-menu,neon-animated-pages").each(function(){this.selected=page;});
+ $("#connect")[0].close();
 });
 
 $(window).on("resize",function(){
@@ -166,11 +160,11 @@ $(window).on("resize",function(){
  });
 });
 
-$(window).on("popstate",function(e,pop){
+/*$(window).on("popstate",function(e,pop){
  if($.dialog() && $.dialog().opened){
   $.dialog().close();
  }return;
-});
+});*/
 </script>
 </body>
 </html>

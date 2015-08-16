@@ -1,0 +1,20 @@
+<dom-module id="paper-item-icon-button">
+ <style is="custom-style">
+  .paper-item-icon-button::shadow{color:var(--primary-text-color);white-space:nowrap;font-family:'Roboto',sans-serif;min-width:0px;min-height:0px;}
+  .paper-item-icon-button::shadow paper-item{padding:0px 5px 0px 0px;min-height:0px;color:var(--primary-text-color);line-height:1px;}
+  .paper-item-icon-button::shadow paper-item iron-icon{margin-right:5px!important;}
+  .paper-item-icon-button::shadow paper-material{padding:7px!important;}
+ </style>
+ <template>
+  <paper-button class="paper-item-icon-button"><paper-item>
+   <iron-icon icon="[[icon]]"></iron-icon>
+   <content></content>
+  </paper-item></paper-button>
+ </template>
+</dom-module>
+
+<script>
+Polymer({
+ is: 'paper-item-icon-button',
+});
+</script>
