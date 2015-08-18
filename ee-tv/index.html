@@ -21,7 +21,7 @@
 <template is="dom-bind" id="tv-gui">
  <paper-toast-stack></paper-toast-stack> 
  <paper-drawer-panel force-narrow id="page">
-  <paper-material id="drawer" elevation="5" drawer>
+  <paper-material id="drawer" elevation="5" style="z-index:200;" drawer>
    <img src="./images/logo.png" alt="Logo" title="Logo"/>
    <paper-menu class="list" style="padding:0px;">
     <paper-item file="remote.html"><iron-icon icon="notification:tap-and-play"></iron-icon>Remote</paper-item>
@@ -85,15 +85,16 @@ var scheme="http://",host="192.168.1.1",tv_data="",paths={"":"",
 $(document).on("WebComponentsReady",function(){
  $("div#mainContainer").removeClass("style-scope");
  if($.cookie("host")!=undefined){host=$.cookie("host");}
+ $("span#gui-title-bar, div#drawer").css("z-index","100");
  $("svg[preserveAspectRatio]").removeAttr("preserveAspectRatio");
  $(document).ajaxStart(function(){$("[icon='refresh']").addClass("spin");});
  $(document).ajaxStop(function(){$("[icon='refresh']").removeClass("spin");});
  $("paper-menu,neon-animated-pages").each(function(){this.selected=parseInt(start);});
- $("paper-button:contains('CONNECT')").on("click",function(event){$(window).trigger("attempt");});
+ $("[role='button']:contains('CONNECT')").on("click",function(event){$(window).trigger("attempt");});
  $(host.split(".")).each(function(k,v){$("#connect paper-input")[k].label=v;});$("#connect")[0].open();
  $("paper-drawer-panel")[0].closeDrawer=function(){$("paper-toast-stack").animate({"left":"12px"});this.selected="main";};
  $("paper-drawer-panel")[0].openDrawer=function(){$("paper-toast-stack").animate({"left":"268px"});this.selected="drawer";};
- 
+  
  $("paper-dialog").each(function(e){this._onNeonAnimationFinish=function(){
   if(this.opened){this._finishRenderOpened();}else{this._finishRenderClosed();}
   if(this.opened){this.resetFit();this.refit();}
