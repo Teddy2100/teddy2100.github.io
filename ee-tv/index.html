@@ -24,9 +24,9 @@
   <paper-material id="drawer" elevation="5" style="z-index:200;" drawer>
    <img src="./images/logo.png" alt="Logo" title="Logo"/>
    <paper-menu class="list" style="padding:0px;">
-    <paper-item file="remote.html"><iron-icon icon="notification:tap-and-play"></iron-icon>Remote</paper-item>
-    <paper-item file="channels.html"><iron-icon icon="apps"></iron-icon>Channels</paper-item>
-    <paper-item file="recordings.html"><iron-icon icon="notification:ondemand-video"></iron-icon>Recordings</paper-item>
+    <paper-item page="remote.html"><iron-icon icon="notification:tap-and-play"></iron-icon>Remote</paper-item>
+    <paper-item page="channels.html"><iron-icon icon="apps"></iron-icon>Channels</paper-item>
+    <paper-item page="recordings.html"><iron-icon icon="notification:ondemand-video"></iron-icon>Recordings</paper-item>
     <paper-item><iron-icon icon="editor:insert-link"></iron-icon>Play URL</paper-item>
    </paper-menu>
    <paper-progress max="100" class="green" indeterminate></paper-progress>
@@ -88,12 +88,14 @@ $(document).on("WebComponentsReady",function(){
  $("span#gui-title-bar, div#drawer").css("z-index","100");
  $("svg[preserveAspectRatio]").removeAttr("preserveAspectRatio");
  $(document).ajaxStart(function(){$("[icon='refresh']").addClass("spin");});
- $(document).ajaxStop(function(){$("[icon='refresh']").removeClass("spin");});
- $("paper-menu,neon-animated-pages").each(function(){this.selected=parseInt(start);});
+ $(document).ajaxStop(function(){$("[icon='refresh']").removeClass("spin");}); 
+ $("paper-menu,neon-animated-pages").each(function(){this.selected=parseInt(start);}); 
+ $("paper-item[page]").on("click",function(){$(window).trigger("display",$(this).getAttrs());});
  $("[role='button']:contains('CONNECT')").on("click",function(event){$(window).trigger("attempt");});
- $(host.split(".")).each(function(k,v){$("#connect paper-input")[k].label=v;});$("#connect")[0].open();
+ $(host.split(".")).each(function(k,value){$("#connect paper-input")[k].label=value;});$("#connect")[0].open();
+ $("paper-item[page]").each(function(){$(this).attr("index",$(this).index()).attr("title",$(this).text().trim());});
  $("paper-drawer-panel")[0].closeDrawer=function(){$("paper-toast-stack").animate({"left":"12px"});this.selected="main";};
- $("paper-drawer-panel")[0].openDrawer=function(){$("paper-toast-stack").animate({"left":"268px"});this.selected="drawer";};
+ $("paper-drawer-panel")[0].openDrawer=function(){$("paper-toast-stack").animate({"left":"268px"});this.selected="drawer";};  
   
  $("paper-dialog").each(function(e){this._onNeonAnimationFinish=function(){
   if(this.opened){this._finishRenderOpened();}else{this._finishRenderClosed();}
@@ -104,7 +106,7 @@ $(document).on("WebComponentsReady",function(){
   if(this._squelchNextFinishEvent){this._squelchNextFinishEvent=false;return;}
   this._completeSelectedChanged(event.detail.fromPage,event.detail.toPage);
   $("paper-drawer-panel")[0].closeDrawer();
- };
+ }; 
  
  $("paper-item:contains('URL')").on("click",function(page){
   var link="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4";
@@ -132,40 +134,34 @@ $(window).on("attempt",function(e){
  }).error(function(e){$().toast({text:"FAILED TO CONNECT TO "+host,type:"alert"});});
 });
 
-$(window).on("connected",function(e,data){
+$(window).on("connected",function(e,data){console.clear();
  var used=parseInt(tv_data.pvr.status.disk.usedSpace/1024/1024);
  var total=parseInt(tv_data.pvr.status.disk.totalSpace/1024/1024);
- $(window).toast({text:"CONNECT TO "+host}).trigger("display",start);  
- $("paper-item[file]").on("click",function(){$(window).trigger("display",$(this).index())});  
  $("neon-animatable").each(function(k,v){$.get($(this).attr("page"),function(d){$(v).html(d);})});
  $("paper-progress").attr("value",tv_data.pvr.status.disk.percent).removeAttr("indeterminate");
  $("paper-progress").append("<span><b>"+used+"GB</b> of <b>"+total+"GB</b></span>");
+ $(window).toast({text:"CONNECT TO "+host}).trigger("display",{init:true});
  $("paper-progress").append("<code>Connected via: "+host+"</code>");
- $.cookie("host",host,{expires:7});console.clear();
+ $.cookie("host",host,{expires:7});$("#connect")[0].close();
 });
 
-$(window).on("display",function(e,page){
- var pageHandle=$("neon-animated-pages")[0];
- var pageName=$("paper-item")[page].innerText;
- if(page==0){$("[icon='refresh']").hide();}else{$("[icon='refresh']").show();}
-  pageHandle.exitAnimation="slide-"+(page<pageHandle.selected?"right":"left")+"-animation";
-  pageHandle.entryAnimation="slide-from-"+(page<pageHandle.selected?"left":"right")+"-animation";
- $("#gui-title-bar")[0].innerHTML="EE TV : "+$("paper-item")[page].innerText.toUpperCase();
- $("paper-menu,neon-animated-pages").each(function(){this.selected=page;});
- $("#connect")[0].close();
-});
+$(window).on("display",function(e,setup){try{
+ var pageHandle=$("neon-animated-pages").get(0);
+ if(setup.init){setup.title=$("paper-item[page]")[start].title;setup.index=start;}
+ if(setup.index==0){$("[icon='refresh']").hide();}else{$("[icon='refresh']").show();} 
+  pageHandle.exitAnimation="slide-"+(setup.index<pageHandle.selected?"right":"left")+"-animation";
+  pageHandle.entryAnimation="slide-from-"+(setup.index<pageHandle.selected?"left":"right")+"-animation";  
+ $("paper-menu, neon-animated-pages").each(function(){this.selected=setup.index;});
+ $("#gui-title-bar")[0].innerHTML="EE TV : "+setup.title.toUpperCase(); 
+}catch(e){alert("Opps Can't Display Requested Item");
+ console.log(e);
+}});
 
 $(window).on("resize",function(){
  $("paper-dialog").each(function(k){
   if(this.opened){this.resetFit();this.refit();}
  });
 });
-
-/*$(window).on("popstate",function(e,pop){
- if($.dialog() && $.dialog().opened){
-  $.dialog().close();
- }return;
-});*/
 </script>
 </body>
 </html>
