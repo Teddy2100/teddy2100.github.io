@@ -1,0 +1,40 @@
+<dom-module id="event-listener">
+ <template>
+  <content></content>
+ </template>
+</dom-module>
+<script>
+Polymer({
+ is:'event-listener', 
+ behaviors:[
+  Polymer.IronResizableBehavior,
+  Polymer.IronSelectableBehavior
+ ], 
+ listeners:{
+  'iron-overlay-opened':'_ironOverlayOpened',
+  'iron-overlay-closed':'_ironOverlayClosed',
+  'iron-resize':'resized'
+ },
+ 
+ _ironOverlayOpened:function(){
+  //$("paper-toolbar paper-icon-button").attr("disabled","disabled");
+  //console.log("_ironOverlayOpened");
+ }, 
+ _ironOverlayClosed:function(){
+  //$("paper-toolbar paper-icon-button").removeAttr("disabled");
+  //console.log("_ironOverlayClosed");
+ },
+ 
+ registered:function(){
+  $("neon-animated-pages").on("neon-animation-finish",function(){
+   $("paper-drawer-panel")[0].closeDrawer();
+  });
+ }, 
+ resized:function(){
+  $("paper-dialog").each(function(k){if(this.opened){
+   this.style.minHeight=this.offsetHeight+"px";
+   this.resetFit();this.refit();
+  }});
+ }
+});
+</script>

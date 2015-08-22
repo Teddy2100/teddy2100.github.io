@@ -1,50 +1,4 @@
-<!--
-@license
-Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
-
-<link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
-<link rel="import" href="../iron-a11y-keys-behavior/iron-a11y-keys-behavior.html">
-<link rel="import" href="../iron-behaviors/iron-control-state.html">
-<link rel="import" href="../iron-overlay-behavior/iron-overlay-behavior.html">
-<link rel="import" href="../neon-animation/neon-animation-runner-behavior.html">
-<link rel="import" href="../neon-animation/animations/opaque-animation.html">
-<link rel="import" href="iron-dropdown-scroll-manager.html">
-
-<!--
-`<iron-dropdown>` is a generalized element that is useful when you have
-hidden content (`.dropdown-content`) that is revealed due to some change in
-state that should cause it to do so.
-
-Note that this is a low-level element intended to be used as part of other
-composite elements that cause dropdowns to be revealed.
-
-Examples of elements that might be implemented using an `iron-dropdown`
-include comboboxes, menubuttons, selects. The list goes on.
-
-The `<iron-dropdown>` element exposes attributes that allow the position
-of the `.dropdown-content` relative to the `.dropdown-trigger` to be
-configured.
-
-    <iron-dropdown horizontal-align="right" vertical-align="top">
-      <div class="dropdown-content">Hello!</div>
-    </iron-dropdown>
-
-In the above example, the `<div>` with class `.dropdown-content` will be
-hidden until the dropdown element has `opened` set to true, or when the `open`
-method is called on the element.
-
-@demo demo/index.html
--->
-
-<dom-module id="iron-dropdown">
-  <style>
+<link rel=import href=../polymer/polymer.html><link rel=import href=../iron-resizable-behavior/iron-resizable-behavior.html><link rel=import href=../iron-a11y-keys-behavior/iron-a11y-keys-behavior.html><link rel=import href=../iron-behaviors/iron-control-state.html><link rel=import href=../iron-overlay-behavior/iron-overlay-behavior.html><link rel=import href=../neon-animation/neon-animation-runner-behavior.html><link rel=import href=../neon-animation/animations/opaque-animation.html><link rel=import href=iron-dropdown-scroll-manager.html><dom-module id=iron-dropdown><style>
     :host {
       position: fixed;
     }
@@ -56,14 +10,7 @@ method is called on the element.
     #contentWrapper.animating ::content > * {
       overflow: hidden;
     }
-  </style>
-  <template>
-    <div id="contentWrapper">
-      <content id="content" select=".dropdown-content"></content>
-    </div>
-  </template>
-
-  <script>
+  </style><template><div id=contentWrapper><content id=content select=.dropdown-content></content></div></template><script>
     (function() {
       'use strict';
 
@@ -146,6 +93,14 @@ method is called on the element.
           },
 
           /**
+           * If provided, this will be the element that will be focused when
+           * the dropdown opens.
+           */
+          focusTarget: {
+            type: Object
+          },
+
+          /**
            * Set to true to disable animations when opening and closing the
            * dropdown.
            */
@@ -185,6 +140,17 @@ method is called on the element.
           return Polymer.dom(this.$.content).getDistributedNodes()[0];
         },
 
+        /**
+         * The element that should be focused when the dropdown opens.
+         */
+        get _focusTarget() {
+          return this.focusTarget || this.containedElement;
+        },
+
+        /**
+         * The element that should be used to position the dropdown when
+         * it opens, if no position target is configured.
+         */
         get _defaultPositionTarget() {
           var parent = Polymer.dom(this).parentNode;
 
@@ -195,6 +161,9 @@ method is called on the element.
           return parent;
         },
 
+        /**
+         * The bounding rect of the position target.
+         */
         get _positionRect() {
           if (!this._positionRectMemo && this.positionTarget) {
             this._positionRectMemo = this.positionTarget.getBoundingClientRect();
@@ -203,6 +172,9 @@ method is called on the element.
           return this._positionRectMemo;
         },
 
+        /**
+         * The horizontal offset value used to position the dropdown.
+         */
         get _horizontalAlignTargetValue() {
           var target;
 
@@ -217,6 +189,9 @@ method is called on the element.
           return Math.max(target, 0);
         },
 
+        /**
+         * The vertical offset value used to position the dropdown.
+         */
         get _verticalAlignTargetValue() {
           var target;
 
@@ -231,27 +206,41 @@ method is called on the element.
           return Math.max(target, 0);
         },
 
+        /**
+         * Called when the value of `opened` changes.
+         *
+         * @param {boolean} opened True if the dropdown is opened.
+         */
         _openedChanged: function(opened) {
           if (opened && this.disabled) {
             this.cancel();
           } else {
-            this._cancelAnimations();
+            this.cancelAnimation();
             this._prepareDropdown();
             Polymer.IronOverlayBehaviorImpl._openedChanged.apply(this, arguments);
           }
+
+          if (this.opened) {
+            this._focusContent();
+          }
         },
 
+        /**
+         * Overridden from `IronOverlayBehavior`.
+         */
         _renderOpened: function() {
           Polymer.IronDropdownScrollManager.pushScrollLock(this);
           if (!this.noAnimations && this.animationConfig && this.animationConfig.open) {
             this.$.contentWrapper.classList.add('animating');
             this.playAnimation('open');
           } else {
-            this._focusContent();
             Polymer.IronOverlayBehaviorImpl._renderOpened.apply(this, arguments);
           }
         },
 
+        /**
+         * Overridden from `IronOverlayBehavior`.
+         */
         _renderClosed: function() {
           Polymer.IronDropdownScrollManager.removeScrollLock(this);
           if (!this.noAnimations && this.animationConfig && this.animationConfig.close) {
@@ -262,6 +251,12 @@ method is called on the element.
           }
         },
 
+        /**
+         * Called when animation finishes on the dropdown (when opening or
+         * closing). Responsible for "completing" the process of opening or
+         * closing the dropdown by positioning it or setting its display to
+         * none.
+         */
         _onNeonAnimationFinish: function() {
           this.$.contentWrapper.classList.remove('animating');
           if (this.opened) {
@@ -271,6 +266,9 @@ method is called on the element.
           }
         },
 
+        /**
+         * Called when an `iron-resize` event fires.
+         */
         _onIronResize: function() {
           var containedElement = this.containedElement;
           var scrollTop;
@@ -293,14 +291,17 @@ method is called on the element.
           }
         },
 
+        /**
+         * Called when the `positionTarget` property changes.
+         */
         _positionTargetChanged: function() {
           this._updateOverlayPosition();
         },
 
-        _cancelAnimations: function() {
-          this.cancelAnimation();
-        },
-
+        /**
+         * Constructs the final animation config from different properties used
+         * to configure specific parts of the opening and closing animations.
+         */
         _updateAnimationConfig: function() {
           var animationConfig = {};
           var animations = [];
@@ -328,12 +329,21 @@ method is called on the element.
           this.animationConfig = animationConfig;
         },
 
+        /**
+         * Prepares the dropdown for opening by updating measured layout
+         * values.
+         */
         _prepareDropdown: function() {
           this.sizingTarget = this.containedElement || this.sizingTarget;
           this._updateAnimationConfig();
           this._updateOverlayPosition();
         },
 
+        /**
+         * Updates the overlay position based on configured horizontal
+         * and vertical alignment, and re-memoizes these values for the sake
+         * of behavior in `IronFitBehavior`.
+         */
         _updateOverlayPosition: function() {
           this._positionRectMemo = null;
 
@@ -359,13 +369,18 @@ method is called on the element.
           }
         },
 
+        /**
+         * Focuses the configured focus target.
+         */
         _focusContent: function() {
-          if (this.containedElement) {
-            this.containedElement.focus();
-          }
+          // NOTE(cdata): This is async so that it can attempt the focus after
+          // `display: none` is removed from the element.
+          this.async(function() {
+            if (this._focusTarget) {
+              this._focusTarget.focus();
+            }
+          });
         }
       });
     })();
-  </script>
-</dom-module>
-
+  </script></dom-module>

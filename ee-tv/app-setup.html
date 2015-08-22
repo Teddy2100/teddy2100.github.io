@@ -5,14 +5,14 @@ $.ajaxSetup({
 
 $.extend({
  dialog:function(element){try{
-  if(!element){return $("neon-animatable[class='iron-selected'] paper-dialog")[0];}
-  else{return $(element)[0];}
- }catch(e){
-  console.log("Not Dialogs Found");
- }}
+  if($.type(element)=="string"){return $(element);}  
+  else{return $("neon-animatable[class='iron-selected'] paper-dialog");}
+ }catch(e){console.log("No Dialogs Found");}}
 });
 
 $.fn.extend({
+ open:function(){this[0].open();},
+ close:function(){this[0].close();},
  tagSort:function(options){
   var order=[],holder=$(this);
   $.each(holder.children(options.sort).get(),function(k,v){

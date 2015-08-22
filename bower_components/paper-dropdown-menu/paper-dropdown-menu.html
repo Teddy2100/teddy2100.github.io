@@ -1,73 +1,4 @@
-<!--
-@license
-Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
-
-<link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../paper-styles/default-theme.html">
-<link rel="import" href="../paper-input/paper-input.html">
-<link rel="import" href="../paper-menu-button/paper-menu-button.html">
-<link rel="import" href="../paper-ripple/paper-ripple.html">
-<link rel="import" href="../iron-a11y-keys-behavior/iron-a11y-keys-behavior.html">
-<link rel="import" href="../iron-behaviors/iron-control-state.html">
-<link rel="import" href="../iron-behaviors/iron-button-state.html">
-<link rel="import" href="../iron-icons/iron-icons.html">
-<link rel="import" href="../iron-icon/iron-icon.html">
-<link rel="import" href="../iron-selector/iron-selectable.html">
-
-<!--
-`paper-dropdown-menu` is similar to a native browser select element.
-`paper-dropdown-menu` works with selectable content. The currently selected
-item is displayed in the control. If no item is selected, the `label` is
-displayed instead.
-
-The child element with the class `dropdown-content` will be used as the dropdown
-menu. It could be a `paper-menu` or element that triggers `iron-activate` when
-selecting its children.
-
-Example:
-
-    <paper-dropdown-menu label="Your favourite pastry">
-      <paper-menu class="dropdown-content">
-        <paper-item>Croissant</paper-item>
-        <paper-item>Donut</paper-item>
-        <paper-item>Financier</paper-item>
-        <paper-item>Madeleine</paper-item>
-      </paper-menu>
-    </paper-dropdown-menu>
-
-This example renders a dropdown menu with 4 options.
-
-### Styling
-
-The following custom properties and mixins are also available for styling:
-
-Custom property | Description | Default
-----------------|-------------|----------
-`--paper-dropdown-menu` | A mixin that is applied to the element host | `{}`
-`--paper-dropdown-menu-disabled` | A mixin that is applied to the element host when disabled | `{}`
-`--paper-dropdown-menu-ripple` | A mixin that is applied to the internal ripple | `{}`
-`--paper-dropdown-menu-button` | A mixin that is applied to the internal menu button | `{}`
-`--paper-dropdown-menu-input` | A mixin that is applied to the internal paper input | `{}`
-`--paper-dropdown-menu-icon` | A mixin that is applied to the internal icon | `{}`
-
-You can also use any of the `paper-input-container` and `paper-menu-button`
-style mixins and custom properties to style the internal input and menu button
-respectively.
-
-@group Paper Elements
-@element paper-dropdown-menu
-@hero hero.svg
-@demo demo/index.html
--->
-
-<dom-module id="paper-dropdown-menu">
-  <style>
+<link rel=import href=../polymer/polymer.html><link rel=import href=../paper-styles/default-theme.html><link rel=import href=../paper-input/paper-input.html><link rel=import href=../paper-menu-button/paper-menu-button.html><link rel=import href=../paper-ripple/paper-ripple.html><link rel=import href=../iron-a11y-keys-behavior/iron-a11y-keys-behavior.html><link rel=import href=../iron-behaviors/iron-control-state.html><link rel=import href=../iron-behaviors/iron-button-state.html><link rel=import href=../iron-icons/iron-icons.html><link rel=import href=../iron-icon/iron-icon.html><link rel=import href=../iron-selector/iron-selectable.html><dom-module id=paper-dropdown-menu><style>
     :host {
       display: inline-block;
       position: relative;
@@ -121,37 +52,7 @@ respectively.
       @apply(--paper-dropdown-menu-icon);
     }
 
-  </style>
-  <template>
-    <paper-menu-button
-      id="menuButton"
-      vertical-align="top"
-      horizontal-align="right"
-      vertical-offset="[[_computeMenuVerticalOffset(noLabelFloat)]]"
-      disabled="[[disabled]]"
-      no-animations="[[noAnimations]]"
-      on-iron-activate="_onIronActivate"
-      opened="{{opened}}">
-      <div class="dropdown-trigger">
-        <paper-ripple></paper-ripple>
-        <paper-input
-          readonly
-          disabled="[[disabled]]"
-          value="[[selectedItemLabel]]"
-          placeholder="[[placeholder]]"
-          always-float-label="[[alwaysFloatLabel]]"
-          no-label-float="[[noLabelFloat]]"
-          label="[[label]]">
-          <iron-icon icon="arrow-drop-down" suffix></iron-icon>
-        </paper-input>
-      </div>
-      <div class="dropdown-content">
-        <content select=".dropdown-content"></content>
-      </div>
-    </paper-menu-button>
-  </template>
-</dom-module>
-<script>
+  </style><template><paper-menu-button id=menuButton vertical-align=top horizontal-align=right vertical-offset=[[_computeMenuVerticalOffset(noLabelFloat)]] disabled=[[disabled]] no-animations=[[noAnimations]] on-iron-select=_onIronSelect opened={{opened}}><div class=dropdown-trigger><paper-ripple></paper-ripple><paper-input readonly="" disabled=[[disabled]] value=[[selectedItemLabel]] placeholder=[[placeholder]] always-float-label=[[alwaysFloatLabel]] no-label-float=[[noLabelFloat]] label=[[label]]><iron-icon icon=arrow-drop-down suffix=""></iron-icon></paper-input></div><content id=content select=.dropdown-content></content></paper-menu-button></template></dom-module><script>
   (function() {
     'use strict';
 
@@ -190,7 +91,7 @@ respectively.
         /**
          * The last selected item. An item is selected if the dropdown menu has
          * a child with class `dropdown-content`, and that child triggers an
-         * `iron-activate` event with the selected `item` in the `detail`.
+         * `iron-select` event with the selected `item` in the `detail`.
          */
         selectedItem: {
           type: Object,
@@ -264,6 +165,24 @@ respectively.
         'aria-haspopup': 'true'
       },
 
+      attached: function() {
+        // NOTE(cdata): Due to timing, a preselected value in a `IronSelectable`
+        // child will cause an `iron-select` event to fire while the element is
+        // still in a `DocumentFragment`. This has the effect of causing
+        // handlers not to fire. So, we double check this value on attached:
+        var contentElement = this.contentElement;
+        if (contentElement && contentElement.selectedItem) {
+          this._setSelectedItem(contentElement.selectedItem);
+        }
+      },
+
+      /**
+       * The content element that is contained by the dropdown menu, if any.
+       */
+      get contentElement() {
+        return Polymer.dom(this.$.content).getDistributedNodes()[0];
+      },
+
       /**
        * Show the dropdown content.
        */
@@ -279,11 +198,11 @@ respectively.
       },
 
       /**
-       * A handler that is called when `iron-activate` is fired.
+       * A handler that is called when `iron-select` is fired.
        *
-       * @param {CustomEvent} event An `iron-activate` event.
+       * @param {CustomEvent} event An `iron-select` event.
        */
-      _onIronActivate: function(event) {
+      _onIronSelect: function(event) {
         this._setSelectedItem(event.detail.item);
       },
 
@@ -329,4 +248,3 @@ respectively.
     });
   })();
 </script>
-

@@ -14,14 +14,15 @@
  <script type="text/javascript" src="./images/jquery.cookie.js"></script>
  <link rel="import" href="../bower_components/vulcanized-full.html"/>
  <link rel="import" href="./elements/paper-item-icon-button.html"/>
+ <link rel="import" href="./elements/event-listener.html"/>
  <link rel="manifest" href="./app-manifest.json"/>
  <link rel="import" href="./app-setup.html"/>
 </head>
 <body unresolved>
-<template is="dom-bind" id="tv-gui">
+<event-listener id="ee-gui">
  <paper-toast-stack></paper-toast-stack> 
  <paper-drawer-panel force-narrow id="page">
-  <paper-material id="drawer" elevation="5" style="z-index:200;" drawer>
+  <paper-material id="drawer" elevation="5" drawer>
    <img src="./images/logo.png" alt="Logo" title="Logo"/>
    <paper-menu class="list" style="padding:0px;">
     <paper-item page="remote.html"><iron-icon icon="notification:tap-and-play"></iron-icon>Remote</paper-item>
@@ -61,7 +62,7 @@
    <paper-item-icon-button icon="icons:power-settings-new" autofocus>CONNECT</paper-item-icon-button>
   </div>
  </paper-dialog>
-</template>
+</event-listener>
 <script type="text/javascript">
 var unix=parseInt(new Date().getTime()),start=1;
 var urls=function(key){return scheme+host+paths[key];};
@@ -85,28 +86,22 @@ var scheme="http://",host="192.168.1.1",tv_data="",paths={"":"",
 $(document).on("WebComponentsReady",function(){
  $("div#mainContainer").removeClass("style-scope");
  if($.cookie("host")!=undefined){host=$.cookie("host");}
- $("span#gui-title-bar, div#drawer").css("z-index","100");
- $("svg[preserveAspectRatio]").removeAttr("preserveAspectRatio");
+ $("div#drawer,div#scrim,span#gui-title-bar").css("z-index","10");
  $(document).ajaxStart(function(){$("[icon='refresh']").addClass("spin");});
  $(document).ajaxStop(function(){$("[icon='refresh']").removeClass("spin");}); 
  $("paper-menu,neon-animated-pages").each(function(){this.selected=parseInt(start);}); 
  $("paper-item[page]").on("click",function(){$(window).trigger("display",$(this).getAttrs());});
  $("[role='button']:contains('CONNECT')").on("click",function(event){$(window).trigger("attempt");});
- $(host.split(".")).each(function(k,value){$("#connect paper-input")[k].label=value;});$("#connect")[0].open();
+ $(host.split(".")).each(function(key,v){$("#connect paper-input")[key].label=v;});$.dialog("#connect").open();
  $("paper-item[page]").each(function(){$(this).attr("index",$(this).index()).attr("title",$(this).text().trim());});
  $("paper-drawer-panel")[0].closeDrawer=function(){$("paper-toast-stack").animate({"left":"12px"});this.selected="main";};
- $("paper-drawer-panel")[0].openDrawer=function(){$("paper-toast-stack").animate({"left":"268px"});this.selected="drawer";};  
-  
- $("paper-dialog").each(function(e){this._onNeonAnimationFinish=function(){
-  if(this.opened){this._finishRenderOpened();}else{this._finishRenderClosed();}
-  if(this.opened){this.resetFit();this.refit();}
- }}); 
+ $("paper-drawer-panel")[0].openDrawer=function(){$("paper-toast-stack").animate({"left":"268px"});this.selected="drawer";};
  
- $("neon-animated-pages")[0]._onNeonAnimationFinish=function(){
-  if(this._squelchNextFinishEvent){this._squelchNextFinishEvent=false;return;}
-  this._completeSelectedChanged(event.detail.fromPage,event.detail.toPage);
-  $("paper-drawer-panel")[0].closeDrawer();
- }; 
+ if(/chrom(e|ium)/.test(navigator.userAgent.toLowerCase())==false){
+  $("#content div.buttons").html("<paper-item-icon-button icon='icons:info-outline' autofocus>GET CHROME</paper-item-icon-button>");
+  $("#content div.holder").html("CHROME APP ONLY");
+  $("#content").html("ooops");
+ }
  
  $("paper-item:contains('URL')").on("click",function(page){
   var link="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4";
@@ -134,7 +129,7 @@ $(window).on("attempt",function(e){
  }).error(function(e){$().toast({text:"FAILED TO CONNECT TO "+host,type:"alert"});});
 });
 
-$(window).on("connected",function(e,data){console.clear();
+$(window).on("connected",function(e,data){//console.clear();
  var used=parseInt(tv_data.pvr.status.disk.usedSpace/1024/1024);
  var total=parseInt(tv_data.pvr.status.disk.totalSpace/1024/1024);
  $("neon-animatable").each(function(k,v){$.get($(this).attr("page"),function(d){$(v).html(d);})});
@@ -142,7 +137,7 @@ $(window).on("connected",function(e,data){console.clear();
  $("paper-progress").append("<span><b>"+used+"GB</b> of <b>"+total+"GB</b></span>");
  $(window).toast({text:"CONNECT TO "+host}).trigger("display",{init:true});
  $("paper-progress").append("<code>Connected via: "+host+"</code>");
- $.cookie("host",host,{expires:7});$("#connect")[0].close();
+ $.cookie("host",host,{expires:7});$.dialog("#connect").close();
 });
 
 $(window).on("display",function(e,setup){try{
@@ -156,12 +151,6 @@ $(window).on("display",function(e,setup){try{
 }catch(e){alert("Opps Can't Display Requested Item");
  console.log(e);
 }});
-
-$(window).on("resize",function(){
- $("paper-dialog").each(function(k){
-  if(this.opened){this.resetFit();this.refit();}
- });
-});
 </script>
 </body>
 </html>
