@@ -10,6 +10,9 @@
  #remote{margin:0px auto;}
 }
 </style>
+
+<img id="nowplaying" src="" width="720px"/>
+
 <div id="remote" class="nodebug">
  <div id="keypad" style="width:300px;height:450px;"> 
   <span style="top:4.0%;left:71.0%;width:16.0%;height:10.5%;">on_off</span>  
@@ -54,4 +57,6 @@ $("#remote span").on("click",function(){
  if(navigator.vibrate){navigator.vibrate(50);}
  $.ajax(urls("remote_keys")+$(this).text());
 });
+
+$("#nowplaying").attr("src",urls("playing_now_image"));
 </script>

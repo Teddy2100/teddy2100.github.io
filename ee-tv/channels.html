@@ -5,13 +5,28 @@
  div.channel{background:url('./images/static.png');line-height:60px;font-size:50px;position:relative;}
  div.channel{display:inline-block;margin:8px;border-radius:8px;border:2px solid var(--default-primary-color);}
  div.channel img{position:absolute;top:0px;left:0px;box-sizing:border-box;width:100%;height:100%;border-radius:6px;}
- @media screen and (max-width:640px){div.channel{width:98px;height:49px;line-height:52px;}}
+ img.watchon{width:350px;height:200px;background-size:cover;position:absolute;top:0px;left:0px;}
+ div.watchon{width:350px;height:200px;background-size:cover;position:relative;}
+ 
+ div.watchon::after{
+  font-family:'NobbleeLight','Roboto',sans-serif!important;padding-top:30px;padding-bottom:10px;  
+  background:linear-gradient(to bottom,rgba(0,0,0,0) 0%,var(--primary-background-color) 75%);
+  position:absolute;bottom:0px;left:0px;right:0px;font-size:30px;
+  color:var(--primary-text-color);content:"WATCH ON";
+ }
+ 
+ @media screen and (max-width:640px){
+  div.channel{width:98px;height:49px;line-height:52px;}
+  div.watchon,img.watchon{width:210px;height:120px;}  
+ }
 </style>
 <paper-dialog entry-animation="scale-up-animation" exit-animation="fade-out-animation" modal>
- <table class="holder" style="min-width:240px;"><tr><th colspan="100" nowrap>WATCH ON</th></tr>
-  <tr><td><paper-item onclick="zapChannel();"><iron-icon icon="hardware:tv"></iron-icon>EE TV</paper-item></td></tr>
-  <tr><td><paper-item onclick="playChannel();"><iron-icon icon="hardware:smartphone"></iron-icon>DEVICE</paper-item></td></tr>
- </table>
+ <div class="holder">
+  <img class="watchon" src="./images/static-large.png" style="position:absolute;top:0px;left:0px;">
+  <div class="watchon"></div>
+  <paper-item onclick="zapChannel();"><iron-icon icon="hardware:tv"></iron-icon>EE TV</paper-item>
+  <paper-item onclick="playChannel();"><iron-icon icon="hardware:smartphone"></iron-icon>DEVICE</paper-item>
+ </div>
  <div class="buttons">
   <paper-item-icon-button icon="close" dialog-confirm autofocus>Close</paper-item-icon-button>
  </div>
@@ -22,27 +37,26 @@
 <script>
 console.log("CHANNELS LOADED");
 $("#uiContainer").empty();//CLEAN CONTAINER
-
 $.getJSON(urls("channels"),function(channel_data){$.each(channel_data,function(k,json){
- var holder=$("<div/>").addClass("channel").text(json.zap).on("click",function(){
-  //$.dialog().zapid=json.zap;$.dialog().zapname=json.name;
-  $.dialog().attr({"zapid":json.zap,"zapname":json.name}).get(0).open();
+ var newholder=$("<div/>").addClass("channel").text(json.zap).on("click",function(){
+  $("div.watchon").css("background-image","url("+urls("get_image")+json.zap+")");
+  $.dialog().attr({"zapid":json.zap,"zapname":json.name}).get(0).open();  
  }),logo=$("<img/>").attr("src",urls("channel_logos")+json.zap);
   logo.attr("onerror","this.src='./images/space.png';");
- $("#uiContainer").append(holder.append(logo));
+ $("#uiContainer").append(newholder.append(logo));
 })}).error(function(){
  alert("ERROR CONNECTING");
 });
 
 function playChannel(){
- location.href=urls("play")+$.dialog().zapid;
- $.dialog().close();
+ location.href=urls("play")+$.dialog().attr("zapid");
+ $.dialog().get(0).close();
 }
 
 function zapChannel(){
- $.get(urls("zap")+$.dialog().zapid,function(){
-  $().toast({text:"PLAYING: "+$.dialog().zapname});
-  $.dialog().close();
+ $.get(urls("zap")+$.dialog().attr("zapid"),function(){
+  $().toast({text:"PLAYING: "+$.dialog().attr("zapname")});
+  $.dialog().get(0).close();
  });
 }
 </script>

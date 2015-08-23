@@ -21,7 +21,7 @@
 <body unresolved>
 <event-listener id="ee-gui">
  <paper-toast-stack></paper-toast-stack> 
- <paper-drawer-panel force-narrow id="page">
+ <paper-drawer-panel id="page" force-narrow>
   <paper-material id="drawer" elevation="5" drawer>
    <img src="./images/logo.png" alt="Logo" title="Logo"/>
    <paper-menu class="list" style="padding:0px;">
@@ -67,19 +67,32 @@
 var unix=parseInt(new Date().getTime()),start=1;
 var urls=function(key){return scheme+host+paths[key];};
 var scheme="http://",host="192.168.1.1",tv_data="",paths={"":"",
- "recordings":"/PVR/Records/getList?type=regular&avoidHD=0&tvOnly=0",
- "remote_keys":"/RemoteControl/KeyHandling/sendKey?avoidLongPress=1&key=",
- "channels":"/Live/Channels/getList?tvOnly=0&avoidHD=0&allowHidden=0&fields=name,id,zap,isDVB,hidden,rank,isHD,logo",
- "play_video":"/Live/External/play?position=0&url=", //PLAYS FROM INTERNET ON TV
- "play_recording":"/PVR/Records/play?recordId=", //PLAYS FROM PVR ON TV
+
+ //http://192.168.1.240/PVR/getUPnPDescription.xml
  "get_download_session_id":"/PVR/Records/session?recordId=",
  "download_file_by_session_id":"/PVR/Records/getVideo?sessionId=",
+ "recordings":"/PVR/Records/getList?type=regular&avoidHD=0&tvOnly=0",
+ "play_recording":"/PVR/Records/play?recordId=", //PLAYS FROM PVR ON TV
+ 
+ //http://192.168.1.240/EPG/getUPnPDescription.xml
  "find_programme":"/EPG/Programs/find?fieldName=name&fieldValue=", // &zap=
- "channel_logos":"/Live/Channels/getLogo?zap=",
+ "get_image":"/EPG/Programs/getImage?zap=",
  "cancel_timer":"/EPG/Timers/delete?timerId=",
  "timers":"/EPG/Timers/getConfig",
+ 
+ //http://192.168.1.240/Live/getUPnPDescription.xml
+ "playing_now":"/Live/CurrentContent/getInfo",
+ "playing_now_image":"/Live/CurrentContent/grabImage",
+ "play_video":"/Live/External/play?position=0&title=Internet+Video&url=", //PLAYS FROM INTERNET ON TV
+ "channels":"/Live/Channels/getList?tvOnly=0&avoidHD=0&allowHidden=0&fields=name,id,zap,isDVB,hidden,rank,isHD,logo",
+ "channel_logos":"/Live/Channels/getLogo?zap=",
  "play":"/Live/Channels/get?zap=", //PLAY TV CHANNEL
  "zap":"/Live/Channels/zap?zap=", //CHANGE TV CHANNEL
+ 
+ //http://192.168.1.240/RemoteControl/getUPnPDescription.xml
+ "remote_keys":"/RemoteControl/KeyHandling/sendKey?avoidLongPress=1&key=",
+ 
+ //http://192.168.1.240/UPnP/ServiceDescription/Basic.xml
  "info":"/UPnP/Device/getInfo"
 };
 
@@ -94,9 +107,7 @@ $(document).on("WebComponentsReady",function(){
  $("[role='button']:contains('CONNECT')").on("click",function(event){$(window).trigger("attempt");});
  $(host.split(".")).each(function(key,v){$("#connect paper-input")[key].label=v;});$.dialog("#connect").open();
  $("paper-item[page]").each(function(){$(this).attr("index",$(this).index()).attr("title",$(this).text().trim());});
- $("paper-drawer-panel")[0].closeDrawer=function(){$("paper-toast-stack").animate({"left":"12px"});this.selected="main";};
- $("paper-drawer-panel")[0].openDrawer=function(){$("paper-toast-stack").animate({"left":"268px"});this.selected="drawer";};
- 
+
  if(/chrom(e|ium)/.test(navigator.userAgent.toLowerCase())==false){
   $("#content div.buttons").html("<paper-item-icon-button icon='icons:info-outline' autofocus>GET CHROME</paper-item-icon-button>");
   $("#content div.holder").html("CHROME APP ONLY");
@@ -129,7 +140,7 @@ $(window).on("attempt",function(e){
  }).error(function(e){$().toast({text:"FAILED TO CONNECT TO "+host,type:"alert"});});
 });
 
-$(window).on("connected",function(e,data){//console.clear();
+$(window).on("connected",function(e,data){console.clear();
  var used=parseInt(tv_data.pvr.status.disk.usedSpace/1024/1024);
  var total=parseInt(tv_data.pvr.status.disk.totalSpace/1024/1024);
  $("neon-animatable").each(function(k,v){$.get($(this).attr("page"),function(d){$(v).html(d);})});

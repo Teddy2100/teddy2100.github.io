@@ -1,6 +1,12 @@
 <dom-module id="event-listener">
+ <style>
+  .hide{display:none;}
+ </style>
  <template>
   <content></content>
+  <img src="../images/static-large.png" class="hide"/>
+  <img src="../images/static.png" class="hide"/>
+  <img src="../images/space.png" class="hide"/>
  </template>
 </dom-module>
 <script>
@@ -11,28 +17,20 @@ Polymer({
   Polymer.IronSelectableBehavior
  ], 
  listeners:{
-  'iron-overlay-opened':'_ironOverlayOpened',
-  'iron-overlay-closed':'_ironOverlayClosed',
   'iron-resize':'resized'
  },
  
- _ironOverlayOpened:function(){
-  //$("paper-toolbar paper-icon-button").attr("disabled","disabled");
-  //console.log("_ironOverlayOpened");
- }, 
- _ironOverlayClosed:function(){
-  //$("paper-toolbar paper-icon-button").removeAttr("disabled");
-  //console.log("_ironOverlayClosed");
- },
- 
  registered:function(){
+  $("paper-drawer-panel").on("selected-changed",function(){
+   $("paper-toast-stack").animate({"left":(this.selected=="main"?"12px":"268px")});
+  });
   $("neon-animated-pages").on("neon-animation-finish",function(){
-   $("paper-drawer-panel")[0].closeDrawer();
+   $("paper-drawer-panel").get(0).closeDrawer();
   });
  }, 
  resized:function(){
   $("paper-dialog").each(function(k){if(this.opened){
-   this.style.minHeight=this.offsetHeight+"px";
+   //this.style.minHeight=this.offsetHeight+"px";   
    this.resetFit();this.refit();
   }});
  }
