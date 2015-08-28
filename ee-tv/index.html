@@ -49,15 +49,29 @@
   **FAKE DRAWER : DO NOT USE**
  </paper-material>
  <paper-dialog id="connect" entry-animation="scale-up-animation" exit-animation="fade-out-animation" modal>
-  <table class="holder" style="min-width:240px;"><tr><th colspan="100" nowrap>CONNECT VIA</th></tr><tr>
-   <td><paper-input type="tel" size="3" maxlength="3" label="192" pattern="^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$" no-label-float auto-validate></paper-input></td>
-   <td style="font-size:30px;">.</td>
-   <td><paper-input type="tel" size="3" maxlength="3" label="168" pattern="^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$" no-label-float auto-validate></paper-input></td>
-   <td style="font-size:30px;">.</td>
-   <td><paper-input type="tel" size="3" maxlength="3" label="1" pattern="^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$" no-label-float auto-validate></paper-input></td>
-   <td style="font-size:30px;">.</td>
-   <td><paper-input type="tel" size="3" maxlength="3" label="1" pattern="^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$" no-label-float auto-validate></paper-input></td>
-  </tr></table>
+  <div class="holder">
+   <div class="title" align="center" nowrap>CONNECT TO IP</div>
+   <table align="center" cellspacing="0"><tr>
+    <td><paper-input type="tel" size="3" maxlength="3" label="192" pattern="^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$" no-label-float auto-validate></paper-input></td>
+    <td style="font-size:30px;">.</td>
+    <td><paper-input type="tel" size="3" maxlength="3" label="168" pattern="^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$" no-label-float auto-validate></paper-input></td>
+    <td style="font-size:30px;">.</td>
+    <td><paper-input type="tel" size="3" maxlength="3" label="1" pattern="^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$" no-label-float auto-validate></paper-input></td>
+    <td style="font-size:30px;">.</td>
+    <td><paper-input type="tel" size="3" maxlength="3" label="1" pattern="^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$" no-label-float auto-validate></paper-input></td>
+   </tr></table>
+   <hr>
+   <div class="title" align="center" nowrap>BOX INDENTIFIER</div>
+   <table align="center" cellspacing="0"><tr>
+    <td style="font-size:20px;text-align:right;width:0px;">EE TV [</td>
+    <td><paper-input type="text" size="2" maxlength="2" label="AB" pattern="^[a-zA-Z0-9]+$" no-label-float auto-validate></paper-input></td>
+    <td style="font-size:20px;text-align:center;">:</td>
+    <td><paper-input type="text" size="2" maxlength="2" label="CD" pattern="^[a-zA-Z0-9]+$" no-label-float auto-validate></paper-input></td>
+    <td style="font-size:20px;text-align:center;">:</td>
+    <td><paper-input type="text" size="2" maxlength="2" label="EF" pattern="^[a-zA-Z0-9]+$" no-label-float auto-validate></paper-input></td>
+    <td style="font-size:20px;text-align:left;">]</td>
+   </tr></table>
+  </div>
   <div class="buttons">
    <paper-item-icon-button icon="icons:power-settings-new" autofocus>CONNECT</paper-item-icon-button>
   </div>
@@ -131,16 +145,20 @@ $(document).on("WebComponentsReady",function(){
 });
 
 $(window).on("attempt",function(e){
- var t=[],inputs=$("#connect paper-input");
- $(inputs).each(function(k,v){t[k]=v.value?v.value:v.label;});host=t.join(".");
- var powerOn="http://"+host+"/RemoteControl/KeyHandling/sendKey?avoidLongPress=1&key=on_off";
+ var ip=[],bi=[],inputs=$("#connect paper-input");
+ var powerOn="http://"+host+"/RemoteControl/KeyHandling/sendKey?avoidLongPress=1&key=on_off"; 
+ $(inputs).has("[type='tel']").each(function(k,v){ip[k]=v.value?v.value:v.label;});host=ip.join(".");
+ $(inputs).has("[type='text']").each(function(k,v){bi[k]=v.value?v.value:v.label;});device="ee-tv-"+bi.join("")+".default";
+
+  console.log(device.toLowerCase(),host);
+
  $.getJSON("http://"+host+"/UPnP/Device/getInfo?nc="+parseInt(new Date().getTime()),function(info_data){
   if(!info_data.pvr.available){$.get(powerOn,function(){$().sleep(5000,function(){$(window).trigger("connected");});});}
   if(info_data.pvr.available){tv_data=info_data;$(window).trigger("connected",["ready"]);}
  }).error(function(e){$().toast({text:"FAILED TO CONNECT TO "+host,type:"alert"});});
 });
 
-$(window).on("connected",function(e,data){console.clear();
+$(window).on("connected",function(e,data){//console.clear();
  var used=parseInt(tv_data.pvr.status.disk.usedSpace/1024/1024);
  var total=parseInt(tv_data.pvr.status.disk.totalSpace/1024/1024);
  $("neon-animatable").each(function(k,v){$.get($(this).attr("page"),function(d){$(v).html(d);})});
