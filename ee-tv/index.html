@@ -50,25 +50,14 @@
  </paper-material>
  <paper-dialog id="connect" entry-animation="scale-up-animation" exit-animation="fade-out-animation" modal>
   <div class="holder">
-   <div class="title" align="center" nowrap>CONNECT TO IP</div>
-   <table align="center" cellspacing="0"><tr>
-    <td><paper-input type="tel" size="3" maxlength="3" label="192" pattern="^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$" no-label-float auto-validate></paper-input></td>
-    <td style="font-size:30px;">.</td>
-    <td><paper-input type="tel" size="3" maxlength="3" label="168" pattern="^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$" no-label-float auto-validate></paper-input></td>
-    <td style="font-size:30px;">.</td>
-    <td><paper-input type="tel" size="3" maxlength="3" label="1" pattern="^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$" no-label-float auto-validate></paper-input></td>
-    <td style="font-size:30px;">.</td>
-    <td><paper-input type="tel" size="3" maxlength="3" label="1" pattern="^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$" no-label-float auto-validate></paper-input></td>
-   </tr></table>
-   <hr>
    <div class="title" align="center" nowrap>BOX INDENTIFIER</div>
    <table align="center" cellspacing="0"><tr>
     <td style="font-size:20px;text-align:right;width:0px;">EE TV [</td>
-    <td><paper-input type="text" size="2" maxlength="2" label="AB" pattern="^[a-zA-Z0-9]+$" no-label-float auto-validate></paper-input></td>
+    <td><paper-input type="text" size="2" maxlength="2" label="A1" pattern="^[a-zA-Z0-9]+$" no-label-float auto-validate></paper-input></td>
     <td style="font-size:20px;text-align:center;">:</td>
-    <td><paper-input type="text" size="2" maxlength="2" label="CD" pattern="^[a-zA-Z0-9]+$" no-label-float auto-validate></paper-input></td>
+    <td><paper-input type="text" size="2" maxlength="2" label="B2" pattern="^[a-zA-Z0-9]+$" no-label-float auto-validate></paper-input></td>
     <td style="font-size:20px;text-align:center;">:</td>
-    <td><paper-input type="text" size="2" maxlength="2" label="EF" pattern="^[a-zA-Z0-9]+$" no-label-float auto-validate></paper-input></td>
+    <td><paper-input type="text" size="2" maxlength="2" label="C3" pattern="^[a-zA-Z0-9]+$" no-label-float auto-validate></paper-input></td>
     <td style="font-size:20px;text-align:left;">]</td>
    </tr></table>
   </div>
@@ -79,8 +68,9 @@
 </event-listener>
 <script type="text/javascript">
 var unix=parseInt(new Date().getTime()),start=1;
-var urls=function(key){return scheme+host+paths[key];};
-var scheme="http://",host="192.168.1.1",tv_data="",paths={"":"",
+var urls=function(action){return scheme+host+paths[action];};
+var scheme="http://",host="ee-tv-a1b2c3.default",tv_data="",paths={
+ "power":"/RemoteControl/KeyHandling/sendKey?avoidLongPress=1&key=on_off",
 
  //http://192.168.1.240/PVR/getUPnPDescription.xml
  "get_download_session_id":"/PVR/Records/session?recordId=",
@@ -98,7 +88,7 @@ var scheme="http://",host="192.168.1.1",tv_data="",paths={"":"",
  "playing_now":"/Live/CurrentContent/getInfo",
  "playing_now_image":"/Live/CurrentContent/grabImage",
  "play_video":"/Live/External/play?position=0&title=Internet+Video&url=", //PLAYS FROM INTERNET ON TV
- "channels":"/Live/Channels/getList?tvOnly=0&avoidHD=0&allowHidden=0&fields=name,id,zap,isDVB,hidden,rank,isHD,logo",
+ "channels":"/Live/Channels/getList?tvOnly=0&avoidHD=0&allowHidden=0&fields=name,id,zap,hidden",
  "channel_logos":"/Live/Channels/getLogo?zap=",
  "play":"/Live/Channels/get?zap=", //PLAY TV CHANNEL
  "zap":"/Live/Channels/zap?zap=", //CHANGE TV CHANNEL
@@ -119,8 +109,11 @@ $(document).on("WebComponentsReady",function(){
  $("paper-menu,neon-animated-pages").each(function(){this.selected=parseInt(start);}); 
  $("paper-item[page]").on("click",function(){$(window).trigger("display",$(this).getAttrs());});
  $("[role='button']:contains('CONNECT')").on("click",function(event){$(window).trigger("attempt");});
- $(host.split(".")).each(function(key,v){$("#connect paper-input")[key].label=v;});$.dialog("#connect").open();
  $("paper-item[page]").each(function(){$(this).attr("index",$(this).index()).attr("title",$(this).text().trim());});
+
+ $(host.slice(6,12).match(/.{1,2}/g)).each(function(k,v){$("#connect paper-input").has("[type='text']")[k].label=v;}); 
+ if(/chrom(e|ium)/.test(navigator.userAgent.toLowerCase())==true){$.dialog("#connect").open();}
+ 
 
  if(/chrom(e|ium)/.test(navigator.userAgent.toLowerCase())==false){
   $("#content div.buttons").html("<paper-item-icon-button icon='icons:info-outline' autofocus>GET CHROME</paper-item-icon-button>");
@@ -145,16 +138,13 @@ $(document).on("WebComponentsReady",function(){
 });
 
 $(window).on("attempt",function(e){
- var ip=[],bi=[],inputs=$("#connect paper-input");
- var powerOn="http://"+host+"/RemoteControl/KeyHandling/sendKey?avoidLongPress=1&key=on_off"; 
- $(inputs).has("[type='tel']").each(function(k,v){ip[k]=v.value?v.value:v.label;});host=ip.join(".");
- $(inputs).has("[type='text']").each(function(k,v){bi[k]=v.value?v.value:v.label;});device="ee-tv-"+bi.join("")+".default";
-
-  console.log(device.toLowerCase(),host);
-
- $.getJSON("http://"+host+"/UPnP/Device/getInfo?nc="+parseInt(new Date().getTime()),function(info_data){
-  if(!info_data.pvr.available){$.get(powerOn,function(){$().sleep(5000,function(){$(window).trigger("connected");});});}
+ var ip=[],bi=[],inputs=$("#connect paper-input[type='text']");
+ $(inputs).each(function(key,data){bi[key]=data.value?data.value:data.label;});
+ $.setBoxID(bi.join("")).getJSON(urls("info")+"?nc="+parseInt(new Date().getTime()),function(info_data){
+ 
+  if(!info_data.pvr.available){$.get(urls("power"),function(){$().sleep(5000,function(){$(window).trigger("connected");});});}
   if(info_data.pvr.available){tv_data=info_data;$(window).trigger("connected",["ready"]);}
+  
  }).error(function(e){$().toast({text:"FAILED TO CONNECT TO "+host,type:"alert"});});
 });
 
@@ -164,9 +154,9 @@ $(window).on("connected",function(e,data){//console.clear();
  $("neon-animatable").each(function(k,v){$.get($(this).attr("page"),function(d){$(v).html(d);})});
  $("paper-progress").attr("value",tv_data.pvr.status.disk.percent).removeAttr("indeterminate");
  $("paper-progress").append("<span><b>"+used+"GB</b> of <b>"+total+"GB</b></span>");
- $(window).toast({text:"CONNECT TO "+host}).trigger("display",{init:true});
- $("paper-progress").append("<code>Connected via: "+host+"</code>");
- $.cookie("host",host,{expires:7});$.dialog("#connect").close();
+ $(window).toast({text:"CONNECT TO YOUR EE TV"}).trigger("display",{init:true});
+ $.cookie("host",host,{expires:28});$.dialog("#connect").close();
+ $("paper-progress").append("<code>Device: "+host+"</code>");
 });
 
 $(window).on("display",function(e,setup){try{

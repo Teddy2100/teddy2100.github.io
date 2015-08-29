@@ -11,21 +11,23 @@
 <body>
 
 <div class="content" style="text-align:center;">
- <canvas width="192" height="192" image="ic_com.htc.soundrecorder___com.htc.soundrecorder.SoundRecorderBG.png"></canvas>
- <canvas width="192" height="192" image="ic_com.htc.contacts___com.htc.contacts.DialerTabActivity.png"></canvas>
- <canvas width="192" height="192" image="test.png"></canvas>
- <canvas width="192" height="192" image="test0.png"></canvas>
- <canvas width="192" height="192" image="test1.png"></canvas>
- <canvas width="192" height="192" image="test2.png"></canvas>
+<?
+foreach(glob("./icons/*.png") as $image){
+ $colors=array("#F5F5F5","#6362BC","#DCDCDC","#FCD20B","#04B9F0","#7CC102","#FF9601","#FE369D","#FE2323","#434446");
+ 
+ 
+ echo" <canvas width='192' height='192' color='".$colors[array_rand($colors,1)]."' image='{$image}'></canvas>\n";
+} 
+?> 
 </div>
 
 <script>
 $(document).one("ready",function(){
  $("canvas").each(function(k){
-  var canvas=this;var ctx=canvas.getContext('2d');var size=96;
+  var canvas=this;var ctx=canvas.getContext('2d');var size=128;
   var img=new Image(),back=new Image(),mask=new Image(),overlay=new Image();
   
-  mask.src="./design_mask.png",overlay.src="./design_overlay.png",img.src="./icons/"+$(canvas).attr("image");
+  mask.src="./design_mask.png",overlay.src="./design_overlay.png",img.src=$(canvas).attr("image");
   
   img.addEventListener('load',function(){
    ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -34,8 +36,8 @@ $(document).one("ready",function(){
    var imageData=ctx.getImageData(0,0,canvas.width,canvas.height);
    for(var i=0;i<imageData.data.length;i+=4){if(imageData.data[i+3]!=0){
     imageData.data[i+0]=0;imageData.data[i+1]=0;imageData.data[i+2]=0;
-    imageData.data[i+3]=Math.min(imageData.data[i+3],30);
-   }}ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle="rgb(255,102,255)";
+    imageData.data[i+3]=Math.min(imageData.data[i+3],40);
+   }}ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle=$(canvas).attr("color");
    ctx.putImageData(imageData,0,0);ctx.drawImage(img,xy[0],xy[1],Math.min(size,img.width),Math.min(size,img.height));   
    ctx.globalCompositeOperation="destination-over";ctx.fillRect(0,0,canvas.width,canvas.height);
    //ctx.globalCompositeOperation="destination-over";ctx.drawImage(back,0,0);

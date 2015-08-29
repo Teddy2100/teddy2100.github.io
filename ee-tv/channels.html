@@ -31,7 +31,10 @@
  </div>
 </paper-dialog>
 <center id="uiContainer" page="channels.html">
- LOADING
+ <h1 cat="dvbsd">SD Channels</h1><div id="dvbsd"/>
+ <h1 cat="dvbhd">HD Channels</h1><div id="dvbhd"/>
+ <h1 cat="dab">Radio Channels</h1><div id="dab"/>
+ <h1 cat="x">Other Channels</h1><div id="x"/>
 </center>
 <script>
 console.log("CHANNELS LOADED");
@@ -39,7 +42,7 @@ $("#uiContainer").empty();//CLEAN CONTAINER
 $.getJSON(urls("channels"),function(channel_data){$.each(channel_data,function(k,json){
  var newholder=$("<div/>").addClass("channel").text(json.zap).on("click",function(){
   $("div.watchon").css("background-image","url("+urls("get_image")+json.zap+")");
-  $.dialog().attr({"zapid":json.zap,"zapname":json.name}).get(0).open();  
+  $.dialog().attr({"zapid":json.zap,"zapname":json.name}).get(0).open();
  }),logo=$("<img/>").attr("src",urls("channel_logos")+json.zap);
   logo.attr("onerror","this.src='./images/space.png';");
  $("#uiContainer").append(newholder.append(logo));

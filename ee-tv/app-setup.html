@@ -8,7 +8,11 @@ $.extend({
  dialog:function(element){try{
   if($.type(element)=="string"){return $(element);}  
   else{return $("neon-animatable[class='iron-selected'] paper-dialog");}
- }catch(e){console.log("No Dialogs Found");}}
+ }catch(e){console.log("No Dialogs Found");}},
+ setBoxID:function(id){
+  host="ee-tv-"+id+".default"
+  return this;
+ }
 });
 
 $.fn.extend({
