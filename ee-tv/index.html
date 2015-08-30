@@ -141,14 +141,12 @@ $(window).on("attempt",function(e){
  var ip=[],bi=[],inputs=$("#connect paper-input");
  $(inputs).each(function(key,data){bi[key]=data.value?data.value:data.label;});
  $.setBoxID(bi.join("")).getJSON(urls("info")+"?nc="+parseInt(new Date().getTime()),function(info_data){
- 
-  if(!info_data.pvr.available){$.get(urls("power"),function(){$().sleep(5000,function(){$(window).trigger("connected");});});}
-  if(info_data.pvr.available){tv_data=info_data;$(window).trigger("connected",["ready"]);}
-  
+  if(!info_data.pvr.available){$.get(urls("power"),function(){$().sleep(5000,function(){$(window).trigger("attempt");});});}
+  if(info_data.pvr.available){tv_data=info_data;$(window).trigger("connected",["ready"]);}  
  }).error(function(e){$().toast({text:"FAILED TO CONNECT TO "+host,type:"alert"});});
 });
 
-$(window).on("connected",function(e,data){//console.clear();
+$(window).on("connected",function(e,data){console.clear();
  var used=parseInt(tv_data.pvr.status.disk.usedSpace/1024/1024);
  var total=parseInt(tv_data.pvr.status.disk.totalSpace/1024/1024);
  $("neon-animatable").each(function(k,v){$.get($(this).attr("page"),function(d){$(v).html(d);})});
