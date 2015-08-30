@@ -53,11 +53,11 @@
    <div class="title" align="center" nowrap>BOX INDENTIFIER</div>
    <table align="center" cellspacing="0"><tr>
     <td style="font-size:20px;text-align:right;width:0px;">EE TV [</td>
-    <td><paper-input type="text" size="2" maxlength="2" label="A1" pattern="^[a-zA-Z0-9]+$" no-label-float auto-validate></paper-input></td>
+    <td><paper-input type="tel" size="2" maxlength="2" label="A1" pattern="^[a-zA-Z0-9]+$" no-label-float auto-validate></paper-input></td>
     <td style="font-size:20px;text-align:center;">:</td>
-    <td><paper-input type="text" size="2" maxlength="2" label="B2" pattern="^[a-zA-Z0-9]+$" no-label-float auto-validate></paper-input></td>
+    <td><paper-input type="tel" size="2" maxlength="2" label="B2" pattern="^[a-zA-Z0-9]+$" no-label-float auto-validate></paper-input></td>
     <td style="font-size:20px;text-align:center;">:</td>
-    <td><paper-input type="text" size="2" maxlength="2" label="C3" pattern="^[a-zA-Z0-9]+$" no-label-float auto-validate></paper-input></td>
+    <td><paper-input type="tel" size="2" maxlength="2" label="C3" pattern="^[a-zA-Z0-9]+$" no-label-float auto-validate></paper-input></td>
     <td style="font-size:20px;text-align:left;">]</td>
    </tr></table>
   </div>
@@ -111,7 +111,7 @@ $(document).on("WebComponentsReady",function(){
  $("[role='button']:contains('CONNECT')").on("click",function(event){$(window).trigger("attempt");});
  $("paper-item[page]").each(function(){$(this).attr("index",$(this).index()).attr("title",$(this).text().trim());});
 
- $(host.slice(6,12).match(/.{1,2}/g)).each(function(k,v){$("#connect paper-input").has("[type='text']")[k].label=v;}); 
+ $(host.slice(6,12).match(/.{1,2}/g)).each(function(k,v){$("#connect paper-input")[k].label=v;}); 
  if(/chrom(e|ium)/.test(navigator.userAgent.toLowerCase())==true){$.dialog("#connect").open();}
  
 
@@ -138,7 +138,7 @@ $(document).on("WebComponentsReady",function(){
 });
 
 $(window).on("attempt",function(e){
- var ip=[],bi=[],inputs=$("#connect paper-input[type='text']");
+ var ip=[],bi=[],inputs=$("#connect paper-input");
  $(inputs).each(function(key,data){bi[key]=data.value?data.value:data.label;});
  $.setBoxID(bi.join("")).getJSON(urls("info")+"?nc="+parseInt(new Date().getTime()),function(info_data){
  
