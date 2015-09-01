@@ -1,7 +1,9 @@
-body{margin:0px;}
-h1, h2, h3{font-weight:300;}
+body{margin:0px;padding:0px!important;}h1,h2,h3{font-weight:300;}
 html{font:16px/1 'Open Sans','Helvetica Neue',Helvetica,Arial,sans-serif;}
 img[shaddow]{-webkit-box-shadow:0 0 1.5em rgba(0,0,0,1);-moz-box-shadow:0 0 1.5em rgba(0,0,0,1);box-shadow:0 0 1.5em rgba(0,0,0,1);}
+
+a.project img{-webkit-filter:drop-shadow(12px 12px 25px rgba(0,0,0,0.5));}
+a.project{color:#FFFFFF;text-decoration:none;font-size:20px;}
 
 header{
  background-color:#E1E1E1;text-align:center;
@@ -12,7 +14,7 @@ header{
  background-image:-o-radial-gradient(center,ellipse cover,rgba(235,235,235,.7) 0,rgba(200,200,200,.3) 50%,rgba(30,30,30,.25) 100%);
  background-image:radial-gradient(ellipse at center,rgba(235,235,235,.7) 0,rgba(200,200,200,.3) 50%,rgba(30,30,30,.25) 100%);
  filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#B3EBEBEB', endColorstr='#401E1E1E', GradientType=1);
- background-repeat:repeat;height:22em;padding-top:0.6em;
+ background-repeat:repeat;height:300px;padding-top:0.6em;
 }
 
 section{
@@ -59,5 +61,5 @@ footer{
  box-sizing:border-box;
 }
 
-.avatar{width:320px;height:320px;border-radius:320px;border:solid 0.3125em #cc0b0b;margin-top:3em;}
-.guthublink img{height:32px;float:right;margin:10px;}
+.avatar{width:300px;height:300px;border-radius:300px;border:solid 0.3125em #cc0b0b;margin-top:3em;}
+footer img{height:32px;float:right;margin:10px;}

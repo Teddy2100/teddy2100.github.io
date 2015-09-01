@@ -5,25 +5,34 @@
  <meta http-equiv="X-UA-Compatible" content="IE=edge">
  <meta name="viewport" content="width=device-width, initial-scale=1">
  <meta name="description" content="Learning more and more each and every day.">
- <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+ <script type="text/javascript" src="./bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+ <script type="text/javascript" src="./bower_components/jquery/dist/jquery.min.js"></script>
  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:300,400,700">
+ <link rel="import" href="./bower_components/vulcanized-full.html"/>
  <link rel="stylesheet" href="./style.css">
 <body>
-
 <header>
  <img class="avatar" src="https://avatars0.githubusercontent.com/u/8090464" shaddow>
 </header>
 <section>
  <article>
-  <h2>PROJECTS COMING SOON</h2>
-  <div class="content" style="text-align:center;">
-  </div>
+  <h2>MY PROJECTS</h2>
+  <div class="content"><table width="100%" align="center" style="max-width:800px;"><tr>
+   <td align="center"><a class="project" href="./ee-tv/" title="EE TV GUI"></a></td>
+   <td align="center"><a class="project" href="./icon-maker/" title="ICON MAKER"></a></td>
+  </tr></table></div>
  </article>
 </section>
 <footer>
- <a href="https://github.com" class="guthublink">
-  <img alt="The GitHub Logo" src="https://help.github.com/assets/images/site/invertocat.png">
- </a>
+ <a href="http://bower.io/" title="Bower"><img src="http://bower.io/img/bower-logo.png"></a>
+ <a href="http://github.com/" title="GitHub"><img src="https://help.github.com/assets/images/site/invertocat.png"></a>
+ <a href="http://www.polymer-project.org/" title="Polymer"><img src="https://www.polymer-project.org/images/logos/p-logo-32.png"></a>
 </footer>
+<script>
+$("a.project").each(function(){
+ $(this).html($("<img/>").attr("src",this.href+"project.png"));
+ $(this).append($("<h3/>").html(this.title));
+});
+</script>
 </body>
 </html>

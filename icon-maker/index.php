@@ -10,7 +10,7 @@
  <script type="text/javascript" src="../bower_components/jquery/dist/jquery.min.js"></script>
  <style>
   body{background:radial-gradient(ellipse at center, #87e0fd 0%,#53cbf1 40%,#05abe0 100%);} 
-  img{width:100px;height:100px;cursor:pointer;-webkit-filter:drop-shadow(12px 12px 25px rgba(0,0,0,0.5));;}
+  img{width:100px;height:100px;cursor:pointer;-webkit-filter:drop-shadow(12px 12px 25px rgba(0,0,0,0.5));}
   canvas{display:none;}
  </style>
 <body>
