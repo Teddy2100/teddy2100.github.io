@@ -17,39 +17,59 @@
 
 <div class="content" style="text-align:center;">
 <?
+require("./setup.inc");
 function moveFile($from,$to){
  @mkdir(pathinfo($to)["dirname"],0755,true);
  if($from!=$to){rename($from,$to);}
 }
 
-foreach(glob("./res/**/*.png") as $image){
+foreach(glob("./input/**/*.png") as $image){
  switch(getimagesize($image)[0].getimagesize($image)[1]){
-  case"512512":moveFile($image,"./res/drawable-web/".pathinfo($image)["basename"]);break;
-  case"192192":moveFile($image,"./res/drawable-xxxhdpi/".pathinfo($image)["basename"]);break;
-  case"144144":moveFile($image,"./res/drawable-xxhdpi/".pathinfo($image)["basename"]);break;
-  case"9696":moveFile($image,"./res/drawable-xhdpi/".pathinfo($image)["basename"]);break;
-  case"7272":moveFile($image,"./res/drawable-hdpi/".pathinfo($image)["basename"]);break;
-  case"4848":moveFile($image,"./res/drawable-mdpi/".pathinfo($image)["basename"]);break;
-  case"3636":moveFile($image,"./res/drawable-ldpi/".pathinfo($image)["basename"]);break;
-  default:moveFile($image,"./res/drawable-nodpi/".pathinfo($image)["basename"]);
+  case"512512":moveFile($image,"./input/drawable-web/".pathinfo($image)["basename"]);break;
+  case"192192":moveFile($image,"./input/drawable-xxxhdpi/".pathinfo($image)["basename"]);break;
+  case"144144":moveFile($image,"./input/drawable-xxhdpi/".pathinfo($image)["basename"]);break;
+  case"9696":moveFile($image,"./input/drawable-xhdpi/".pathinfo($image)["basename"]);break;
+  case"7272":moveFile($image,"./input/drawable-hdpi/".pathinfo($image)["basename"]);break;
+  case"4848":moveFile($image,"./input/drawable-mdpi/".pathinfo($image)["basename"]);break;
+  case"3636":moveFile($image,"./input/drawable-ldpi/".pathinfo($image)["basename"]);break;
+  default:moveFile($image,"./input/drawable-nodpi/".pathinfo($image)["basename"]);
  }
 }
 
-foreach(glob("./res/**/*.png") as $image){
+foreach(glob("./input/**/*.png") as $image){
  $slices=explode("~",str_replace(["___","__","_"],"~",pathinfo($image)["filename"]));
  $colors=array("F5F5F5","6362BC","DCDCDC","FCD20B","04B9F0","7CC102","FF9601","FE369D","FE2323","434446");
  if(!@$slices[3]){$slices[3]=$colors[array_rand($colors,1)];}else{$slices[3]=str_replace("HEX","",$slices[3]);}
  moveFile($image,pathinfo($image)["dirname"]."/".implode("~",array_slice($slices,0,5)).".png");
 }
 
-$infolder="";
-foreach(glob("./res/**/*.png") as $image){
- $size=@explode("_",pathinfo($image)["filename"])[4];
- $requested=@explode("_",pathinfo($image)["filename"])[3];
- $foldername=strtoupper(substr(pathinfo($image)["dirname"],15));
+@mkdir("./res/drawable-xxhdpi/",0755,true);
+@mkdir("./res/xml/",0755,true);$infolder="";
+$drawable=openXML("./res/xml/drawable.xml","resources",1);
+$appfilter=openXML("./res/xml/appfilter.xml","resources",1);
+ $appfilter->addChild("scale")->addAttribute("factor","0.75");
+ $drawable->addChild("item")->addAttribute("drawable","design_logo");
+ $appfilter->addChild("iconmask")->addAttribute("img1","design_mask");
+ $appfilter->addChild("iconupon")->addAttribute("img1","design_overlay");
+ 
+ $bg=$appfilter->addChild("iconback");
+foreach(glob("./input/bg_*.png") as $k=>$file){
+	$refrence=pathinfo($file)["filename"];
+	$bg->addAttribute("img".($k+1),$refrence);
+}
+ 
+foreach(glob("./input/**/*.png") as $image){
+ $options=@explode("~",pathinfo($image)["filename"]);
+ $foldername=strtoupper(substr(pathinfo($image)["dirname"],17));
  if($infolder!=$foldername){echo"<h1>{$foldername}</h1>\n";$infolder=$foldername;} 
- echo" <canvas width='192' height='192' hex='#{$requested}' image='{$image}'></canvas>\n"; 
-} 
+ echo" <canvas width='192' height='192' image='{$image}'></canvas>\n"; 
+ $drawable->addChild("item")->addAttribute("drawable","icon_".md5($options[1].$options[2]));
+ $newItemApp=$appfilter->addChild("item");
+	$newItemApp->addAttribute("component","ComponentInfo{".$options[1]."/".$options[2]."}");
+ $newItemApp->addAttribute("drawable","icon_".md5($options[1].$options[2]));
+}
+saveXML("./res/xml/appfilter.xml",$appfilter);
+saveXML("./res/xml/drawable.xml",$drawable);
 ?> 
 </div>
 
@@ -72,11 +92,10 @@ $(document).one("ready",function(){
     for(var x=1;x<mask.width;x++){ctx.drawImage(img,xy[0]+x,xy[1]+x,iconxy[0],iconxy[1]);}
     ctx.putImageData(shadow(ctx.getImageData(0,0,mask.width,mask.height)),0,0);ctx.drawImage(img,xy[0],xy[1],iconxy[0],iconxy[1]);
     ctx.globalCompositeOperation="destination-over";ctx.fillStyle="#"+options[2];ctx.fillRect(0,0,mask.width,mask.height);
-    ctx.globalCompositeOperation="source-over";ctx.drawImage(overlay,0,0);//ctx.drawImage(best,0,0);
-    ctx.globalCompositeOperation="xor";ctx.drawImage(mask,0,0);
+    //ctx.globalCompositeOperation="source-over";ctx.drawImage(overlay,0,0);//ctx.drawImage(best,0,0);
+    //ctx.globalCompositeOperation="xor";ctx.drawImage(mask,0,0);
 
-    data["name"]=(options[0]+options[1]).replace(/^.*[\\\/]/,"");
-    data["nc"]=new Date().getTime();data["base64"]=canvas.toDataURL();
+    data["name"]=(options[0]+options[1]);data["base64"]=canvas.toDataURL();
     $.post("./base64png.php",data,function(x){var base64=$("<img/>").attr("src",x);
      base64.on("click",function(){window.open("https://play.google.com/store/apps/details?id="+options[0]);});
      $(canvas).replaceWith(base64);console.log("SAVED",x);
@@ -89,7 +108,7 @@ $(document).one("ready",function(){
 function shadow(imageData){
  for(var i=0;i<imageData.data.length;i+=4){if(imageData.data[i+3]!=0){
   imageData.data[i+0]=0;imageData.data[i+1]=0;imageData.data[i+2]=0;
-  imageData.data[i+3]=Math.min(imageData.data[i+3],40);
+  imageData.data[i+3]=Math.min(imageData.data[i+3],50);
  }}return imageData;
 }
 </script>
