@@ -1,26 +1,20 @@
-<link rel=import href=../polymer/polymer.html><link rel=import href=../paper-styles/paper-styles.html><link rel=import href=paper-input-addon-behavior.html><dom-module id=paper-input-error><style>
+<link rel=import href=../polymer/polymer.html><link rel=import href=../paper-styles/paper-styles.html><link rel=import href=paper-input-addon-behavior.html><dom-module id=paper-input-error><template><style>
+      :host {
+        display: inline-block;
+        visibility: hidden;
+        float: left;
 
-    :host {
-      display: inline-block;
-      visibility: hidden;
-      float: left;
+        color: var(--paper-input-container-invalid-color, --google-red-500);
 
-      color: var(--paper-input-container-invalid-color, --google-red-500);
+        @apply(--paper-font-caption);
+        @apply(--paper-input-error);
+      }
 
-      @apply(--paper-font-caption);
-      @apply(--paper-input-error);
-    }
-
-    :host([invalid]) {
-      visibility: visible;
-    };
-
-  </style><template><content></content></template></dom-module><script>
-
-(function() {
-
+      :host([invalid]) {
+        visibility: visible;
+      };
+    </style><content></content></template></dom-module><script>
   Polymer({
-
     is: 'paper-input-error',
 
     behaviors: [
@@ -28,7 +22,6 @@
     ],
 
     properties: {
-
       /**
        * True if the error is showing.
        */
@@ -37,15 +30,10 @@
         reflectToAttribute: true,
         type: Boolean
       }
-
     },
 
     update: function(state) {
       this._setInvalid(state.invalid);
     }
-
-  })
-
-})();
-
+  });
 </script>

@@ -2,7 +2,6 @@
 
     :host {
       display: block;
-      will-change: transform;
     }
 
     :host(.has-scroller) {
@@ -18,6 +17,7 @@
       box-sizing: border-box;
       position: absolute;
       top: 0;
+      will-change: transform;
     }
 
   </style><template><array-selector id=selector items={{items}} selected={{selectedItems}} selected-item={{selectedItem}}></array-selector><div id=items><content></content></div></template></dom-module><script>
@@ -719,7 +719,7 @@
 
         // create the initial physical items
         if (!this._physicalItems) {
-          this._physicalCount = DEFAULT_PHYSICAL_COUNT;
+          this._physicalCount = Math.max(1, Math.min(DEFAULT_PHYSICAL_COUNT, this._virtualCount));
           this._physicalItems = this._createPool(this._physicalCount);
           this._physicalSizes = new Array(this._physicalCount);
         }

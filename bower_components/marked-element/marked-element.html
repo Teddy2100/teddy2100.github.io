@@ -1,4 +1,9 @@
-<link rel=import href=../polymer/polymer.html><link rel=import href=marked-import.html><dom-module id=marked-element><template><div id=content></div></template></dom-module><script>
+<link rel=import href=../polymer/polymer.html><link rel=import href=marked-import.html><dom-module id=marked-element><template><style>
+      /* Thanks IE 10. */
+      .hidden {
+        display: none !important;
+      }
+    </style><content select=.markdown-html></content><div id=content class=hidden></div></template></dom-module><script>
 
   'use strict';
 
@@ -42,11 +47,22 @@
      */
     attached: function() {
       this._attached = true;
+      this._outputElement = this.outputElement;
       this.render();
     },
 
     detached: function() {
       this._attached = false;
+    },
+
+    get outputElement () {
+      var child = Polymer.dom(this).queryDistributedElements('.markdown-html')[0];
+
+      if (child)
+        return child;
+
+      this.toggleClass('hidden', false, this.$.content);
+      return this.$.content;
     },
 
     /**
@@ -61,11 +77,11 @@
     render: function() {
       if (!this._attached) return;
       if (!this.markdown) {
-        this.$.content.innerHTML = '';
+        Polymer.dom(this._outputElement).innerHTML = '';
         return;
       }
 
-      this.$.content.innerHTML = marked(this.markdown, {
+      Polymer.dom(this._outputElement).innerHTML = marked(this.markdown, {
         highlight: this._highlight.bind(this),
       });
     },

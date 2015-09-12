@@ -1,21 +1,20 @@
 <?
+set_time_limit(300);
 date_default_timezone_set("Europe/London");
 header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Cache-Control: post-check=0, pre-check=0",false);
 header("Cache-Control: no-store, no-cache, must-revalidate");
 
-define("APK_NAME","TestApp");
 define("ADB","C:/Android/sdk/platform-tools");
 define("JAVA_HOME","C:/Progra~1/Java/jdk1.7.0_72");
-define("ANDROID_HOME","C:/Android/sdk/build-tools/22.0.1");
+define("ANDROID_HOME","C:/Android/sdk/build-tools/23.0.1");
 define("DEV_HOME","C:/Dropbox/Projects/Android Applications");
-define("APK",documentRoot("../Projects/Android Applications/IconMaker/"));
-define("TEMP",documentRoot("../../xampp/tmp/icons/"));@mkdir(TEMP,0755,true);
+define("ANDROID_JAR","C:/Android/sdk/platforms/android-23/android.jar");
+define("APPLICATION_HOME","C:/Dropbox/Projects/Android Applications/IconMaker");
 
-if(!file_exists(APK)){die("ANDROID APPLICATION FOLDER DOES NOT EXISTS");}else{
- define("DRAWABLE",APK."res/drawable-xxhdpi/");define("XML",APK."res/xml/");
- if(!file_exists(DRAWABLE)){mkdir(DRAWABLE,0755,true);}
- if(!file_exists(XML)){mkdir(XML,0755,true);}
+if(!file_exists(APPLICATION_HOME)){die("ANDROID APPLICATION FOLDER DOES NOT EXISTS");}else{
+ define("DRAWABLE",APPLICATION_HOME."/res/drawable-xxxhdpi/");if(!file_exists(DRAWABLE)){mkdir(DRAWABLE,0755,true);}
+ define("XML",APPLICATION_HOME."/res/xml/");if(!file_exists(XML)){mkdir(XML,0755,true);}
 }
 
 function documentRoot($goto=""){
@@ -49,5 +48,14 @@ function openJSON($filename){
 
 function saveJSON($filename,$array){
  file_put_contents($filename,json_encode($array));
+}
+
+function randomPART(){
+ return str_pad(dechex(mt_rand(0,255)),2,"0",STR_PAD_LEFT);
+}
+
+function randomCOLOR(){
+ $hex=randomPART().randomPART().randomPART();
+ return strToUpper($hex);
 }
 ?>

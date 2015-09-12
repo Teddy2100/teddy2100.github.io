@@ -1,4 +1,4 @@
-<link rel=import href=../polymer/polymer.html><link rel=import href=../paper-styles/paper-styles.html><link rel=import href=../paper-progress/paper-progress.html><link rel=import href=../paper-input/paper-input.html><link rel=import href=../paper-behaviors/paper-inky-focus-behavior.html><link rel=import href=../paper-ripple/paper-ripple.html><link rel=import href=../iron-a11y-keys-behavior/iron-a11y-keys-behavior.html><link rel=import href=../iron-range-behavior/iron-range-behavior.html><link rel=import href=../iron-form-element-behavior/iron-form-element-behavior.html><dom-module id=paper-slider><link rel=import type=css href=paper-slider.css><template><div id=sliderContainer class$="[[_getClassNames(disabled, pin, snaps, immediateValue, min, expand, dragging, transiting, editable)]]"><div class=bar-container><paper-progress class$=[[_getProgressClass(transiting)]] id=sliderBar aria-hidden=true min=[[min]] max=[[max]] step=[[step]] value=[[immediateValue]] secondary-progress=[[secondaryProgress]] on-down=_bardown on-up=_resetKnob on-track=_onTrack></paper-progress></div><template is=dom-if if=[[snaps]]><div class="slider-markers horizontal layout"><template is=dom-repeat items=[[markers]]><div class="slider-marker flex"></div></template></div></template><div id=sliderKnob class="center-justified center horizontal layout" on-down=_knobdown on-up=_resetKnob on-track=_onTrack on-transitionend=_knobTransitionEnd><paper-ripple center id=ink class=circle hidden$=[[!receivedFocusFromKeyboard]]></paper-ripple><div id=sliderKnobInner value$=[[immediateValue]]></div></div></div><template is=dom-if if=[[editable]]><paper-input id=input class=slider-input disabled$=[[disabled]] on-change=_inputChange value=[[_fixForInput(immediateValue)]]></paper-input></template></template></dom-module><script>
+<link rel=import href=../polymer/polymer.html><link rel=import href=../paper-styles/paper-styles.html><link rel=import href=../paper-progress/paper-progress.html><link rel=import href=../paper-input/paper-input.html><link rel=import href=../paper-behaviors/paper-inky-focus-behavior.html><link rel=import href=../paper-ripple/paper-ripple.html><link rel=import href=../iron-a11y-keys-behavior/iron-a11y-keys-behavior.html><link rel=import href=../iron-range-behavior/iron-range-behavior.html><link rel=import href=../iron-form-element-behavior/iron-form-element-behavior.html><dom-module id=paper-slider><link rel=import type=css href=paper-slider.css><template><div id=sliderContainer class$="[[_getClassNames(disabled, pin, snaps, immediateValue, min, expand, dragging, transiting, editable)]]"><div class=bar-container><paper-progress disabled$=[[disabled]] id=sliderBar aria-hidden=true min=[[min]] max=[[max]] step=[[step]] value=[[immediateValue]] secondary-progress=[[secondaryProgress]] on-down=_bardown on-up=_resetKnob on-track=_onTrack></paper-progress></div><template is=dom-if if=[[snaps]]><div class="slider-markers horizontal layout"><template is=dom-repeat items=[[markers]]><div class="slider-marker flex"></div></template></div></template><div id=sliderKnob class="center-justified center horizontal layout" on-down=_knobdown on-up=_resetKnob on-track=_onTrack on-transitionend=_knobTransitionEnd><paper-ripple center id=ink class=circle hidden$=[[!receivedFocusFromKeyboard]]></paper-ripple><div id=sliderKnobInner value$=[[immediateValue]]></div></div></div><template is=dom-if if=[[editable]]><paper-input id=input class=slider-input disabled$=[[disabled]] on-change=_inputChange value=[[_fixForInput(immediateValue)]]></paper-input></template></template></dom-module><script>
 
   Polymer({
     is: 'paper-slider',
@@ -57,7 +57,8 @@
       immediateValue: {
         type: Number,
         value: 0,
-        readOnly: true
+        readOnly: true,
+        notify: true
       },
 
       /**
@@ -318,23 +319,15 @@
     },
 
     _getClassNames: function() {
-      var classes = {};
-
-      classes.disabled = this.disabled;
-      classes.pin = this.pin;
-      classes.snaps = this.snaps;
-      classes.ring = this.immediateValue <= this.min;
-      classes.expand = this.expand;
-      classes.dragging = this.dragging;
-      classes.transiting = this.transiting;
-      classes.editable = this.editable;
-
-      return this._mergeClasses(classes);
-    },
-
-    _getProgressClass: function() {
       return this._mergeClasses({
-        transiting: this.transiting
+        disabled: this.disabled,
+        pin: this.pin,
+        snaps: this.snaps,
+        ring: this.immediateValue <= this.min,
+        expand: this.expand,
+        dragging: this.dragging,
+        transiting: this.transiting,
+        editable: this.editable
       });
     },
 
