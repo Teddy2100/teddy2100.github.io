@@ -14,7 +14,7 @@ $_GET['image']=pathinfo($_GET['image'])['basename'];
 $imagelocation=glob("./{res/**,stored/raw}/".$_GET['image'].".png",GLOB_BRACE)[0];
 echo"  <div id='canvasoutput' style='position:relative;width:192px;height:192px;'>\n";
 $options=@json_decode(file_get_contents("./stored/list.json"),true)[str_replace(".png","",$_GET['image'])];
-if(!$options){$options['size']=128;$options['background']="FFFFFF";$options['name']=explode("~",$_GET['image'])[1];}
+if(!$options){$options['size']=128;$options['background']="FFFFFF";$options['name']=@explode("~",$_GET['image'])[1];}
 echo"   <canvas id='raw' hex='#{$options['background']}' size='{$options['size']}' image='{$imagelocation}?nc=".time()."'></canvas>\n";
 echo"   <img id='overlay' src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII='/>\n";
 echo"   <img id='bestfit' src='./designs/best_fit.png' style='display:none;'/>\n";

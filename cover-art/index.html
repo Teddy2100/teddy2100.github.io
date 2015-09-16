@@ -1,0 +1,76 @@
+<html lang="en" class="">
+<head>
+ <meta charset="utf-8">
+ <title>Social Cover Maker</title>
+ <meta name="language" content="english"/>
+ <meta name="theme-color" content="#009C9C">
+ <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+ <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+ <script type="text/javascript" src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+ <script type="text/javascript" src="../bower_components/jquery/dist/jquery.min.js"></script>
+ <link rel="import" href="../bower_components/vulcanized-full.html"/>
+ <style is="custom-style">
+  canvas{border:1px solid black;}
+ </style>
+</head>
+<body>
+<canvas id="cover" width="851" height="315"></canvas>
+<br><hr><br>
+<input type="file" id="upload" for="backleft">
+<input type="file" id="upload" for="frontleft">
+<input type="file" id="upload" for="frontcenter">
+<input type="file" id="upload" for="frontright">
+<input type="file" id="upload" for="backright">
+<script>
+var images=new Array();
+var canvas=$("canvas").get(0);
+var context=canvas.getContext("2d");
+
+$("canvas").on("redraw",function(){
+ context.clearRect(0,0,canvas.width*2,canvas.height*2);
+ var gradient=context.createLinearGradient(0,0,canvas.width,0);
+ gradient.addColorStop(0.0,"lightblue");gradient.addColorStop(1.0,"pink");
+ context.fillStyle=gradient;context.fillRect(0,0,canvas.width,canvas.height);context.shadowColor="black";context.shadowBlur=15;
+ context.drawImage(addRing(images['backleft'],canvas.height*0.45),(canvas.width*0.14)-(canvas.height*0.45)/2,(canvas.height-(canvas.height*0.45))/2);
+ context.drawImage(addRing(images['backright'],canvas.height*0.45),(canvas.width*0.86)-(canvas.height*0.45)/2,(canvas.height-(canvas.height*0.45))/2);
+ context.drawImage(addRing(images['frontleft'],canvas.height*0.55),(canvas.width*0.30)-(canvas.height*0.55)/2,(canvas.height-(canvas.height*0.55))/2);
+ context.drawImage(addRing(images['frontright'],canvas.height*0.55),(canvas.width*0.70)-(canvas.height*0.55)/2,(canvas.height-(canvas.height*0.55))/2);
+ context.drawImage(addRing(images['frontcenter'],canvas.height*0.75),(canvas.width*0.50)-(canvas.height*0.75)/2,(canvas.height-(canvas.height*0.75))/2);
+});
+
+$("input[type='file']").each(function(){
+ var hidden=$("<input/>").attr("type","hidden");
+  hidden.attr("id",$(this).attr("for"));
+  $("canvas").trigger("redraw");
+ $("body").append(hidden);
+});
+
+$("input[type='file']").on("change",function(e){
+ var reader=new FileReader(),file=$(this).get(0).files[0],id=$(this).attr("for");
+  reader.onload=function(e){$("#"+id).val(reader.result).trigger("change");}
+  reader.onerror=function(e){console.log("OOPS");}
+ reader.readAsDataURL(file);
+});
+
+$("input[type='hidden']").on("change",function(){
+ var temp=$(this).attr("id");images[temp]=new Image();
+  images[temp].src=$(this).val();images[temp].ref=new Date();
+  images[temp].onload=function(){$("canvas").trigger("redraw");};
+ return;
+});
+
+function addRing(img,size){
+ var temp=document.createElement('canvas'),scale=1;
+ var tempctx=temp.getContext("2d");temp.width=size;temp.height=size;try{scale=img.width/img.height;
+  tempctx.beginPath();tempctx.arc(temp.width/2,temp.height/2,(temp.height/2)-3,0,2*Math.PI);tempctx.save();
+  if(scale<1){tempctx.clip();tempctx.drawImage(img,0,-((size/scale)-size)/2,size,size/scale);}
+  if(scale>1){tempctx.clip();tempctx.drawImage(img,-((size*scale)-size)/2,0,size*scale,size);} 
+  if(scale==1){tempctx.clip();tempctx.drawImage(img,0,0,size,size);}
+  tempctx.restore();tempctx.strokeStyle='#FFF';
+  tempctx.lineWidth=5;tempctx.stroke();
+ }catch(event){}
+ return temp;
+}
+</script>
+</body>
+</head>

@@ -1,5 +1,6 @@
 <?require("./setup.inc");?>
-<html lang="en" class=""><head>
+<html lang="en" class="">
+<head>
  <meta charset="utf-8">
  <title>Android Icon Maker</title>
  <meta name="language" content="english"/>
@@ -13,6 +14,7 @@
   body{background:radial-gradient(ellipse at center, #87e0fd 0%,#53cbf1 40%,#05abe0 100%);}
   canvas{display:none;}canvas:first-of-type{display:block;}
  </style>
+</head>
 <body>
 <div class="content"> 
 <?
