@@ -1,4 +1,5 @@
-<html lang="en" class=""><head>
+<html lang="en" class="">
+<head>
  <meta charset="utf-8">
  <title>My Github Projects</title>
  <link rel="shortcut icon" href="favicon.ico">
@@ -9,20 +10,96 @@
  <script type="text/javascript" src="./bower_components/jquery/dist/jquery.min.js"></script>
  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:300,400,700">
  <link rel="import" href="./bower_components/vulcanized-full.html"/>
- <link rel="stylesheet" href="./style.css">
+ <style is="custom-style">  
+ body{margin:0px;padding:0px!important;}h1,h2,h3{font-weight:300;}
+ html{font:16px/1 'Open Sans','Helvetica Neue',Helvetica,Arial,sans-serif;}
+
+ header{
+  background-color:#E1E1E1;text-align:center;
+  background-image:-webkit-gradient(radial,center center,0,center center,100%,color-stop(0%,rgba(235,235,235,.7)),color-stop(50%,rgba(200,200,200,.3)),color-stop(100%,rgba(30,30,30,.25)));
+  background-image:-webkit-radial-gradient(center,ellipse cover,rgba(235,235,235,.7) 0,rgba(200,200,200,.3) 50%,rgba(30,30,30,.25) 100%);
+  background-image:-moz-radial-gradient(center,ellipse cover,rgba(235,235,235,.7) 0,rgba(200,200,200,.3) 50%,rgba(30,30,30,.25) 100%);
+  background-image:-ms-radial-gradient(center,ellipse cover,rgba(235,235,235,.7) 0,rgba(200,200,200,.3) 50%,rgba(30,30,30,.25) 100%);
+  background-image:-o-radial-gradient(center,ellipse cover,rgba(235,235,235,.7) 0,rgba(200,200,200,.3) 50%,rgba(30,30,30,.25) 100%);
+  background-image:radial-gradient(ellipse at center,rgba(235,235,235,.7) 0,rgba(200,200,200,.3) 50%,rgba(30,30,30,.25) 100%);
+  filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#B3EBEBEB', endColorstr='#401E1E1E', GradientType=1);
+  background-repeat:repeat;height:250px;padding-top:0.6em;
+ }
+ header img.avatar{
+  -webkit-box-shadow:0 0 1.5em rgba(0,0,0,1);-moz-box-shadow:0 0 1.5em rgba(0,0,0,1);box-shadow:0 0 1.5em rgba(0,0,0,1);
+  position:absolute;top:25px;left:0px;right:0px;margin:auto;width:250px;height:250px;
+  border-radius:100%;border:solid 0.3125em #cc0b0b;
+ }
+
+ section{
+  background-color:#e50c0c;
+ }
+ section article{
+  border-bottom:solid 0.3125em #cc0b0b;
+  border-top:solid 0.3125em #cc0b0b;
+  text-align:center;
+ }
+ section article h2{
+  background-color: #ff3e3e;
+  border-bottom: solid .104em #ff5656;
+  border-top: solid .104em #ff5656;
+  -webkit-box-shadow: 0 0 .8333em rgba(0,0,0,.4);
+  -moz-box-shadow: 0 0 .8333em rgba(0,0,0,.4);
+  box-shadow: 0 0 .8333em rgba(0,0,0,.4);
+  clear: both;
+  color: #FFF;
+  margin-bottom: 0.5em;
+  margin-top: 0.9375em;
+  padding: 0.1875em 0;
+  text-align: center;
+  text-shadow: 0 -1px rgba(0,0,0,.5);
+  font-size:3em;
+  line-height:1.3;
+ }
+ section article h2:last-of-type{
+  margin-bottom: 0.9375em;
+ }
+ section article a[shadow] h3{
+  margin-bottom:35px;
+  margin-top:10px;
+ }  
+ section article a[shadow]{
+  display:inline-block;min-width:275px;
+  -webkit-filter:drop-shadow(0px 20px 25px rgba(0,0,0,0.5));
+  color:#FFFFFF;text-decoration:none;font-size:20px;
+  text-shadow:1px 1px rgba(0,0,0,0.5);
+  text-align:center;
+ }
+
+ footer{
+  background-color: #C8C8C8;
+  background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0%,#C8C8C8),color-stop(100%,#FFF));
+  background-image: -webkit-linear-gradient(top,#C8C8C8 0,#FFF 100%);
+  background-image: -moz-linear-gradient(top,#C8C8C8 0,#FFF 100%);
+  background-image: -ms-linear-gradient(top,#C8C8C8 0,#FFF 100%);
+  background-image: -o-linear-gradient(top,#C8C8C8 0,#FFF 100%);
+  background-image: linear-gradient(to bottom,#C8C8C8 0,#FFF 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#c8c8c8', endColorstr='#ffffff', GradientType=0);
+  border-top:1px solid #F0F0F0;height:5em;
+  box-sizing:border-box;
+ }
+ footer img{
+  height:32px;float:right;margin:10px;
+ }
+ </style> 
 </head>
 <body>
 <header>
- <img class="avatar" src="https://avatars0.githubusercontent.com/u/8090464" shaddow>
+ <img class="avatar" src="https://avatars0.githubusercontent.com/u/8090464">
 </header>
 <section>
  <article>
   <h2>MY PROJECTS</h2>
-  <div class="content"><table width="100%" align="center" style="max-width:800px;"><tr>
-   <td align="center"><a class="project" href="./ee-tv/" title="EE TV GUI"></a></td>
-   <td align="center"><a class="project" href="./icon-maker/" title="MY ICON PACK"></a></td>
-   <td align="center"><a class="project" href="./cover-art/" title="COVER MAKER"></a></td>
-  </tr></table></div>
+  <div class="content">
+   <a class="project" href="./ee-tv/" title="EE TV GUI"></a>
+   <a class="project" href="./icon-maker/" title="MY ICON PACK"></a>
+   <a class="project" href="./cover-art/" title="COVER MAKER"></a>
+  </div>  
  </article>
 </section>
 <footer>
@@ -32,8 +109,9 @@
 </footer>
 <script>
 $("a.project").each(function(){
- $(this).html($("<img/>").attr("src",this.href+"project.png"));
+ $(this).html($("<img/>").attr({"src":this.href+"project.png"}));
  $(this).append($("<h3/>").html(this.title));
+ $(this).attr("shadow","");
 });
 </script>
 </body>

@@ -1,75 +1,127 @@
-<html lang="en" class="">
+<!doctype html>
+<html lang="en" data-framework="polymer">
 <head>
  <meta charset="utf-8">
- <title>Social Cover Maker</title>
+ <title>Social Cover Art Maker</title>
  <meta name="language" content="english"/>
  <meta name="theme-color" content="#009C9C">
  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
  <script type="text/javascript" src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
  <script type="text/javascript" src="../bower_components/jquery/dist/jquery.min.js"></script>
+ <script type="text/javascript" src="./elements/jquery.cookie.js"></script>
  <link rel="import" href="../bower_components/vulcanized-full.html"/>
+  <link rel="import" href="./elements/paper-item-icon-button.html"/>
+ <link rel="import" href="./elements/event-listener.html"/>
+ <link rel="import" href="./app-setup.html"/>
  <style is="custom-style">
-  canvas{border:1px solid black;}
+  canvas{display:none;}
  </style>
 </head>
-<body>
-<canvas id="cover" width="851" height="315"></canvas>
-<br><hr><br>
-<input type="file" id="upload" for="backleft">
-<input type="file" id="upload" for="frontleft">
-<input type="file" id="upload" for="frontcenter">
-<input type="file" id="upload" for="frontright">
-<input type="file" id="upload" for="backright">
+<body unresolved>
+<event-listener id="art-gui">
+ <paper-toast-stack></paper-toast-stack> 
+ <paper-drawer-panel id="page" force-narrow>
+  <paper-material id="drawer" elevation="5" drawer>
+   <paper-item page="remote.html"><iron-icon icon="notification:tap-and-play"></iron-icon>Remote</paper-item>
+   <paper-item page="channels.html"><iron-icon icon="apps"></iron-icon>Channels</paper-item>
+   <paper-item page="recordings.html"><iron-icon icon="notification:ondemand-video"></iron-icon>Recordings</paper-item>
+   <paper-item><iron-icon icon="editor:insert-link"></iron-icon>Play URL</paper-item>
+   <paper-progress max="100" class="green" indeterminate></paper-progress>
+  </paper-material>
+  <paper-header-panel id="main" mode="standard" main>
+   <paper-toolbar mode="none">
+     <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
+     <span id="gui-title-bar" class="title">Loading Please Wait</span>
+     <paper-icon-button icon="refresh"></paper-icon-button>
+   </paper-toolbar>
+   <section class="fit" style="text-align:center;">
+    <canvas id="mobile" width="563" height="315"></canvas>
+    <canvas id="desktop" width="851" height="315"></canvas>
+    <paper-material class="preview" elevation="2">
+     <img id="desktop-preview" style="width:100%;max-width:851px;"/>
+    </paper-material>
+    <paper-material class="content" elevation="2">
+     <table cellspacing="10" cellpadding="0" border="0" class="thumbs">
+      <tr><td><img src="./images/no-image.png" id="tmp-mainback"/></td><th><input type="file" for="mainback"></th></tr>
+     </table>
+    </paper-material>
+    <paper-material class="content" elevation="2">
+     <table cellspacing="10" cellpadding="0" border="0" class="thumbs">
+      <tr><td><img src="./images/no-image.png" id="tmp-backleft"/></td><th><input type="file" for="backleft"></th></tr>
+      <tr><td><img src="./images/no-image.png" id="tmp-frontleft"/></td><th><input type="file" for="frontleft"></th></tr>
+      <tr><td><img src="./images/no-image.png" id="tmp-frontcenter"/></td><th><input type="file" for="frontcenter"></th></tr>
+      <tr><td><img src="./images/no-image.png" id="tmp-frontright"/></td><th><input type="file" for="frontright"></th></tr>
+      <tr><td><img src="./images/no-image.png" id="tmp-backright"/></td><th><input type="file" for="backright"></th></tr>
+     </table>
+    </paper-material>
+   </section>
+  </paper-header-panel>
+ </paper-drawer-panel>
+ <paper-material id="drawer-fake" elevation="5">
+  **FAKE DRAWER : DO NOT USE**
+ </paper-material>
+</event-listener>
 <script>
 var images=new Array();
-var canvas=$("canvas").get(0);
-var context=canvas.getContext("2d");
+var reader=new FileReader();
+var mobile=$("canvas#mobile").get(0);
+var desktop=$("canvas#desktop").get(0);
 
-$("canvas").on("redraw",function(){
- context.clearRect(0,0,canvas.width*2,canvas.height*2);
- var gradient=context.createLinearGradient(0,0,canvas.width,0);
- gradient.addColorStop(0.0,"lightblue");gradient.addColorStop(1.0,"pink");
- context.fillStyle=gradient;context.fillRect(0,0,canvas.width,canvas.height);context.shadowColor="black";context.shadowBlur=15;
- context.drawImage(addRing(images['backleft'],canvas.height*0.45),(canvas.width*0.14)-(canvas.height*0.45)/2,(canvas.height-(canvas.height*0.45))/2);
- context.drawImage(addRing(images['backright'],canvas.height*0.45),(canvas.width*0.86)-(canvas.height*0.45)/2,(canvas.height-(canvas.height*0.45))/2);
- context.drawImage(addRing(images['frontleft'],canvas.height*0.55),(canvas.width*0.30)-(canvas.height*0.55)/2,(canvas.height-(canvas.height*0.55))/2);
- context.drawImage(addRing(images['frontright'],canvas.height*0.55),(canvas.width*0.70)-(canvas.height*0.55)/2,(canvas.height-(canvas.height*0.55))/2);
- context.drawImage(addRing(images['frontcenter'],canvas.height*0.75),(canvas.width*0.50)-(canvas.height*0.75)/2,(canvas.height-(canvas.height*0.75))/2);
+$(window).on("load",function(){
+ var temp=document.createElement("canvas");
+ var tempctx=temp.getContext("2d");temp.width=851;temp.height=315;
+ var gradient=desktop.getContext("2d").createLinearGradient(0,0,temp.width,0);
+  gradient.addColorStop(0.0,"lightblue");gradient.addColorStop(1.0,"pink");
+  tempctx.fillStyle=gradient;tempctx.fillRect(0,0,temp.width,temp.height);
+ $("#tmp-mainback").attr("src",temp.toDataURL());
+ //$("img[id^='tmp']").first().trigger("change");
 });
 
-$("input[type='file']").each(function(){
- var hidden=$("<input/>").attr("type","hidden");
-  hidden.attr("id",$(this).attr("for"));
-  $("canvas").trigger("redraw");
- $("body").append(hidden);
+$("paper-icon-button[icon='refresh']").on("click",function(){
+ $("img[id^='tmp']").first().trigger("change");
 });
 
-$("input[type='file']").on("change",function(e){
- var reader=new FileReader(),file=$(this).get(0).files[0],id=$(this).attr("for");
-  reader.onload=function(e){$("#"+id).val(reader.result).trigger("change");}
-  reader.onerror=function(e){console.log("OOPS");}
- reader.readAsDataURL(file);
+$("input[type='file']").on("change",function(event){
+ var thumb="#tmp-"+event.target.attributes.for.value||null;
+  reader.onload=function(e){$(thumb).attr("src",reader.result);}
+  reader.onerror=function(e){console.log("Error Loading");}
+ reader.readAsDataURL($(this).get(0).files[0]);
 });
 
-$("input[type='hidden']").on("change",function(){
- var temp=$(this).attr("id");images[temp]=new Image();
-  images[temp].src=$(this).val();images[temp].ref=new Date();
-  images[temp].onload=function(){$("canvas").trigger("redraw");};
- return;
+$("img[id^='tmp']").on("load change",function(event){
+ desktop.getContext("2d").clearRect(0,0,desktop.width*2,desktop.height*2);
+ desktop.getContext("2d").shadowColor="black";desktop.getContext("2d").shadowBlur=15;desktop.getContext("2d").drawImage(addImage("mainback"),0,0);
+ desktop.getContext("2d").drawImage(addRing("backleft",desktop.height*0.45),(desktop.width*0.14)-(desktop.height*0.45)/2,(desktop.height-(desktop.height*0.45))/2);
+ desktop.getContext("2d").drawImage(addRing("backright",desktop.height*0.45),(desktop.width*0.86)-(desktop.height*0.45)/2,(desktop.height-(desktop.height*0.45))/2);
+ desktop.getContext("2d").drawImage(addRing("frontleft",desktop.height*0.55),(desktop.width*0.30)-(desktop.height*0.55)/2,(desktop.height-(desktop.height*0.55))/2);
+ desktop.getContext("2d").drawImage(addRing("frontright",desktop.height*0.55),(desktop.width*0.70)-(desktop.height*0.55)/2,(desktop.height-(desktop.height*0.55))/2);
+ desktop.getContext("2d").drawImage(addRing("frontcenter",desktop.height*0.75),(desktop.width*0.50)-(desktop.height*0.75)/2,(desktop.height-(desktop.height*0.75))/2);
+ //mobile.getContext("2d").putImageData(desktop.getContext("2d").getImageData(144,0,desktop.width-144,desktop.height),0,0);
+ $("#desktop-preview").attr("src",desktop.toDataURL());console.log("Desktop Canvas Updated:",new Date());
+ //$("#mobile-preview").attr("src",mobile.toDataURL());console.log("Mobile Canvas Updated:",new Date());
+ console.log(event);
 });
 
 function addRing(img,size){
- var temp=document.createElement('canvas'),scale=1;
+ var temp=document.createElement("canvas"),scale=1,img=$("#tmp-"+img).get(0);
  var tempctx=temp.getContext("2d");temp.width=size;temp.height=size;try{scale=img.width/img.height;
   tempctx.beginPath();tempctx.arc(temp.width/2,temp.height/2,(temp.height/2)-3,0,2*Math.PI);tempctx.save();
   if(scale<1){tempctx.clip();tempctx.drawImage(img,0,-((size/scale)-size)/2,size,size/scale);}
   if(scale>1){tempctx.clip();tempctx.drawImage(img,-((size*scale)-size)/2,0,size*scale,size);} 
   if(scale==1){tempctx.clip();tempctx.drawImage(img,0,0,size,size);}
-  tempctx.restore();tempctx.strokeStyle='#FFF';
+  tempctx.restore();tempctx.strokeStyle="#FFF";
   tempctx.lineWidth=5;tempctx.stroke();
- }catch(event){}
- return temp;
+ }catch(event){}return temp;
+}
+
+function addImage(img){
+ var temp=document.createElement("canvas"),scale=1,img=$("#tmp-"+img).get(0);
+ var tempctx=temp.getContext("2d");temp.width=851;temp.height=315;try{scale=img.naturalWidth/img.naturalHeight;
+  if(scale<1){tempctx.drawImage(img,0,0,img.naturalWidth,img.naturalHeight,0,-((temp.width*scale)-temp.height)/2,temp.width,temp.width*scale);}
+  if(scale>1){tempctx.drawImage(img,0,0,img.naturalWidth,img.naturalHeight,0,-((temp.width/scale)-temp.height)/2,temp.width,temp.width/scale);}
+  if(scale==1){tempctx.drawImage(img,0,0,img.naturalWidth,img.naturalHeight,0,-(temp.width-temp.height)/2,temp.width,temp.width);}
+ }catch(event){}return temp;
 }
 </script>
 </body>
