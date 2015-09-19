@@ -39,14 +39,15 @@
     <canvas id="mobile" width="563" height="315"></canvas>
     <canvas id="desktop" width="851" height="315"></canvas>
     <paper-material class="preview" elevation="2">
-     <img id="desktop-preview" style="width:100%;max-width:851px;"/>
+     <img id="desktop-preview" usemap="image-upload-map" style="width:100%;max-width:851px;"/>
+     <div id="map-float" style="position:absolute;background:rgba(0,255,0,0.5);z-index:999;pointer-events:none;">&nbsp;</div>
     </paper-material>
     <paper-material class="content" elevation="2">
      <table cellspacing="10" cellpadding="0" border="0" class="thumbs">
       <tr><td><img src="./images/no-image.png" id="tmp-mainback"/></td><th><input type="file" for="mainback"></th></tr>
      </table>
     </paper-material>
-    <paper-material class="content" elevation="2">
+    <paper-material class="content hide" elevation="2">
      <table cellspacing="10" cellpadding="0" border="0" class="thumbs">
       <tr><td><img src="./images/no-image.png" id="tmp-backleft"/></td><th><input type="file" for="backleft"></th></tr>
       <tr><td><img src="./images/no-image.png" id="tmp-frontleft"/></td><th><input type="file" for="frontleft"></th></tr>
@@ -55,6 +56,13 @@
       <tr><td><img src="./images/no-image.png" id="tmp-backright"/></td><th><input type="file" for="backright"></th></tr>
      </table>
     </paper-material>
+    <map class="hide" name="image-upload-map">
+     <area title="Change This Image" href="javascript:upload('backleft');" shape="rect" coords="48,86,190,228" style="outline:none;"/>
+     <area title="Change This Image" href="javascript:upload('frontleft');" shape="rect" coords="169,71,343,245" style="outline:none;"/>
+     <area title="Change This Image" href="javascript:upload('frontcenter');" shape="rect" coords="306,38,544,276" style="outline:none;"/>
+     <area title="Change This Image" href="javascript:upload('frontright');" shape="rect" coords="509,71,683,245" style="outline:none;"/>
+     <area title="Change This Image" href="javascript:upload('backright');" shape="rect" coords="661,86,803,228" style="outline:none;"/>
+    </map>
    </section>
   </paper-header-panel>
  </paper-drawer-panel>
@@ -75,7 +83,6 @@ $(window).on("load",function(){
   gradient.addColorStop(0.0,"lightblue");gradient.addColorStop(1.0,"pink");
   tempctx.fillStyle=gradient;tempctx.fillRect(0,0,temp.width,temp.height);
  $("#tmp-mainback").attr("src",temp.toDataURL());
- //$("img[id^='tmp']").first().trigger("change");
 });
 
 $("paper-icon-button[icon='refresh']").on("click",function(){
@@ -84,24 +91,32 @@ $("paper-icon-button[icon='refresh']").on("click",function(){
 
 $("input[type='file']").on("change",function(event){
  var thumb="#tmp-"+event.target.attributes.for.value||null;
-  reader.onload=function(e){$(thumb).attr("src",reader.result);}
+  reader.onload=function(e){$(thumb).get(0).src=reader.result;}
   reader.onerror=function(e){console.log("Error Loading");}
  reader.readAsDataURL($(this).get(0).files[0]);
 });
 
-$("img[id^='tmp']").on("load change",function(event){
- desktop.getContext("2d").clearRect(0,0,desktop.width*2,desktop.height*2);
+$(window,"img[id^='tmp']").delay("load change",function(event){
+ desktop.getContext("2d").clearRect(0,0,desktop.width*2,desktop.height*2);$("map area").remove();
  desktop.getContext("2d").shadowColor="black";desktop.getContext("2d").shadowBlur=15;desktop.getContext("2d").drawImage(addImage("mainback"),0,0);
- desktop.getContext("2d").drawImage(addRing("backleft",desktop.height*0.45),(desktop.width*0.14)-(desktop.height*0.45)/2,(desktop.height-(desktop.height*0.45))/2);
- desktop.getContext("2d").drawImage(addRing("backright",desktop.height*0.45),(desktop.width*0.86)-(desktop.height*0.45)/2,(desktop.height-(desktop.height*0.45))/2);
- desktop.getContext("2d").drawImage(addRing("frontleft",desktop.height*0.55),(desktop.width*0.30)-(desktop.height*0.55)/2,(desktop.height-(desktop.height*0.55))/2);
- desktop.getContext("2d").drawImage(addRing("frontright",desktop.height*0.55),(desktop.width*0.70)-(desktop.height*0.55)/2,(desktop.height-(desktop.height*0.55))/2);
- desktop.getContext("2d").drawImage(addRing("frontcenter",desktop.height*0.75),(desktop.width*0.50)-(desktop.height*0.75)/2,(desktop.height-(desktop.height*0.75))/2);
- //mobile.getContext("2d").putImageData(desktop.getContext("2d").getImageData(144,0,desktop.width-144,desktop.height),0,0);
- $("#desktop-preview").attr("src",desktop.toDataURL());console.log("Desktop Canvas Updated:",new Date());
- //$("#mobile-preview").attr("src",mobile.toDataURL());console.log("Mobile Canvas Updated:",new Date());
- console.log(event);
-});
+ desktop.getContext("2d").drawRing("backleft",desktop.height*0.45,(desktop.width*0.14)-(desktop.height*0.45)/2,(desktop.height-(desktop.height*0.45))/2);
+ desktop.getContext("2d").drawRing("backright",desktop.height*0.45,(desktop.width*0.86)-(desktop.height*0.45)/2,(desktop.height-(desktop.height*0.45))/2);
+ desktop.getContext("2d").drawRing("frontleft",desktop.height*0.55,(desktop.width*0.30)-(desktop.height*0.55)/2,(desktop.height-(desktop.height*0.55))/2);
+ desktop.getContext("2d").drawRing("frontright",desktop.height*0.55,(desktop.width*0.70)-(desktop.height*0.55)/2,(desktop.height-(desktop.height*0.55))/2);
+ desktop.getContext("2d").drawRing("frontcenter",desktop.height*0.75,(desktop.width*0.50)-(desktop.height*0.75)/2,(desktop.height-(desktop.height*0.75))/2);
+ $("#desktop-preview").attr("src",desktop.toDataURL());console.log("Desktop Canvas Updated:",new Date());//OUTPUT DESKTOP CANVAS IMAGE
+ if(event.type=="load"){$(this).trigger("change");}
+},1000);
+
+CanvasRenderingContext2D.prototype.drawRing=function(imageid,size,x,y){
+ var image=addRing(imageid,size),scale=($("#desktop-preview").get(0).naturalWidth/$("#desktop-preview").get(0).width)||1;
+ var xy=new Array(Math.round(x/scale),Math.round(y/scale),Math.round((x+image.width)/scale),Math.round((y+image.height)/scale));
+ var area=$("<area/>").attr({"title":"Change This Image","href":"javascript:upload('"+imageid+"');"});
+  area.attr({"shape":"rect","style":"outline:none;","coords":xy.join(",")});
+  area.on("mouseover mouseout",function(e){highlight(this,e);});
+ $("map[name='image-upload-map']").append(area);
+ return this.drawImage(image,x,y);
+};
 
 function addRing(img,size){
  var temp=document.createElement("canvas"),scale=1,img=$("#tmp-"+img).get(0);
@@ -122,6 +137,20 @@ function addImage(img){
   if(scale>1){tempctx.drawImage(img,0,0,img.naturalWidth,img.naturalHeight,0,-((temp.width/scale)-temp.height)/2,temp.width,temp.width/scale);}
   if(scale==1){tempctx.drawImage(img,0,0,img.naturalWidth,img.naturalHeight,0,-(temp.width-temp.height)/2,temp.width,temp.width);}
  }catch(event){}return temp;
+}
+
+function highlight(area,e){
+ var locations=$(area).attr("coords").split(",");
+ $.each(locations,function(k,v){locations[k]=parseInt(locations[k]);});
+ $("#map-float").css("left",locations[0]+"px").width(locations[3]-locations[1]);
+ $("#map-float").css("top",locations[1]+"px").height(locations[3]-locations[1]);
+ $("#map-float").css("border-radius",locations[3]-locations[1]);
+ if(e.type=="mouseover"){$("#map-float").show();}
+ else{$("#map-float").hide();}
+}
+
+function upload(file){
+ $("input[type='file'][for='"+file+"']").click();
 }
 </script>
 </body>

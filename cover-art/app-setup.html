@@ -8,60 +8,14 @@ $.ajaxSetup({
  timeout:2000
 });
 
-$.extend({
- dialog:function(element){try{
-  if($.type(element)=="string"){return $(element);}  
-  else{return $("neon-animatable[class='iron-selected'] paper-dialog");}
- }catch(e){console.log("No Dialogs Found");}},
- setBoxID:function(id){
-  host="ee-tv-"+id+".default"
-  return this;
- }
-});
-
-$.fn.extend({
- open:function(){this[0].open();},
- close:function(){this[0].close();},
- tagSort:function(options){
-  var order=[],holder=$(this);
-  $.each(holder.children(options.sort).get(),function(k,v){
-   order.push($(v).attr(options.by));
-  });order.sort();$.each(order,function(k,v){
-   $("["+options.by+"='"+v+"']").appendTo(holder);
-  });return holder;
-	},
- toast:function(obj){
-  var x="PT"+new Date().getTime();
-  if(obj){var toast=$("<paper-toast/>");
-   var colors={alert:"#CC0000",done:"#31B404"};
-    toast.addClass("paper-toast-open").attr({id:x,text:obj.text});   
-    toast.css({"background":colors[obj.type]?colors[obj.type]:"#009C9C"});
-   $("paper-toast-stack").append(toast).css({"bottom":"-50px"}).sleep(0,function(){
-    $("paper-toast-stack").animate({"bottom":"0px"}).sleep(5000,function(){
-     $("#"+x).fadeOut("250",function(){$(this).remove();});
-    });
-   });
-  }return $(this);
- },
- getQuery:function(key){try{
-  var hashes=window.location.href.split("?")[1].split('&');
-  for(var i=0;i<hashes.length;i++){var hash=hashes[i].split('=');
-   if(key==hash[0]){return hash[1];}
-  }return null;
- }catch(e){
-  return null;
- }},
- getAttrs:function(){
-  var attrs={};$.each(this[0].attributes,function(idx,attr){
-   attrs[attr.nodeName]=attr.nodeValue;
-  });return attrs;
- },
- sleep:function(ms,callback){
-  return setTimeout(callback, ms);
- },
- upperText:function(){
-  return $(this).html().trim().toUpperCase();
- }
+var task=null;$.fn.extend({
+ delay:function(calls,callback,ms){
+  this.on(calls,function(event){clearTimeout(task);wait=ms;
+   if(!ms){console.log("Delay has not been set, Using 0ms");wait=0;}
+   if($.inArray(event.type,["load"])!=-1){wait=250;}
+   task=setTimeout(callback,wait,event);   
+  });return this;  
+	}
 });
 </script>
 <style is="custom-style">
@@ -104,6 +58,5 @@ paper-header-panel::shadow #mainContainer::-webkit-scrollbar-thumb{
  border:2px solid var(--primary-background-color);;
  background-color:var(--default-primary-color);
  n-webkit-border-radius:5px;
-}
-
+}*.hide{display:none;}
 </style>
