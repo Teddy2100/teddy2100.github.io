@@ -60,8 +60,8 @@
   margin-bottom: 0.9375em;
  }
  section article a[shadow] h3{
-  margin-bottom:35px;
-  margin-top:10px;
+  margin:10px 0px 35px;
+  font-size:1.2em;
  }  
  section article a[shadow]{
   display:inline-block;min-width:275px;
@@ -85,6 +85,12 @@
  }
  footer img{
   height:32px;float:right;margin:10px;
+ }
+ 
+ @media screen and (max-width:640px){
+  section article a[shadow]{min-width:150px;}
+  section article a[shadow] h3{font-size:0.8em;}
+  section article a[shadow] img{width:128px;}
  }
  </style> 
 </head>
