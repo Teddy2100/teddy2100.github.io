@@ -14,9 +14,6 @@
   <link rel="import" href="./elements/paper-item-icon-button.html"/>
  <link rel="import" href="./elements/event-listener.html"/>
  <link rel="import" href="./app-setup.html"/>
- <style is="custom-style">
-  canvas{display:none;}
- </style>
 </head>
 <body unresolved>
 <event-listener id="art-gui">
@@ -33,19 +30,18 @@
    <paper-toolbar mode="none">
      <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
      <span id="gui-title-bar" class="title">Loading Please Wait</span>
-     <paper-icon-button icon="refresh"></paper-icon-button>
+     <a id="save-as"><paper-icon-button icon="save"></paper-icon-button></a>
    </paper-toolbar>
    <section class="fit" style="text-align:center;">
-    <canvas id="mobile" width="563" height="315"></canvas>
-    <canvas id="desktop" width="851" height="315"></canvas>
     <paper-material class="preview" elevation="2">
-     <img id="desktop-preview" usemap="image-upload-map" style="width:100%;max-width:851px;"/>
-     <div id="map-float" style="position:absolute;background:rgba(0,255,0,0.5);z-index:999;pointer-events:none;">&nbsp;</div>
+     <canvas id="desktop" width="851" height="315"></canvas>
+     <img id="desktop-preview" usemap="image-upload-map" style="width:100%;"/>
+     <div id="map-float" class="image-upload-map">&nbsp;</div>
     </paper-material>
     <paper-material class="content" elevation="2">
      <table cellspacing="10" cellpadding="0" border="0" class="thumbs">
       <tr><td><img src="./images/no-image.png" id="tmp-mainback"/></td><th><input type="file" for="mainback"></th></tr>
-     </table>
+     </table><paper-slider id="offset" min="0" max="315" step="1" value="0" pin></paper-slider>
     </paper-material>
     <paper-material class="content hide" elevation="2">
      <table cellspacing="10" cellpadding="0" border="0" class="thumbs">
@@ -85,31 +81,40 @@ $(window).on("load",function(){
  $("#tmp-mainback").attr("src",temp.toDataURL());
 });
 
-$("paper-icon-button[icon='refresh']").on("click",function(){
- $("img[id^='tmp']").first().trigger("change");
-});
-
 $("input[type='file']").on("change",function(event){
- var thumb="#tmp-"+event.target.attributes.for.value||null;
+ try{thumb="#tmp-"+event.target.attributes.for.value||null;
   reader.onload=function(e){$(thumb).get(0).src=reader.result;}
   reader.onerror=function(e){console.log("Error Loading");}
- reader.readAsDataURL($(this).get(0).files[0]);
+  reader.readAsDataURL($(this).get(0).files[0]);
+ }catch(event){}
 });
 
-$(window,"img[id^='tmp']").delay("load change",function(event){
- desktop.getContext("2d").clearRect(0,0,desktop.width*2,desktop.height*2);$("map area").remove();
- desktop.getContext("2d").shadowColor="black";desktop.getContext("2d").shadowBlur=15;desktop.getContext("2d").drawImage(addImage("mainback"),0,0);
+$(window,"img[id^='tmp']").delay("load resize change",function(event){init=Date.now();
+ desktop.getContext("2d").clearRect(0,0,desktop.width,desktop.height);$("map area").remove();
+ desktop.getContext("2d").shadowColor="rgba(000,000,000,0.75)";desktop.getContext("2d").shadowBlur=25; 
+ desktop.getContext("2d").drawImage(resizeImage("mainback",desktop.width,desktop.height),0,-$("#offset").val());
+ /*
  desktop.getContext("2d").drawRing("backleft",desktop.height*0.45,(desktop.width*0.14)-(desktop.height*0.45)/2,(desktop.height-(desktop.height*0.45))/2);
  desktop.getContext("2d").drawRing("backright",desktop.height*0.45,(desktop.width*0.86)-(desktop.height*0.45)/2,(desktop.height-(desktop.height*0.45))/2);
  desktop.getContext("2d").drawRing("frontleft",desktop.height*0.55,(desktop.width*0.30)-(desktop.height*0.55)/2,(desktop.height-(desktop.height*0.55))/2);
  desktop.getContext("2d").drawRing("frontright",desktop.height*0.55,(desktop.width*0.70)-(desktop.height*0.55)/2,(desktop.height-(desktop.height*0.55))/2);
  desktop.getContext("2d").drawRing("frontcenter",desktop.height*0.75,(desktop.width*0.50)-(desktop.height*0.75)/2,(desktop.height-(desktop.height*0.75))/2);
- $("#desktop-preview").attr("src",desktop.toDataURL());console.log("Desktop Canvas Updated:",new Date());//OUTPUT DESKTOP CANVAS IMAGE
+ */
+ desktop.getContext("2d").drawRing("backleft",desktop.height*0.45,(desktop.width*0.14)-(desktop.height*0.45)/2,(desktop.height-(desktop.height*0.75))/2);
+ desktop.getContext("2d").drawRing("backright",desktop.height*0.45,(desktop.width*0.86)-(desktop.height*0.45)/2,(desktop.height-(desktop.height*0.75))/2);
+ desktop.getContext("2d").drawRing("frontleft",desktop.height*0.55,(desktop.width*0.30)-(desktop.height*0.55)/2,(desktop.height-(desktop.height*0.65))/2);
+ desktop.getContext("2d").drawRing("frontright",desktop.height*0.55,(desktop.width*0.70)-(desktop.height*0.55)/2,(desktop.height-(desktop.height*0.65))/2);
+ desktop.getContext("2d").drawRing("frontcenter",desktop.height*0.75,(desktop.width*0.50)-(desktop.height*0.75)/2,(desktop.height-(desktop.height*0.75))/2);
+
+ $("a#save-as").attr({href:desktop.toDataURL(),download:"cover_"+new Date().getTime()+".png"});
+ $("img#desktop-preview").attr({src:desktop.toDataURL()});$("#map-float").hide();
+ $("a#save-as paper-icon-button").first().attr("icon","save");
  if(event.type=="load"){$(this).trigger("change");}
+ console.log("Render Time",Date.now()-init+"ms");
 },1000);
 
 CanvasRenderingContext2D.prototype.drawRing=function(imageid,size,x,y){
- var image=addRing(imageid,size),scale=($("#desktop-preview").get(0).naturalWidth/$("#desktop-preview").get(0).width)||1;
+ var image=createRing(imageid,size),scale=($("#desktop-preview").get(0).naturalWidth/$("#desktop-preview").get(0).width)||1;
  var xy=new Array(Math.round(x/scale),Math.round(y/scale),Math.round((x+image.width)/scale),Math.round((y+image.height)/scale));
  var area=$("<area/>").attr({"title":"Change This Image","href":"javascript:upload('"+imageid+"');"});
   area.attr({"shape":"rect","style":"outline:none;","coords":xy.join(",")});
@@ -118,16 +123,27 @@ CanvasRenderingContext2D.prototype.drawRing=function(imageid,size,x,y){
  return this.drawImage(image,x,y);
 };
 
-function addRing(img,size){
- var temp=document.createElement("canvas"),scale=1,img=$("#tmp-"+img).get(0);
+function createRing(x,size){
+ var border=5,ringsize=size-(border*2),safe=(border/2);
+ var temp=document.createElement("canvas"),scale=1,img=$("#tmp-"+x).get(0);
  var tempctx=temp.getContext("2d");temp.width=size;temp.height=size;try{scale=img.width/img.height;
-  tempctx.beginPath();tempctx.arc(temp.width/2,temp.height/2,(temp.height/2)-3,0,2*Math.PI);tempctx.save();
-  if(scale<1){tempctx.clip();tempctx.drawImage(img,0,-((size/scale)-size)/2,size,size/scale);}
-  if(scale>1){tempctx.clip();tempctx.drawImage(img,-((size*scale)-size)/2,0,size*scale,size);} 
-  if(scale==1){tempctx.clip();tempctx.drawImage(img,0,0,size,size);}
-  tempctx.restore();tempctx.strokeStyle="#FFF";
-  tempctx.lineWidth=5;tempctx.stroke();
+  tempctx.beginPath();tempctx.arc(temp.width/2,temp.height/2,(temp.height/2)-safe,0,2*Math.PI);tempctx.save();  
+  if(scale<1){tempctx.clip();tempctx.drawImage(img,border,-((ringsize/scale)-ringsize)/2,ringsize,ringsize/scale);}
+  if(scale>1){tempctx.clip();tempctx.drawImage(img,-((ringsize*scale)-ringsize)/2,border,ringsize*scale,ringsize);} 
+  if(scale==1){tempctx.clip();tempctx.drawImage(img,border,border,ringsize,ringsize);}tempctx.restore();
+  tempctx.strokeStyle="#FFF";tempctx.lineWidth=border;tempctx.stroke();
  }catch(event){}return temp;
+}
+
+function resizeImage(x,width,height){
+ var temp=document.createElement("canvas"),img=$("#tmp-"+x).get(0);
+ var tempscale=(width/height)||1,scale=(img.naturalWidth/img.naturalHeight)||1; 
+ var tempctx=temp.getContext("2d");temp.width=width;temp.height=Math.round(width/scale);try{
+  tempctx.drawImage(img,0,0,img.naturalWidth,img.naturalHeight,0,0,temp.width,temp.height);
+  if(x=="mainback"){$("paper-slider#offset").attr("max",temp.height-height);}
+  $(img).attr("max",Math.abs(temp.height-height).toString());
+ }catch(error){console.log(error);}
+ return temp;
 }
 
 function addImage(img){
