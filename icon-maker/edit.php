@@ -7,14 +7,15 @@
  </style>
 </head>
 <body>
-<table cellspacing="10">
- <tr><td width="192px" height="192px">
+<table id="editDialog" cellspacing="10">
+ <tr><td width="192px" height="192px" rowspan="3">
 <?
 $_GET['image']=pathinfo($_GET['image'])['basename'];
+$appname=@substr(implode("/",explode("~",$_GET['image'])),3);
 $imagelocation=glob("./{res/**,stored/raw}/".$_GET['image'].".png",GLOB_BRACE)[0];
 echo"  <div id='canvasoutput' style='position:relative;width:192px;height:192px;'>\n";
 $options=@json_decode(file_get_contents("./stored/list.json"),true)[str_replace(".png","",$_GET['image'])];
-if(!$options){$options['size']=128;$options['background']="FFFFFF";$options['name']=@explode("~",$_GET['image'])[1];}
+if(!$options){$options['size']=128;$options['background']="ECEBEB";$options['name']=@explode("~",$_GET['image'])[1];$options['apps'][]=$appname;}
 echo"   <canvas id='raw' hex='#{$options['background']}' size='{$options['size']}' image='{$imagelocation}?nc=".time()."'></canvas>\n";
 echo"   <img id='overlay' src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII='/>\n";
 echo"   <img id='bestfit' src='./designs/best_fit.png' style='display:none;'/>\n";
@@ -22,13 +23,18 @@ echo"  </div>\n";//print_r($options);
 ?>
  </td><td>
   <paper-input id="name" label="Application Name" value="<?=$options['name'];?>" always-float-label></paper-input>
-  <paper-slider id="size" min="64" max="256" step="2" value="5" class="orange" pin></paper-slider>
+ </td><td>
+  <paper-input id="background" label="Background Color" value="#<?=$options['background'];?>" always-float-label></paper-input>
+ </td></tr></tr><td colspan="2">
+    <paper-slider id="size" min="64" max="256" step="2" value="5" class="orange" width="100%" pin></paper-slider>
+ </td></tr><tr><td colspan="2">
+<?
+foreach($options['apps'] as $app){
+ echo"  <paper-input id='app' value='{$app}' no-label-float></paper-input>\n";
+}echo"  <paper-input id='app' no-label-float></paper-input>\n";
+?>  
  </td></tr>
 </table>
-<div style="position:fixed;bottom:0px;right:0px;height:75px;">
- <paper-fab icon="icons:arrow-back" title="Back" class="orange" onclick="location.replace('./');" style="width:75px;"></paper-fab>
- <paper-fab icon="icons:save" title="Save Changes" class="green" onclick="saveCanvas();" style="width:125px;"></paper-fab>
-</div>
 <script>
 var data={},ready=0,design="blawb";
 var img=new Image();img.src=$("canvas#raw").attr("image");
@@ -65,25 +71,29 @@ function createCanvas(){
  }
 }
 
-$("img#overlay").click(function(e){
- var context=$("canvas#raw")[0].getContext('2d');
- var rgba=context.getImageData(e.pageX-$(this).offset().left,e.pageY-$(this).offset().top,1,1).data;
- var newCanvas=$("canvas#raw").clone().attr("hex",RGB2HEX(complement({red:rgba[0],green:rgba[1],blue:rgba[2]})));
- $("div#canvasoutput").prepend(newCanvas);$("canvas#raw").last().remove();createCanvas();
+$("img#overlay, paper-input#background").on("click keyup",function(e){
+ var tmp=$("canvas#raw")[0].getContext('2d'),newCanvas=$("canvas#raw").clone();
+ var trigger=e.currentTarget.localName+"#"+e.currentTarget.id;//EVENT TRIGGERED BY ELEMENT
+ if(trigger=="img#overlay"){var rgba=tmp.getImageData(e.pageX-$(this).offset().left,e.pageY-$(this).offset().top,1,1).data;}
+ if(trigger=="img#overlay"){newCanvas.attr("hex",RGB2HEX(complement({red:rgba[0],green:rgba[1],blue:rgba[2]})));}
+ if(trigger=="paper-input#background"){newCanvas.attr("hex",$("input",this).get(0).value);}
+ $("paper-input#background").attr("value",newCanvas.attr("hex"));
+ if(newCanvas.attr("hex").length!=7){return;}
+ $("div#canvasoutput").prepend(newCanvas);
+ $("canvas#raw").last().remove();
+ createCanvas();
 });
 
-$("paper-slider").on("change",function(){
+$("paper-slider#size").on("change",function(){
  var newCanvas=$("canvas#raw").first().clone();
  $("div#canvasoutput").prepend(newCanvas.attr("size",$(this).attr("value")));
  $("canvas#raw").last().remove();createCanvas();
 });
 
 function saveCanvas(){
- data["name"]=$("paper-input#name").val();
- $.post("./actions/update.php",data,function(x){
-  console.log("SAVED",x);
-  closeDialog();
- });
+ data["apps"]=[];data["name"]=$("paper-input#name").val();
+ $.each($("paper-input#app"),function(k,v){if($(v).val()){data["apps"].push($(v).val());}});
+ $.post("./actions/update.php",data,function(x){closeDialog();});
 }
 
 function forceColor(){

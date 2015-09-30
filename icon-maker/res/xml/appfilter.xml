@@ -3,105 +3,82 @@
     <item component="ComponentInfo{com.google.android.contacts/com.android.contacts.activities.PeopleActivity}" drawable="ic_com.google.android.contacts___com.android.contacts.activities.PeopleActivity" />
     <item component="ComponentInfo{com.google.android.dialer/com.google.android.dialer.extensions.GoogleDialtactsActivity}" drawable="ic_com.google.android.dialer___com.google.android.dialer.extensions.GoogleDialtactsActivity" />
     <item component="ComponentInfo{com.android.settings/com.android.settings.Settings}" drawable="ic_com.android.settings___com.android.settings.Settings" />
-    <item component="ComponentInfo{com.google.android.apps.docs/com.google.android.apps.docs.app.NewMainProxyActivity}" drawable="ic_com.google.android.apps.docs___com.google.android.apps.docs.app.NewMainProxyActivity" />
     <item component="ComponentInfo{com.google.android.music/com.android.music.activitymanagement.TopLevelActivity}" drawable="ic_com.google.android.music___com.android.music.activitymanagement.TopLevelActivity" />
-    <item component="ComponentInfo{com.google.android.GoogleCamera/com.android.camera.CameraLauncher}" drawable="ic_com.google.android.GoogleCamera___com.android.camera.CameraLauncher" />
-    <item component="ComponentInfo{com.android.chrome/com.google.android.apps.chrome.Main}" drawable="ic_com.android.chrome___com.google.android.apps.chrome.Main" />
     <item component="ComponentInfo{com.android.vending/com.android.vending.AssetBrowserActivity}" drawable="ic_com.android.vending___com.android.vending.AssetBrowserActivity" />
-    <item component="ComponentInfo{com.google.android.calendar/com.android.calendar.AllInOneActivity}" drawable="ic_com.google.android.calendar___com.android.calendar.AllInOneActivity" />
     <item component="ComponentInfo{com.google.android.youtube/com.google.android.youtube.app.honeycomb.Shell$HomeActivity}" drawable="ic_com.google.android.youtube___com.google.android.youtube.app.honeycomb.Shell$HomeActivity" />
+    <item component="ComponentInfo{com.google.android.apps.docs.editors.docs/com.google.android.apps.docs.app.NewMainProxyActivity}" drawable="ic_com.google.android.apps.docs.editors.docs___com.google.android.apps.docs.app.NewMainProxyActivity" />
+    <item component="ComponentInfo{com.google.android.gms/com.google.android.gms.app.settings.GoogleSettingsActivity}" drawable="ic_com.google.android.gms___com.google.android.gms.app.settings.GoogleSettingsActivity" />
     <item component="ComponentInfo{com.google.android.talk/com.google.android.talk.SigningInActivity}" drawable="ic_com.google.android.talk___com.google.android.talk.SigningInActivity" />
     <item component="ComponentInfo{com.google.android.deskclock/com.android.deskclock.DeskClock}" drawable="ic_com.google.android.deskclock___com.android.deskclock.DeskClock" />
+    <item component="ComponentInfo{com.android.chrome/com.google.android.apps.chrome.Main}" drawable="ic_com.android.chrome___com.google.android.apps.chrome.Main" />
+    <item component="ComponentInfo{com.google.android.calendar/com.android.calendar.AllInOneActivity}" drawable="ic_com.google.android.calendar___com.android.calendar.AllInOneActivity" />
     <item component="ComponentInfo{com.google.android.apps.photos/com.google.android.apps.photos.home.HomeActivity}" drawable="ic_com.google.android.apps.photos___com.google.android.apps.photos.home.HomeActivity" />
     <item component="ComponentInfo{com.google.android.apps.docs.editors.sheets/com.google.android.apps.docs.app.NewMainProxyActivity}" drawable="ic_com.google.android.apps.docs.editors.sheets___com.google.android.apps.docs.app.NewMainProxyActivity" />
-    <item component="ComponentInfo{com.google.android.gms/com.google.android.gms.app.settings.GoogleSettingsActivity}" drawable="ic_com.google.android.gms___com.google.android.gms.app.settings.GoogleSettingsActivity" />
-    <item component="ComponentInfo{com.timehop/com.timehop.LoginActivity}" drawable="ic_com.timehop___com.timehop.LoginActivity" />
+    <item component="ComponentInfo{com.google.android.GoogleCamera/com.android.camera.CameraLauncher}" drawable="ic_com.google.android.GoogleCamera___com.android.camera.CameraLauncher" />
+    <item component="ComponentInfo{com.google.android.apps.docs/com.google.android.apps.docs.app.NewMainProxyActivity}" drawable="ic_com.google.android.apps.docs___com.google.android.apps.docs.app.NewMainProxyActivity" />
     <item component="ComponentInfo{com.teslacoilsw.launcher/com.teslacoilsw.launcher.NovaShortcutHandler}" drawable="ic_com.teslacoilsw.launcher___com.teslacoilsw.launcher.NovaShortcutHandler" />
+    <item component="ComponentInfo{com.timehop/com.timehop.LoginActivity}" drawable="ic_com.timehop___com.timehop.LoginActivity" />
     <item component="ComponentInfo{com.paypal.android.p2pmobile/com.paypal.android.p2pmobile.activity.IntroActivity}" drawable="ic_com.paypal.android.p2pmobile___com.paypal.android.p2pmobile.activity.IntroActivity" />
     <item component="ComponentInfo{com.android.calculator2/com.android.calculator2.Calculator}" drawable="ic_com.android.calculator2___com.android.calculator2.Calculator" />
     <item component="ComponentInfo{com.android.providers.downloads.ui/com.android.providers.downloads.ui.DownloadList}" drawable="ic_com.android.providers.downloads.ui___com.android.providers.downloads.ui.DownloadList" />
-    <item component="ComponentInfo{com.android.stk/com.android.stk.StkMain}" drawable="ic_com.android.stk___com.android.stk.StkMain" />
-    <item component="ComponentInfo{eu.chainfire.supersu/eu.chainfire.supersu.MainActivity-Material}" drawable="ic_eu.chainfire.supersu___eu.chainfire.supersu.MainActivity-Material" />
-    <item component="ComponentInfo{com.google.android.street/com.google.android.apps.dragonfly.activities.main.MainActivity}" drawable="ic_com.google.android.street___com.google.android.apps.dragonfly.activities.main.MainActivity" />
-    <item component="ComponentInfo{com.google.android.keep/com.google.android.keep.activities.BrowseActivity}" drawable="ic_com.google.android.keep___com.google.android.keep.activities.BrowseActivity" />
-    <item component="ComponentInfo{com.google.android.apps.maps/com.google.android.maps.MapsActivity}" drawable="ic_com.google.android.apps.maps___com.google.android.maps.MapsActivity" />
-    <item component="ComponentInfo{com.google.android.play.games/com.google.android.gms.games.ui.destination.main.MainActivity}" drawable="ic_com.google.android.play.games___com.google.android.gms.games.ui.destination.main.MainActivity" />
     <item component="ComponentInfo{com.google.android.googlequicksearchbox/com.google.android.googlequicksearchbox.VoiceSearchActivity}" drawable="ic_com.google.android.googlequicksearchbox___com.google.android.googlequicksearchbox.VoiceSearchActivity" />
     <item component="ComponentInfo{com.google.android.googlequicksearchbox/com.google.android.googlequicksearchbox.SearchActivity}" drawable="ic_com.google.android.googlequicksearchbox___com.google.android.googlequicksearchbox.SearchActivity" />
+    <item component="ComponentInfo{com.google.android.apps.maps/com.google.android.maps.MapsActivity}" drawable="ic_com.google.android.apps.maps___com.google.android.maps.MapsActivity" />
+    <item component="ComponentInfo{com.google.android.keep/com.google.android.keep.activities.BrowseActivity}" drawable="ic_com.google.android.keep___com.google.android.keep.activities.BrowseActivity" />
+    <item component="ComponentInfo{com.google.earth/com.google.earth.EarthActivity}" drawable="ic_com.google.earth___com.google.earth.EarthActivity" />
     <item component="ComponentInfo{com.google.android.apps.plus/com.google.android.apps.plus.phone.HomeActivity}" drawable="ic_com.google.android.apps.plus___com.google.android.apps.plus.phone.HomeActivity" />
-    <item component="ComponentInfo{uk.co.ee.myee/uk.co.ee.myee.MyEE}" drawable="ic_uk.co.ee.myee___uk.co.ee.myee.MyEE" />
-    <item component="ComponentInfo{com.parkopedia/com.parkopedia.activities.SearchActivity}" drawable="ic_com.parkopedia___com.parkopedia.activities.SearchActivity" />
-    <item component="ComponentInfo{com.ivy.doze/com.ivy.doze.doze.MainActivity}" drawable="ic_com.ivy.doze___com.ivy.doze.doze.MainActivity" />
-    <item component="ComponentInfo{com.devhd.feedly/com.devhd.feedly.Main}" drawable="ic_com.devhd.feedly___com.devhd.feedly.Main" />
-    <item component="ComponentInfo{com.nxp.nfc.tagwriter/com.nxp.nfc.tagwriter.activities.WelcomeScreen}" drawable="ic_com.nxp.nfc.tagwriter___com.nxp.nfc.tagwriter.activities.WelcomeScreen" />
-    <item component="ComponentInfo{com.pushbullet.android.portal/com.pushbullet.android.portal.ui.LaunchActivity}" drawable="ic_com.pushbullet.android.portal___com.pushbullet.android.portal.ui.LaunchActivity" />
-    <item component="ComponentInfo{com.ctm.cinema/com.ctm.cinema.ui.SplashActivity}" drawable="ic_com.ctm.cinema___com.ctm.cinema.ui.SplashActivity" />
-    <item component="ComponentInfo{com.blinkbox.tablet.live/com.blinkbox.LauncherActivity}" drawable="ic_com.blinkbox.tablet.live___com.blinkbox.LauncherActivity" />
-    <item component="ComponentInfo{com.giffgaffmobile.controller/com.giffgaffmobile.controller.SplashActivity}" drawable="ic_com.giffgaffmobile.controller___com.giffgaffmobile.controller.SplashActivity" />
-    <item component="ComponentInfo{com.rovio.baba/com.rovio.rcs.RovioUnityActivity}" drawable="ic_com.rovio.baba___com.rovio.rcs.RovioUnityActivity" />
-    <item component="ComponentInfo{larry.zou.colorfullife/com.colure.pictool.ui.Main_}" drawable="ic_larry.zou.colorfullife___com.colure.pictool.ui.Main_" />
-    <item component="ComponentInfo{com.gumtree.android/com.gumtree.android.home.HomeActivity}" drawable="ic_com.gumtree.android___com.gumtree.android.home.HomeActivity" />
-    <item component="ComponentInfo{com.oxa7.shou/com.oxa7.shou.ScreenActivity}" drawable="ic_com.oxa7.shou___com.oxa7.shou.ScreenActivity" />
-    <item component="ComponentInfo{com.overlook.android.fing/com.overlook.android.fing.FingActivity}" drawable="ic_com.overlook.android.fing___com.overlook.android.fing.FingActivity" />
-    <item component="ComponentInfo{com.facebook.orca/com.facebook.orca.auth.StartScreenActivity}" drawable="ic_com.facebook.orca___com.facebook.orca.auth.StartScreenActivity" />
-    <item component="ComponentInfo{it.android.demi.elettronica.pro/it.android.demi.elettronica.pro.MainElectroPro}" drawable="ic_it.android.demi.elettronica.pro___it.android.demi.elettronica.pro.MainElectroPro" />
+    <item component="ComponentInfo{com.google.android.street/com.google.android.apps.dragonfly.activities.main.MainActivity}" drawable="ic_com.google.android.street___com.google.android.apps.dragonfly.activities.main.MainActivity" />
+    <item component="ComponentInfo{com.google.android.play.games/com.google.android.gms.games.ui.destination.main.MainActivity}" drawable="ic_com.google.android.play.games___com.google.android.gms.games.ui.destination.main.MainActivity" />
+    <item component="ComponentInfo{com.ctm.cinema/com.ctm.cinema.MainActivity}" drawable="ic_com.ctm.cinema___com.ctm.cinema.MainActivity" />
+    <item component="ComponentInfo{com.dropbox.android/com.dropbox.android.activity.DropboxBrowser}" drawable="ic_com.dropbox.android___com.dropbox.android.activity.DropboxBrowser" />
+    <item component="ComponentInfo{com.cpuid.cpu_z/com.cpuid.cpu_z.MainActivity}" drawable="ic_com.cpuid.cpu_z___com.cpuid.cpu_z.MainActivity" />
     <item component="ComponentInfo{uk.co.ee.eetv/uk.co.ee.eetv.EETV}" drawable="ic_uk.co.ee.eetv___uk.co.ee.eetv.EETV" />
-    <item component="ComponentInfo{com.microsoft.office.officelens/com.microsoft.office.apphost.LaunchActivity}" drawable="ic_com.microsoft.office.officelens___com.microsoft.office.apphost.LaunchActivity" />
-    <item component="ComponentInfo{com.whatsapp/com.whatsapp.Main}" drawable="ic_com.whatsapp___com.whatsapp.Main" />
+    <item component="ComponentInfo{com.google.android.apps.inbox/com.google.android.apps.bigtop.activities.InitActivity}" drawable="ic_com.google.android.apps.inbox___com.google.android.apps.bigtop.activities.InitActivity" />
+    <item component="ComponentInfo{com.farproc.wifi.analyzer/com.farproc.wifi.analyzer.MainScreen}" drawable="ic_com.farproc.wifi.analyzer___com.farproc.wifi.analyzer.MainScreen" />
+    <item component="ComponentInfo{com.gumtree.android/com.gumtree.android.home.HomeActivity}" drawable="ic_com.gumtree.android___com.gumtree.android.home.HomeActivity" />
+    <item component="ComponentInfo{com.blinkbox.tablet.live/com.blinkbox.LauncherActivity}" drawable="ic_com.blinkbox.tablet.live___com.blinkbox.LauncherActivity" />
+    <item component="ComponentInfo{com.bankofamerica.android.webwrapper/com.bankofamerica.android.ui.SplashScreenActivity}" drawable="ic_com.bankofamerica.android.webwrapper___com.bankofamerica.android.ui.SplashScreenActivity" />
+    <item component="ComponentInfo{com.google.android.apps.chromecast.app/com.google.android.apps.chromecast.app.DiscoveryActivity}" drawable="ic_com.google.android.apps.chromecast.app___com.google.android.apps.chromecast.app.DiscoveryActivity" />
     <item component="ComponentInfo{com.tdevaux.googleurlshortener/com.tdevaux.googleurlshortener.ui.HomeActivity}" drawable="ic_com.tdevaux.googleurlshortener___com.tdevaux.googleurlshortener.ui.HomeActivity" />
-    <item component="ComponentInfo{px.app.systmonline/px.app.systmonline.screen.PxLoginActivity}" drawable="ic_px.app.systmonline___px.app.systmonline.screen.PxLoginActivity" />
     <item component="ComponentInfo{com.banggood.client/com.banggood.client.main.MainUIActivity}" drawable="ic_com.banggood.client___com.banggood.client.main.MainUIActivity" />
-    <item component="ComponentInfo{com.findsdk.apppermission/com.findsdk.apppermission.MainActivity}" drawable="ic_com.findsdk.apppermission___com.findsdk.apppermission.MainActivity" />
-    <item component="ComponentInfo{com.waze/com.waze.FreeMapAppActivity}" drawable="ic_com.waze___com.waze.FreeMapAppActivity" />
-    <item component="ComponentInfo{stericson.busybox/stericson.busybox.Activity.MainActivity}" drawable="ic_stericson.busybox___stericson.busybox.Activity.MainActivity" />
-    <item component="ComponentInfo{com.shell.sitibv.motorist/com.mobgen.motoristphoenix.ui.start.MotoristWelcomeActivity}" drawable="ic_com.shell.sitibv.motorist___com.mobgen.motoristphoenix.ui.start.MotoristWelcomeActivity" />
-    <item component="ComponentInfo{com.nolanlawson.logcat/com.nolanlawson.logcat.LogcatActivity}" drawable="ic_com.nolanlawson.logcat___com.nolanlawson.logcat.LogcatActivity" />
-    <item component="ComponentInfo{com.bitbotany.polygen/com.bitbotany.polygen.polygen}" drawable="ic_com.bitbotany.polygen___com.bitbotany.polygen.polygen" />
+    <item component="ComponentInfo{com.estrongs.android.pop/com.estrongs.android.pop.view.FileExplorerActivity}" drawable="ic_com.estrongs.android.pop___com.estrongs.android.pop.view.FileExplorerActivity" />
+    <item component="ComponentInfo{com.supercell.clashofclans/com.supercell.clashofclans.GameApp}" drawable="ic_com.supercell.clashofclans___com.supercell.clashofclans.GameApp" />
+    <item component="ComponentInfo{jp.pokemon.poketoru/com.havok.Vision.NativeLibLoader}" drawable="ic_jp.pokemon.poketoru___com.havok.Vision.NativeLibLoader" />
+    <item component="ComponentInfo{com.microsoft.office.officelens/com.microsoft.office.apphost.LaunchActivity}" drawable="ic_com.microsoft.office.officelens___com.microsoft.office.apphost.LaunchActivity" />
+    <item component="ComponentInfo{com.lidroid.lockscreen/com.lidroid.lockscreen.LockScreen}" drawable="ic_com.lidroid.lockscreen___com.lidroid.lockscreen.LockScreen" />
     <item component="ComponentInfo{com.netflix.mediaclient/com.netflix.mediaclient.ui.launch.UIWebViewActivity}" drawable="ic_com.netflix.mediaclient___com.netflix.mediaclient.ui.launch.UIWebViewActivity" />
     <item component="ComponentInfo{tv.twitch.android.viewer/tv.twitch.android.apps.SplashScreenActivity}" drawable="ic_tv.twitch.android.viewer___tv.twitch.android.apps.SplashScreenActivity" />
-    <item component="ComponentInfo{com.opera.max.global/com.opera.max.ui.v2.MainActivity}" drawable="ic_com.opera.max.global___com.opera.max.ui.v2.MainActivity" />
-    <item component="ComponentInfo{nextapp.websharing.r1/nextapp.websharing.ui.HomeActivity}" drawable="ic_nextapp.websharing.r1___nextapp.websharing.ui.HomeActivity" />
-    <item component="ComponentInfo{app.greyshirts.sslcapture/ui.HomeActivity}" drawable="ic_app.greyshirts.sslcapture___ui.HomeActivity" />
-    <item component="ComponentInfo{com.supercell.clashofclans/com.supercell.clashofclans.GameApp}" drawable="ic_com.supercell.clashofclans___com.supercell.clashofclans.GameApp" />
-    <item component="ComponentInfo{com.dropbox.android/com.dropbox.android.activity.DropboxBrowser}" drawable="ic_com.dropbox.android___com.dropbox.android.activity.DropboxBrowser" />
-    <item component="ComponentInfo{com.farproc.wifi.analyzer/com.farproc.wifi.analyzer.MainScreen}" drawable="ic_com.farproc.wifi.analyzer___com.farproc.wifi.analyzer.MainScreen" />
-    <item component="ComponentInfo{com.google.android.wearable.app/com.google.android.clockwork.companion.StatusActivity}" drawable="ic_com.google.android.wearable.app___com.google.android.clockwork.companion.StatusActivity" />
-    <item component="ComponentInfo{dentex.youtube.downloader/dentex.youtube.downloader.MainActivity}" drawable="ic_dentex.youtube.downloader___dentex.youtube.downloader.MainActivity" />
-    <item component="ComponentInfo{com.google.android.apps.photowall/com.google.android.apps.photowall.activities.PhotowallStartActivity}" drawable="ic_com.google.android.apps.photowall___com.google.android.apps.photowall.activities.PhotowallStartActivity" />
-    <item component="ComponentInfo{com.xiaomi.hm.health/cn.com.smartdevices.bracelet.activity.MainActivity}" drawable="ic_com.xiaomi.hm.health___cn.com.smartdevices.bracelet.activity.MainActivity" />
-    <item component="ComponentInfo{com.nexonm.dominations.adk/com.nexonm.ct.plugin.android.AndroidOBBCheckerActivity}" drawable="ic_com.nexonm.dominations.adk___com.nexonm.ct.plugin.android.AndroidOBBCheckerActivity" />
-    <item component="ComponentInfo{com.homeretailgroup.argos.android/com.homeretailgroup.argos.android.activities.SplashActivity}" drawable="ic_com.homeretailgroup.argos.android___com.homeretailgroup.argos.android.activities.SplashActivity" />
-    <item component="ComponentInfo{com.asda.android/com.asda.android.app.main.SplashActivity}" drawable="ic_com.asda.android___com.asda.android.app.main.SplashActivity" />
-    <item component="ComponentInfo{jp.pokemon.poketoru/com.havok.Vision.NativeLibLoader}" drawable="ic_jp.pokemon.poketoru___com.havok.Vision.NativeLibLoader" />
-    <item component="ComponentInfo{com.htsu.hsbcpersonalbanking/com.htsu.hsbcpersonalbanking.activities.LaunchActivity}" drawable="ic_com.htsu.hsbcpersonalbanking___com.htsu.hsbcpersonalbanking.activities.LaunchActivity" />
-    <item component="ComponentInfo{com.supercell.boombeach/com.supercell.boombeach.GameApp}" drawable="ic_com.supercell.boombeach___com.supercell.boombeach.GameApp" />
-    <item component="ComponentInfo{com.acr.shellterminalemulator/com.acr.shellterminalemulator.Main}" drawable="ic_com.acr.shellterminalemulator___com.acr.shellterminalemulator.Main" />
-    <item component="ComponentInfo{com.spryfox.alphabear/com.unity3d.player.UnityPlayerProxyActivity}" drawable="ic_com.spryfox.alphabear___com.unity3d.player.UnityPlayerProxyActivity" />
-    <item component="ComponentInfo{com.lidroid.lockscreen/com.lidroid.lockscreen.LockScreen}" drawable="ic_com.lidroid.lockscreen___com.lidroid.lockscreen.LockScreen" />
-    <item component="ComponentInfo{com.pushbullet.android/com.pushbullet.android.ui.LaunchActivity}" drawable="ic_com.pushbullet.android___com.pushbullet.android.ui.LaunchActivity" />
-    <item component="ComponentInfo{com.estrongs.android.pop/com.estrongs.android.pop.view.FileExplorerActivity}" drawable="ic_com.estrongs.android.pop___com.estrongs.android.pop.view.FileExplorerActivity" />
-    <item component="ComponentInfo{com.ebay.mobile/com.ebay.mobile.activities.eBay}" drawable="ic_com.ebay.mobile___com.ebay.mobile.activities.eBay" />
-    <item component="ComponentInfo{com.miniclip.eightballpool/com.miniclip.eightballpool.EightBallPoolActivity}" drawable="ic_com.miniclip.eightballpool___com.miniclip.eightballpool.EightBallPoolActivity" />
-    <item component="ComponentInfo{com.cardcastgame.android.app/com.cardcastgame.android.app.ui.PlayActivity}" drawable="ic_com.cardcastgame.android.app___com.cardcastgame.android.app.ui.PlayActivity" />
-    <item component="ComponentInfo{com.gombosdev.ampere/com.gombosdev.ampere.MainActivity}" drawable="ic_com.gombosdev.ampere___com.gombosdev.ampere.MainActivity" />
-    <item component="ComponentInfo{com.google.android.apps.paidtasks/com.google.android.apps.paidtasks.LaunchActivity}" drawable="ic_com.google.android.apps.paidtasks___com.google.android.apps.paidtasks.LaunchActivity" />
-    <item component="ComponentInfo{com.aviary.android.feather/com.aviary.android.feather.MainActivity}" drawable="ic_com.aviary.android.feather___com.aviary.android.feather.MainActivity" />
-    <item component="ComponentInfo{uk.co.ergodicity.timedtoggles/uk.co.ergodicity.timedtoggles.MainActivity}" drawable="ic_uk.co.ergodicity.timedtoggles___uk.co.ergodicity.timedtoggles.MainActivity" />
-    <item component="ComponentInfo{net.segv11.bootunlocker/net.segv11.bootunlocker.MainActivity}" drawable="ic_net.segv11.bootunlocker___net.segv11.bootunlocker.MainActivity" />
-    <item component="ComponentInfo{com.elsdoerfer.android.autostarts/com.elsdoerfer.android.autostarts.ListActivity}" drawable="ic_com.elsdoerfer.android.autostarts___com.elsdoerfer.android.autostarts.ListActivity" />
-    <item component="ComponentInfo{com.twodboy.worldofgoofull/com.twodboy.worldofgoofull.WorldOfGooFull}" drawable="ic_com.twodboy.worldofgoofull___com.twodboy.worldofgoofull.WorldOfGooFull" />
-    <item component="ComponentInfo{com.mxtech.videoplayer.ad/com.mxtech.videoplayer.ad.ActivityMediaList}" drawable="ic_com.mxtech.videoplayer.ad___com.mxtech.videoplayer.ad.ActivityMediaList" />
-    <item component="ComponentInfo{org.zwanoo.android.speedtest/com.ookla.speedtest.softfacade.MainActivity}" drawable="ic_org.zwanoo.android.speedtest___com.ookla.speedtest.softfacade.MainActivity" />
-    <item component="ComponentInfo{com.google.android.apps.chromecast.app/com.google.android.apps.chromecast.app.DiscoveryActivity}" drawable="ic_com.google.android.apps.chromecast.app___com.google.android.apps.chromecast.app.DiscoveryActivity" />
-    <item component="ComponentInfo{com.tuxera.streambels/com.tuxera.streambels.HomeActivity}" drawable="ic_com.tuxera.streambels___com.tuxera.streambels.HomeActivity" />
-    <item component="ComponentInfo{com.teamviewer.teamviewer.market.mobile/com.teamviewer.remotecontrollib.activity.MainActivity}" drawable="ic_com.teamviewer.teamviewer.market.mobile___com.teamviewer.remotecontrollib.activity.MainActivity" />
-    <item component="ComponentInfo{com.google.android.apps.handwriting.ime/com.google.android.apps.handwriting.ime.WelcomeActivity}" drawable="ic_com.google.android.apps.handwriting.ime___com.google.android.apps.handwriting.ime.WelcomeActivity" />
-    <item component="ComponentInfo{com.google.android.apps.youtube.gaming/com.google.android.apps.youtube.gaming.watchwhile.activity.WatchWhileActivity}" drawable="ic_com.google.android.apps.youtube.gaming___com.google.android.apps.youtube.gaming.watchwhile.activity.WatchWhileActivity" />
-    <item component="ComponentInfo{com.google.android.apps.inbox/com.google.android.apps.bigtop.activities.InitActivity}" drawable="ic_com.google.android.apps.inbox___com.google.android.apps.bigtop.activities.InitActivity" />
-    <item component="ComponentInfo{com.google.android.apps.unveil/com.google.android.apps.unveil.CaptureActivity}" drawable="ic_com.google.android.apps.unveil___com.google.android.apps.unveil.CaptureActivity" />
-    <item component="ComponentInfo{com.rageconsulting.android.lightflow/com.rageconsulting.android.lightflow.MainActivity2}" drawable="ic_com.rageconsulting.android.lightflow___com.rageconsulting.android.lightflow.MainActivity2" />
-    <item component="ComponentInfo{com.google.android.projection.gearhead/com.google.android.projection.gearhead.companion.AndroidAutoActivity}" drawable="ic_com.google.android.projection.gearhead___com.google.android.projection.gearhead.companion.AndroidAutoActivity" />
-    <item component="ComponentInfo{com.njlabs.showjava/com.njlabs.showjava.ui.Landing}" drawable="ic_com.njlabs.showjava___com.njlabs.showjava.ui.Landing" />
-    <item component="ComponentInfo{com.pinterest/com.pinterest.activity.PinterestActivity}" drawable="ic_com.pinterest___com.pinterest.activity.PinterestActivity" />
+    <item component="ComponentInfo{com.cls.partition/com.cls.partition.activities.MainActivity}" drawable="ic_com.cls.partition___com.cls.partition.activities.MainActivity" />
+    <item component="ComponentInfo{com.oxa7.shou/com.oxa7.shou.ScreenActivity}" drawable="ic_com.oxa7.shou___com.oxa7.shou.ScreenActivity" />
+    <item component="ComponentInfo{com.bitbotany.polygen/com.bitbotany.polygen.polygen}" drawable="ic_com.bitbotany.polygen___com.bitbotany.polygen.polygen" />
+    <item component="ComponentInfo{com.waze/com.waze.FreeMapAppActivity}" drawable="ic_com.waze___com.waze.FreeMapAppActivity" />
     <item component="ComponentInfo{com.aronfeerick.smartvolume/com.aronfeerick.smartvolume.MainActivity}" drawable="ic_com.aronfeerick.smartvolume___com.aronfeerick.smartvolume.MainActivity" />
+    <item component="ComponentInfo{com.google.android.apps.paidtasks/com.google.android.apps.paidtasks.LaunchActivity}" drawable="ic_com.google.android.apps.paidtasks___com.google.android.apps.paidtasks.LaunchActivity" />
+    <item component="ComponentInfo{com.xiaomi.hm.health/cn.com.smartdevices.bracelet.activity.MainActivity}" drawable="ic_com.xiaomi.hm.health___cn.com.smartdevices.bracelet.activity.MainActivity" />
+    <item component="ComponentInfo{com.gombosdev.ampere/com.gombosdev.ampere.MainActivity}" drawable="ic_com.gombosdev.ampere___com.gombosdev.ampere.MainActivity" />
+    <item component="ComponentInfo{com.pushbullet.android.portal/com.pushbullet.android.portal.ui.LaunchActivity}" drawable="ic_com.pushbullet.android.portal___com.pushbullet.android.portal.ui.LaunchActivity" />
+    <item component="ComponentInfo{com.google.android.wearable.app/com.google.android.clockwork.companion.StatusActivity}" drawable="ic_com.google.android.wearable.app___com.google.android.clockwork.companion.StatusActivity" />
+    <item component="ComponentInfo{com.cardcastgame.android.app/com.cardcastgame.android.app.ui.PlayActivity}" drawable="ic_com.cardcastgame.android.app___com.cardcastgame.android.app.ui.PlayActivity" />
+    <item component="ComponentInfo{com.whatsapp/com.whatsapp.Main}" drawable="ic_com.whatsapp___com.whatsapp.Main" />
+    <item component="ComponentInfo{org.zwanoo.android.speedtest/com.ookla.speedtest.softfacade.MainActivity}" drawable="ic_org.zwanoo.android.speedtest___com.ookla.speedtest.softfacade.MainActivity" />
+    <item component="ComponentInfo{com.pinterest/com.pinterest.activity.PinterestActivity}" drawable="ic_com.pinterest___com.pinterest.activity.PinterestActivity" />
+    <item component="ComponentInfo{uk.co.ee.myee/uk.co.ee.myee.MyEE}" drawable="ic_uk.co.ee.myee___uk.co.ee.myee.MyEE" />
+    <item component="ComponentInfo{com.mxtech.videoplayer.ad/com.mxtech.videoplayer.ad.ActivityMediaList}" drawable="ic_com.mxtech.videoplayer.ad___com.mxtech.videoplayer.ad.ActivityMediaList" />
+    <item component="ComponentInfo{com.devhd.feedly/com.devhd.feedly.Main}" drawable="ic_com.devhd.feedly___com.devhd.feedly.Main" />
+    <item component="ComponentInfo{com.overlook.android.fing/com.overlook.android.fing.FingActivity}" drawable="ic_com.overlook.android.fing___com.overlook.android.fing.FingActivity" />
+    <item component="ComponentInfo{larry.zou.colorfullife/com.colure.pictool.ui.Main_}" drawable="ic_larry.zou.colorfullife___com.colure.pictool.ui.Main_" />
+    <item component="ComponentInfo{com.parkopedia/com.parkopedia.activities.SearchActivity}" drawable="ic_com.parkopedia___com.parkopedia.activities.SearchActivity" />
+    <item component="ComponentInfo{com.aviary.android.feather/com.aviary.android.feather.MainActivity}" drawable="ic_com.aviary.android.feather___com.aviary.android.feather.MainActivity" />
+    <item component="ComponentInfo{com.google.android.apps.photowall/com.google.android.apps.photowall.activities.PhotowallStartActivity}" drawable="ic_com.google.android.apps.photowall___com.google.android.apps.photowall.activities.PhotowallStartActivity" />
+    <item component="ComponentInfo{nextapp.websharing.r1/nextapp.websharing.ui.HomeActivity}" drawable="ic_nextapp.websharing.r1___nextapp.websharing.ui.HomeActivity" />
+    <item component="ComponentInfo{com.pushbullet.android/com.pushbullet.android.ui.LaunchActivity}" drawable="ic_com.pushbullet.android___com.pushbullet.android.ui.LaunchActivity" />
+    <item component="ComponentInfo{com.ebay.mobile/com.ebay.mobile.activities.eBay}" drawable="ic_com.ebay.mobile___com.ebay.mobile.activities.eBay" />
+    <item component="ComponentInfo{com.giffgaffmobile.controller/com.giffgaffmobile.controller.SplashActivity}" drawable="ic_com.giffgaffmobile.controller___com.giffgaffmobile.controller.SplashActivity" />
+    <item component="ComponentInfo{com.ivy.doze/com.ivy.doze.doze.MainActivity}" drawable="ic_com.ivy.doze___com.ivy.doze.doze.MainActivity" />
+    <item component="ComponentInfo{com.yum.colonelsclub/com.yum.colonelsclub.activities.FakeActivity}" drawable="ic_com.yum.colonelsclub___com.yum.colonelsclub.activities.FakeActivity" />
+    <item component="ComponentInfo{it.android.demi.elettronica.pro/it.android.demi.elettronica.pro.MainElectroPro}" drawable="ic_it.android.demi.elettronica.pro___it.android.demi.elettronica.pro.MainElectroPro" />
+    <item component="ComponentInfo{com.facebook.orca/com.facebook.orca.auth.StartScreenActivity}" drawable="ic_com.facebook.orca___com.facebook.orca.auth.StartScreenActivity" />
+    <item component="ComponentInfo{com.htsu.hsbcpersonalbanking/com.htsu.hsbcpersonalbanking.activities.LaunchActivity}" drawable="ic_com.htsu.hsbcpersonalbanking___com.htsu.hsbcpersonalbanking.activities.LaunchActivity" />
+    <item component="ComponentInfo{px.app.systmonline/px.app.systmonline.screen.PxLoginActivity}" drawable="ic_px.app.systmonline___px.app.systmonline.screen.PxLoginActivity" />
+    <item component="ComponentInfo{com.asda.android/com.asda.android.app.main.SplashActivity}" drawable="ic_com.asda.android___com.asda.android.app.main.SplashActivity" />
 </resources>

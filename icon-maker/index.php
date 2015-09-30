@@ -47,16 +47,16 @@ $("paper-fab[title]").css("border-radius","56px").each(function(){
 $("img").on("error",function(){location.replace("./");
 }).on("click",function(){current=$(this).attr("src").split("?")[0];
  $.get("./edit.php?image="+$(this).attr("raw"),function(code){
+  $("paper-dialog").removeAttr("style").css("position","fixed");
   $("paper-dialog-scrollable").css("margin-top","0px");
   $("paper-dialog-scrollable#edithtml").html(code);
-  $("paper-dialog").css("position","fixed");
   $("paper-dialog").get(0).open();
  }); 
 });
 
 function closeDialog(){
  var image=current+"?nc="+new Date().getTime();
- $("img[src*='"+current+"']").attr("src",image); 
+ $("img[src*='"+current+"']").attr("src",image);
  $("paper-dialog").get(0).close();
 };
 

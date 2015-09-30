@@ -25,6 +25,7 @@ if(count($output['init']['missing'])==0){switch(@$_REQUEST['step']){
 
 function command($run){
  global $output;passthru($run);
+ $output['action']=$run; 
  $output['raw']=ob_get_contents(); 
  $output['next']=@$_REQUEST['step']+1;
  $output=json_encode($output);
