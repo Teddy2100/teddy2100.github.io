@@ -54,9 +54,10 @@ $("canvas").each(function(){$(this).attr({width:"192px",height:"192px"});});
 $(window).on("load",function(){createCanvas();});
 
 function createCanvas(){
+ var image=new Image(),nocache=new Date().getTime();
  var canvas=$("canvas").get(0);data["md5"]=$(canvas).attr("md5");
  var context=canvas.getContext('2d'),color=$(canvas).attr("color");
- var image=new Image();image.src="./stored/icon/"+data["md5"]+".png"; 
+ if(data["md5"]){image.src="./stored/icon/"+data["md5"]+".png?nc="+nocache;}
  image.addEventListener("load",function(){context.drawImage(image,0,0);
   context.globalCompositeOperation="source-over";context.drawImage(overlay,0,0);  
   context.globalCompositeOperation="xor";context.drawImage(mask,0,0);//APPLY MASK  
