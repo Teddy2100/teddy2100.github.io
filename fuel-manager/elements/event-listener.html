@@ -1,0 +1,35 @@
+<dom-module id="event-listener">
+ <style>
+  .hide{display:none;}
+ </style>
+ <template>
+  <content></content>
+ </template>
+</dom-module>
+<script>
+Polymer({
+ is:'event-listener', 
+ behaviors:[
+  Polymer.IronResizableBehavior,
+  Polymer.IronSelectableBehavior
+ ], 
+ listeners:{
+  'iron-resize':'resized'
+ },
+ 
+ registered:function(){
+  $("paper-drawer-panel").on("selected-changed",function(){
+   $("paper-toast-stack").animate({"left":(this.selected=="main"?"12px":"268px")});
+  });
+  $("neon-animated-pages").on("neon-animation-finish",function(){
+   $("paper-drawer-panel").get(0).closeDrawer();
+  });
+ }, 
+ resized:function(){
+  $("paper-dialog").each(function(k){if(this.opened){
+   //this.style.minHeight=this.offsetHeight+"px";   
+   this.resetFit();this.refit();
+  }});
+ }
+});
+</script>
