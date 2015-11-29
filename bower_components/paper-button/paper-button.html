@@ -1,4 +1,4 @@
-<link rel=import href=../polymer/polymer.html><link rel=import href=../paper-material/paper-material.html><link rel=import href=../paper-ripple/paper-ripple.html><link rel=import href=../paper-behaviors/paper-button-behavior.html><dom-module id=paper-button><template><style>
+<link rel=import href=../polymer/polymer.html><link rel=import href=../paper-material/paper-material.html><link rel=import href=../paper-ripple/paper-ripple.html><link rel=import href=../paper-behaviors/paper-button-behavior.html><link rel=import href=../iron-flex-layout/iron-flex-layout.html><dom-module id=paper-button><template strip-whitespace><style include=paper-material>
       :host {
         display: inline-block;
         position: relative;
@@ -17,12 +17,19 @@
         user-select: none;
         cursor: pointer;
         z-index: 0;
+        padding: 0.7em 0.57em;
 
         @apply(--paper-button);
       }
 
-      .keyboard-focus {
+      :host([raised].keyboard-focus) {
         font-weight: bold;
+        @apply(--paper-button-raised-keyboard-focus);
+      }
+
+      :host(:not([raised]).keyboard-focus) {
+        font-weight: bold;
+        @apply(--paper-button-flat-keyboard-focus);
       }
 
       :host([disabled]) {
@@ -34,22 +41,14 @@
         @apply(--paper-button-disabled);
       }
 
-      :host([noink]) paper-ripple {
-        display: none;
+      paper-ripple {
+        color: var(--paper-button-ink-color);
       }
 
-      paper-material {
-        border-radius: inherit;
-      }
-
-      .content > ::content * {
+      :host > ::content * {
         text-transform: inherit;
       }
-
-      .content {
-        padding: 0.7em 0.57em
-      }
-    </style><paper-ripple></paper-ripple><paper-material class$=[[_computeContentClass(receivedFocusFromKeyboard)]] elevation=[[_elevation]] animated><content></content></paper-material></template></dom-module><script>
+    </style><content></content></template></dom-module><script>
   Polymer({
     is: 'paper-button',
 
@@ -71,18 +70,10 @@
 
     _calculateElevation: function() {
       if (!this.raised) {
-        this._elevation = 0;
+        this.elevation = 0;
       } else {
         Polymer.PaperButtonBehaviorImpl._calculateElevation.apply(this);
       }
-    },
-
-    _computeContentClass: function(receivedFocusFromKeyboard) {
-      var className = 'content ';
-      if (receivedFocusFromKeyboard) {
-        className += ' keyboard-focus';
-      }
-      return className;
     }
   });
 </script>

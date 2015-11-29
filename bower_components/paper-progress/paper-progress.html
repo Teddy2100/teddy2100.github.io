@@ -1,4 +1,4 @@
-<link rel=import href=../polymer/polymer.html><link rel=import href=../paper-styles/paper-styles.html><link rel=import href=../paper-styles/paper-styles-classes.html><link rel=import href=../iron-range-behavior/iron-range-behavior.html><dom-module id=paper-progress><style>
+<link rel=import href=../polymer/polymer.html><link rel=import href=../iron-range-behavior/iron-range-behavior.html><link rel=import href=../paper-styles/color.html><link rel=import href=../iron-flex-layout/iron-flex-layout.html><dom-module id=paper-progress><style>
     :host {
       display: block;
       width: 200px;
@@ -27,7 +27,8 @@
       background-color: var(--paper-progress-container-color, --google-grey-300);
     }
 
-    :host(.transiting) > * {
+    :host(.transiting) #primaryProgress,
+    :host(.transiting) #secondaryProgress {
       -webkit-transition-property: -webkit-transform;
       transition-property: transform;
 
@@ -240,7 +241,7 @@
     },
 
     _disabledChanged: function(disabled) {
-      this.$.progressContainer.setAttribute('aria-disabled', disabled ? 'true' : 'false');
+      this.setAttribute('aria-disabled', disabled ? 'true' : 'false');
     },
 
     _hideSecondaryProgress: function(secondaryRatio) {

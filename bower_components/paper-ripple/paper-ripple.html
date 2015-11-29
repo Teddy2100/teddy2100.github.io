@@ -8,24 +8,26 @@
         left: 0;
         right: 0;
         bottom: 0;
+
+        /* See PolymerElements/paper-behaviors/issues/34. On non-Chrome browsers,
+         * creating a node (with a position:absolute) in the middle of an event
+         * handler "interrupts" that event handler (which happens when the
+         * ripple is created on demand) */
+        pointer-events: none;
       }
-  
+
       :host([animating]) {
         /* This resolves a rendering issue in Chrome (as of 40) where the
            ripple is not properly clipped by its parent (which may have
            rounded corners). See: http://jsbin.com/temexa/4
-  
+
            Note: We only apply this style conditionally. Otherwise, the browser
            will create a new compositing layer for every ripple element on the
            page, and that would be bad. */
         -webkit-transform: translate(0, 0);
         transform: translate3d(0, 0, 0);
       }
-  
-      :host([noink]) {
-        pointer-events: none;
-      }
-  
+
       #background,
       #waves,
       .wave-container,
@@ -37,27 +39,27 @@
         width: 100%;
         height: 100%;
       }
-  
+
       #background,
       .wave {
         opacity: 0;
       }
-  
+
       #waves,
       .wave {
         overflow: hidden;
       }
-  
+
       .wave-container,
       .wave {
         border-radius: 50%;
       }
-  
+
       :host(.circle) #background,
       :host(.circle) #waves {
         border-radius: 50%;
       }
-  
+
       :host(.circle) .wave-container {
         overflow: hidden;
       }
@@ -440,6 +442,17 @@
           observer: '_holdDownChanged'
         },
 
+        /**
+         * If true, the ripple will not generate a ripple effect
+         * via pointer interaction.
+         * Calling ripple's imperative api like `simulatedRipple` will
+         * still generate the ripple effect.
+         */
+        noink: {
+          type: Boolean,
+          value: false
+        },
+
         _animating: {
           type: Boolean
         },
@@ -472,12 +485,17 @@
       },
 
       attached: function() {
-        this.listen(this.target, 'up', 'upAction');
-        this.listen(this.target, 'down', 'downAction');
+        // Set up a11yKeysBehavior to listen to key events on the target,
+        // so that space and enter activate the ripple even if the target doesn't
+        // handle key events. The key handlers deal with `noink` themselves.
+        this.keyEventTarget = this.target;
+        this.listen(this.target, 'up', 'uiUpAction');
+        this.listen(this.target, 'down', 'uiDownAction');
+      },
 
-        if (!this.target.hasAttribute('noink')) {
-          this.keyEventTarget = this.target;
-        }
+      detached: function() {
+        this.unlisten(this.target, 'up', 'uiUpAction');
+        this.unlisten(this.target, 'down', 'uiDownAction');
       },
 
       get shouldKeepAnimating () {
@@ -499,7 +517,22 @@
         }, 1);
       },
 
-      /** @param {Event=} event */
+      /**
+       * Provokes a ripple down effect via a UI event,
+       * respecting the `noink` property.
+       * @param {Event=} event
+       */
+      uiDownAction: function(event) {
+        if (!this.noink) {
+          this.downAction(event);
+        }
+      },
+
+      /**
+       * Provokes a ripple down effect via a UI event,
+       * *not* respecting the `noink` property.
+       * @param {Event=} event
+       */
       downAction: function(event) {
         if (this.holdDown && this.ripples.length > 0) {
           return;
@@ -514,7 +547,22 @@
         }
       },
 
-      /** @param {Event=} event */
+      /**
+       * Provokes a ripple up effect via a UI event,
+       * respecting the `noink` property.
+       * @param {Event=} event
+       */
+      uiUpAction: function(event) {
+        if (!this.noink) {
+          this.upAction(event);
+        }
+      },
+
+      /**
+       * Provokes a ripple up effect via a UI event,
+       * *not* respecting the `noink` property.
+       * @param {Event=} event
+       */
       upAction: function(event) {
         if (this.holdDown) {
           return;
@@ -587,20 +635,25 @@
       },
 
       _onEnterKeydown: function() {
-        this.downAction();
-        this.async(this.upAction, 1);
+        this.uiDownAction();
+        this.async(this.uiUpAction, 1);
       },
 
       _onSpaceKeydown: function() {
-        this.downAction();
+        this.uiDownAction();
       },
 
       _onSpaceKeyup: function() {
-        this.upAction();
+        this.uiUpAction();
       },
 
-      _holdDownChanged: function(holdDown) {
-        if (holdDown) {
+      // note: holdDown does not respect noink since it can be a focus based
+      // effect.
+      _holdDownChanged: function(newVal, oldVal) {
+        if (oldVal === undefined) {
+          return;
+        }
+        if (newVal) {
           this.downAction();
         } else {
           this.upAction();

@@ -1,4 +1,4 @@
-<link rel=import href=../polymer/polymer.html><link rel=import href=../iron-flex-layout/classes/iron-flex-layout.html><link rel=import href=../iron-flex-layout/iron-flex-layout.html><link rel=import href=../iron-behaviors/iron-control-state.html><link rel=import href=../iron-behaviors/iron-button-state.html><link rel=import href=../paper-ripple/paper-ripple.html><dom-module id=paper-tab><style>
+<link rel=import href=../polymer/polymer.html><link rel=import href=../iron-flex-layout/iron-flex-layout.html><link rel=import href=../iron-behaviors/iron-control-state.html><link rel=import href=../iron-behaviors/iron-button-state.html><link rel=import href=../paper-behaviors/paper-ripple-behavior.html><dom-module id=paper-tab><style>
 
     :host {
       @apply(--layout-inline);
@@ -27,12 +27,16 @@
       -webkit-transform: translateZ(0);
       transform: translateZ(0);
       transition: opacity 0.1s cubic-bezier(0.4, 0.0, 1, 1);
-
+      @apply(--layout-horizontal);
+      @apply(--layout-center-center);
+      @apply(--layout-flex-auto);
       @apply(--paper-tab-content);
     }
 
     :host(:not(.iron-selected)) > .tab-content {
       opacity: 0.8;
+
+      @apply(--paper-tab-content-unselected);
     }
 
     :host(:focus) .tab-content {
@@ -40,9 +44,8 @@
       font-weight: 700;
     }
 
-    #ink {
+    paper-ripple {
       color: var(--paper-tab-ink, --paper-yellow-a100);
-      pointer-events: none;
     }
 
     .tab-content > ::content > a {
@@ -55,7 +58,7 @@
       flex-basis: 0.000000001px;
     }
 
-  </style><template><div class="tab-content flex-auto center-center horizontal layout"><content></content></div><template is=dom-if if=[[!noink]]><paper-ripple id=ink initial-opacity=0.95 opacity-decay-velocity=0.98></paper-ripple></template></template></dom-module><script>
+  </style><template><div class=tab-content><content></content></div></template></dom-module><script>
 
   Polymer({
 
@@ -63,22 +66,9 @@
 
     behaviors: [
       Polymer.IronControlState,
-      Polymer.IronButtonState
+      Polymer.IronButtonState,
+      Polymer.PaperRippleBehavior
     ],
-
-    properties: {
-
-      /**
-       * If true, ink ripple effect is disabled.
-       *
-       * @attribute noink
-       */
-      noink: {
-        type: Boolean,
-        value: false
-      }
-
-    },
 
     hostAttributes: {
       role: 'tab'
@@ -86,6 +76,12 @@
 
     listeners: {
       down: '_updateNoink'
+    },
+
+    ready: function() {
+      var ripple = this.getRipple();
+      ripple.initialOpacity = 0.95;
+      ripple.opacityDecayVelocity = 0.98;
     },
 
     attached: function() {

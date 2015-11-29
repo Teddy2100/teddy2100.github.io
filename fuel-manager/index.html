@@ -7,8 +7,8 @@
  <meta name="theme-color" content="#009C9C">
  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
- <script type="text/javascript" src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
  <script type="text/javascript" src="../bower_components/jquery/dist/jquery.min.js"></script>
+ <script type="text/javascript" src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
  <link rel="import" href="../bower_components/vulcanized-full.html"/>
  <link rel="import" href="./elements/paper-item-icon-button.html"/>
  <link rel="import" href="./elements/event-listener.html"/>
@@ -22,7 +22,7 @@
    <paper-menu class="list" style="padding:0px;">
     <div class="ui-header-widget"><b></b><small></small><img/></div>
     <paper-item page="usage-overview"><iron-icon icon="assessment"></iron-icon>Usage Overview</paper-item>
-    <paper-item page="add-fuel-usage"><iron-icon icon="social:whatshot"></iron-icon>Add Fuel Usage</paper-item>
+    <paper-item page="add-reading"><iron-icon icon="social:whatshot"></iron-icon>Add Reading</paper-item>
     <paper-item page="add-topup"><iron-icon icon="add-shopping-cart"></iron-icon>Add Topup</paper-item>
    </paper-menu>
   </paper-material>
@@ -35,13 +35,17 @@
    <neon-animated-pages selected="0" entry-animation="slide-from-right-animation" exit-animation="slide-left-animation">
     <neon-animatable page="usage-overview" icon="cached" style="padding:15px;">
      <h1>Loading Usage Please Wait</h1><artical></artical>
+     <div id="chart_div"></div>
     </neon-animatable>
-    <neon-animatable page="add-fuel-usage" icon="save" style="padding:20px;">
-     <paper-material id="action-back" elevation="1"><paper-icon-button icon="arrow-back"></paper-icon-button></paper-material>
+    <neon-animatable page="add-reading" icon="save" style="padding:20px;">
      <h1>Loading Usage Please Wait</h1><artical></artical>
+     <input name="reading" value="0"/>
+     <input type="button" id="test1" value="READING"> 
     </neon-animatable>
-    <neon-animatable page="add-topup" style="padding:15px;">
+    <neon-animatable page="add-topup" icon="save" style="padding:15px;">
      <h1>Loading Usage Please Wait</h1><artical></artical>
+     <input name="topup" value="10"/>
+     <input type="button" id="test2" value="TOPUP"> 
     </neon-animatable>
    </neon-animated-pages>
   </paper-header-panel>
@@ -51,13 +55,87 @@
  </paper-material>
 </event-listener>
 <script type="text/javascript">
-$(window).on("load refresh",function(){
- $("paper-item[page]").on("click",function(){$(window).trigger("changePage",this);});
-
- $.get("https://script.google.com/macros/s/AKfycbxeuto8P_lOVnWU86TO8Zjxqv628Bf06K2n49plz1-N/dev",function(json){
-  console.log(json);
+$(window).on("load",function(e){
+ $.ajax({data:"user="+btoa("aronfeerick@gmail.com")});
+ $("paper-item[page]").on("click",function(){
+  $(window).trigger("changePage",this);
  });
 });
+
+$("#test1").on("click",function(){
+ var obj=$("[name='reading']").get(0).value;
+ $.ajax({data:"user="+btoa("aronfeerick@gmail.com")+"&reading="+obj});
+});
+
+$("#test2").on("click",function(){
+ var obj=$("[name='topup']").get(0).value;
+ $.ajax({data:"user="+btoa("aronfeerick@gmail.com")+"&topup="+obj});
+});
+
+$(window).on("update",function(e,obj){
+ $("neon-animatable[page='usage-overview'] artical").html("");
+ var temp=$(obj.data).get().reverse(),data={},perhour=[];temp.pop();
+ $.each(temp,function(k,v){if(!data[v[1]]){data[v[1]]=[];}data[v[1]].push(v);});
+ 
+ $.each(data,function(key,fuel){$.each(fuel.reverse(),function(k,v){if(fuel[k-2] && v[2]=="READING"){
+   var usedover=parseFloat((Date.parse(fuel[k][0])-Date.parse(fuel[k-2][0]))/3600000).toFixed(1);
+
+   var used=parseFloat(fuel[k-1][3]-fuel[k][3]).toFixed(2);
+
+   console.log(key+" £",used+" ("+usedover+"hours)");
+  }});
+ });
+ 
+ 
+ //console.log(costperhour);
+ 
+ $.each(data,function(key,fuel){$.each(fuel.reverse(),function(k,v){if(v[2]=="READING"){
+  var timesince=parseFloat((new Date().getTime()-Date.parse(v[0]))/3600000).toFixed(1);
+ 
+  $("neon-animatable[page='usage-overview'] artical").append(v[0]+"<br>");
+  $("neon-animatable[page='usage-overview'] artical").append(timesince+" Hour since last reading<br>");
+  //$("neon-animatable[page='usage-overview'] artical").append(timesince*costperhour);
+  return false;
+ }})});
+});
+
+
+
+
+
+
+function drawBasic(){
+
+      var chart = new google.visualization.DataTable();
+      chart.addColumn('number', 'X');
+      chart.addColumn('number', 'Dogs');
+
+      chart.addRows([
+        [0, 50],   [1, 10],  [2, 23],  [3, 17],  [4, 18],  [5, 9],
+        [6, 11],  [7, 27],  [8, 33],  [9, 40],  [10, 32], [11, 35],
+        [12, 30], [13, 40], [14, 42], [15, 47], [16, 44], [17, 48],
+        [18, 52], [19, 54], [20, 42], [21, 55], [22, 56], [23, 57],
+        [24, 60], [25, 50], [26, 52], [27, 51], [28, 49], [29, 53],
+        [30, 55], [31, 60], [32, 61], [33, 59], [34, 62], [35, 65],
+        [36, 62], [37, 58], [38, 55], [39, 61], [40, 64], [41, 65],
+        [42, 63], [43, 66], [44, 67], [45, 69], [46, 69], [47, 70],
+        [48, 72], [49, 68], [50, 66], [51, 65], [52, 67], [53, 70],
+        [54, 71], [55, 72], [56, 73], [57, 75], [58, 70], [59, 68],
+        [60, 64], [61, 60], [62, 65], [63, 67], [64, 68], [65, 69],
+        [66, 70], [67, 72], [68, 75], [69, 80]
+      ]);
+
+
+      var create=new google.visualization.LineChart(document.getElementById('chart_div'));
+      create.draw(chart,{hAxis:{title:'Time'},vAxis:{title:'Popularity'}});
+    }
+
+
+
+
+
+
+
 
 $(window).on("changePage",function(e,obj){try{
  var pageHandle=$("neon-animated-pages").get(0),data=$(obj);
@@ -66,9 +144,7 @@ $(window).on("changePage",function(e,obj){try{
   pageHandle.entryAnimation="slide-from-"+(requestedPage<pageHandle.selected?"left":"right")+"-animation";  
  if(requestedPage!=pageHandle.selected){pageHandle.selected=requestedPage;}
  if(data.text().length!=0){$("span.title").html(data.text());}
-}catch(e){alert("Opps Can't Display Requested Item");
- console.log(e);
-}});
+}catch(e){alert("Opps Can't Display Requested Item");}});
 </script>
 </body>
 </html>

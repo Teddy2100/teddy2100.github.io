@@ -1,135 +1,129 @@
-<link rel=import href=../polymer/polymer.html><link rel=import href=../iron-menu-behavior/iron-menu-behavior.html><link rel=import href=../iron-behaviors/iron-control-state.html><link rel=import href=../iron-collapse/iron-collapse.html><link rel=import href=../paper-styles/paper-styles.html><dom-module id=paper-submenu><link rel=import type=css href=paper-menu-shared.css><template><div class=selectable-content on-tap=_onTap><content id=trigger select=.menu-trigger></content></div><iron-collapse id=collapse opened={{opened}}><content select=.menu-content></content></iron-collapse></template></dom-module><script>
+<link rel=import href=../polymer/polymer.html><link rel=import href=../iron-menu-behavior/iron-menu-behavior.html><link rel=import href=../iron-behaviors/iron-control-state.html><link rel=import href=../iron-collapse/iron-collapse.html><link rel=import href=../iron-flex-layout/iron-flex-layout.html><link rel=import href=../paper-styles/default-theme.html><link rel=import href=paper-menu-shared-styles.html><dom-module id=paper-submenu><template><style include=paper-menu-shared-styles></style><div class=selectable-content on-tap=_onTap><content id=trigger select=.menu-trigger></content></div><iron-collapse id=collapse opened={{opened}}><content select=.menu-content></content></iron-collapse></template><script>
+    (function() {
+      Polymer({
+        is: 'paper-submenu',
 
-(function() {
+        properties: {
+          /**
+           * Fired when the submenu is opened.
+           *
+           * @event paper-submenu-open
+           */
 
-  Polymer({
+          /**
+           * Fired when the submenu is closed.
+           *
+           * @event paper-submenu-close
+           */
 
-    is: 'paper-submenu',
+          /**
+           * Set opened to true to show the collapse element and to false to hide it.
+           *
+           * @attribute opened
+           */
+          opened: {
+            type: Boolean,
+            value: false,
+            notify: true,
+            observer: '_openedChanged'
+          }
+        },
 
-    properties: {
-      /**
-       * Fired when the submenu is opened.
-       *
-       * @event paper-submenu-open
-       */
+        behaviors: [
+          Polymer.IronControlState
+        ],
 
-      /**
-       * Fired when the submenu is closed.
-       *
-       * @event paper-submenu-close
-       */
+        get __parent() {
+          return Polymer.dom(this).parentNode;
+        },
 
-      /**
-       * Set opened to true to show the collapse element and to false to hide it.
-       *
-       * @attribute opened
-       */
-      opened: {
-        type: Boolean,
-        value: false,
-        notify: true,
-        observer: '_openedChanged'
-      }
-    },
+        get __trigger() {
+          return Polymer.dom(this.$.trigger).getDistributedNodes()[0];
+        },
 
-    behaviors: [
-      Polymer.IronControlState
-    ],
+        attached: function() {
+          this.listen(this.__parent, 'iron-activate', '_onParentIronActivate');
+        },
 
-    get __parent() {
-      return Polymer.dom(this).parentNode;
-    },
+        dettached: function() {
+          this.unlisten(this.__parent, 'iron-activate', '_onParentIronActivate');
+        },
 
-    get __trigger() {
-      return Polymer.dom(this.$.trigger).getDistributedNodes()[0];
-    },
+        /**
+         * Expand the submenu content.
+         */
+        open: function() {
+          if (this.disabled)
+            return;
+          this.$.collapse.show();
+          this._active = true;
+          this.__trigger.classList.add('iron-selected');
+        },
 
-    attached: function() {
-      this.listen(this.__parent, 'iron-activate', '_onParentIronActivate');
-    },
+        /**
+         * Collapse the submenu content.
+         */
+        close: function() {
+          this.$.collapse.hide();
+          this._active = false;
+          this.__trigger.classList.remove('iron-selected');
+        },
 
-    dettached: function() {
-      this.unlisten(this.__parent, 'iron-activate', '_onParentIronActivate');
-    },
+        /**
+         * A handler that is called when the trigger is tapped.
+         */
+        _onTap: function() {
+          if (this.disabled)
+            return;
+          this.$.collapse.toggle();
+        },
 
-    /**
-     * Expand the submenu content.
-     */
-    open: function() {
-      if (this.disabled)
-        return;
-      this.$.collapse.show();
-      this._active = true;
-      this.__trigger.classList.add('iron-selected');
-    },
+        /**
+         * Toggles the submenu content when the trigger is tapped.
+         */
+        _openedChanged: function(opened, oldOpened) {
+          if (opened) {
+            this.fire('paper-submenu-open');
+          } else if (oldOpened != null) {
+            this.fire('paper-submenu-close');
+          }
+        },
 
-    /**
-     * Collapse the submenu content.
-     */
-    close: function() {
-      this.$.collapse.hide();
-      this._active = false;
-      this.__trigger.classList.remove('iron-selected');
-    },
+        /**
+         * A handler that is called when `iron-activate` is fired.
+         *
+         * @param {CustomEvent} event An `iron-activate` event.
+         */
+        _onParentIronActivate: function(event) {
+          if (Polymer.Gestures.findOriginalTarget(event) !== this.__parent) {
+            return;
+          }
 
-    /**
-     * A handler that is called when the trigger is tapped.
-     */
-    _onTap: function() {
-      if (this.disabled)
-        return;
-      this.$.collapse.toggle();
-    },
+          // The activated item can either be this submenu, in which case it
+          // should be expanded, or any of the other sibling submenus, in which
+          // case this submenu should be collapsed.
+          if (event.detail.item == this) {
+            if (this._active)
+              return;
+            this.open();
+          } else {
+            this.close();
+          }
+        },
 
-    /**
-     * Toggles the submenu content when the trigger is tapped.
-     */
-    _openedChanged: function(opened, oldOpened) {
-      if (opened) {
-        this.fire('paper-submenu-open');
-      } else if (oldOpened != null) {
-        this.fire('paper-submenu-close');
-      }
-    },
+        /**
+         * If the dropdown is open when disabled becomes true, close the
+         * dropdown.
+         *
+         * @param {boolean} disabled True if disabled, otherwise false.
+         */
+        _disabledChanged: function(disabled) {
+          Polymer.IronControlState._disabledChanged.apply(this, arguments);
+          if (disabled && this._active) {
+            this.close();
 
-    /**
-     * A handler that is called when `iron-activate` is fired.
-     *
-     * @param {CustomEvent} event An `iron-activate` event.
-     */
-    _onParentIronActivate: function(event) {
-      if (Polymer.Gestures.findOriginalTarget(event) !== this.__parent) {
-        return;
-      }
-
-      // The activated item can either be this submenu, in which case it
-      // should be expanded, or any of the other sibling submenus, in which
-      // case this submenu should be collapsed.
-      if (event.detail.item == this) {
-        if (this._active)
-          return;
-        this.open();
-      } else {
-        this.close();
-      }
-    },
-
-    /**
-     * If the dropdown is open when disabled becomes true, close the
-     * dropdown.
-     *
-     * @param {boolean} disabled True if disabled, otherwise false.
-     */
-    _disabledChanged: function(disabled) {
-      Polymer.IronControlState._disabledChanged.apply(this, arguments);
-      if (disabled && this._active) {
-        this.close();
-
-      }
-    }
-
-  });
-
-})();
-
-</script>
+          }
+        }
+      });
+    })();
+  </script></dom-module>

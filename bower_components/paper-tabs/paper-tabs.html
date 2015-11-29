@@ -1,4 +1,4 @@
-<link rel=import href=../polymer/polymer.html><link rel=import href=../iron-flex-layout/iron-flex-layout.html><link rel=import href=../iron-flex-layout/classes/iron-flex-layout.html><link rel=import href=../iron-resizable-behavior/iron-resizable-behavior.html><link rel=import href=../iron-menu-behavior/iron-menubar-behavior.html><link rel=import href=../iron-icon/iron-icon.html><link rel=import href=../paper-icon-button/paper-icon-button.html><link rel=import href=../paper-styles/color.html><link rel=import href=paper-tabs-icons.html><link rel=import href=paper-tab.html><dom-module id=paper-tabs><style>
+<link rel=import href=../polymer/polymer.html><link rel=import href=../iron-flex-layout/iron-flex-layout.html><link rel=import href=../iron-resizable-behavior/iron-resizable-behavior.html><link rel=import href=../iron-menu-behavior/iron-menubar-behavior.html><link rel=import href=../iron-icon/iron-icon.html><link rel=import href=../paper-icon-button/paper-icon-button.html><link rel=import href=../paper-styles/color.html><link rel=import href=paper-tabs-icons.html><link rel=import href=paper-tab.html><dom-module id=paper-tabs><style>
 
     :host {
       @apply(--layout);
@@ -17,11 +17,16 @@
       @apply(--paper-tabs);
     }
 
+    :host-context([dir=rtl]) {
+      @apply(--layout-horizontal-reverse);
+    }
+
     #tabsContainer {
       position: relative;
       height: 100%;
       white-space: nowrap;
       overflow: hidden;
+      @apply(--layout-flex);
     }
 
     #tabsContent {
@@ -33,17 +38,24 @@
       white-space: nowrap;
     }
 
+    #tabsContent.horizontal {
+      @apply(--layout-horizontal);
+    }
+
     .hidden {
       display: none;
     }
 
     .not-visible {
       opacity: 0;
+      cursor: default;
     }
 
     paper-icon-button {
-      width: 24px;
-      padding: 16px;
+      width: 48px;
+      height: 48px;
+      padding: 12px;
+      margin: 0 4px;
     }
 
     #selectionBar {
@@ -82,7 +94,7 @@
       height: 100%;
     }
 
-  </style><template><paper-icon-button icon=paper-tabs:chevron-left class$="[[_computeScrollButtonClass(_leftHidden, scrollable, hideScrollButtons)]]" on-up=_onScrollButtonUp on-down=_onLeftScrollButtonDown></paper-icon-button><div id=tabsContainer class=flex on-scroll=_scroll><div id=tabsContent class$=[[_computeTabsContentClass(scrollable)]]><content select=*></content><div id=selectionBar class$="[[_computeSelectionBarClass(noBar, alignBottom)]]" on-transitionend=_onBarTransitionEnd></div></div></div><paper-icon-button icon=paper-tabs:chevron-right class$="[[_computeScrollButtonClass(_rightHidden, scrollable, hideScrollButtons)]]" on-up=_onScrollButtonUp on-down=_onRightScrollButtonDown></paper-icon-button></template></dom-module><script>
+  </style><template><paper-icon-button icon=paper-tabs:chevron-left class$="[[_computeScrollButtonClass(_leftHidden, scrollable, hideScrollButtons)]]" on-up=_onScrollButtonUp on-down=_onLeftScrollButtonDown tabindex=-1></paper-icon-button><div id=tabsContainer on-track=_scroll on-down=_down><div id=tabsContent class$=[[_computeTabsContentClass(scrollable)]]><content select=*></content><div id=selectionBar class$="[[_computeSelectionBarClass(noBar, alignBottom)]]" on-transitionend=_onBarTransitionEnd></div></div></div><paper-icon-button icon=paper-tabs:chevron-right class$="[[_computeScrollButtonClass(_rightHidden, scrollable, hideScrollButtons)]]" on-up=_onScrollButtonUp on-down=_onRightScrollButtonDown tabindex=-1></paper-icon-button></template></dom-module><script>
 
   Polymer({
 
@@ -96,11 +108,14 @@
     properties: {
 
       /**
-       * If true, ink ripple effect is disabled.
+       * If true, ink ripple effect is disabled. When this property is changed,
+       * all descendant `<paper-tab>` elements have their `noink` property
+       * changed to the new value as well.
        */
       noink: {
         type: Boolean,
-        value: false
+        value: false,
+        observer: '_noinkChanged'
       },
 
       /**
@@ -199,6 +214,27 @@
       'iron-deselect': '_onIronDeselect'
     },
 
+    created: function() {
+      this._holdJob = null;
+    },
+
+    ready: function() {
+      this.setScrollDirection('y', this.$.tabsContainer);
+    },
+
+    _noinkChanged: function(noink) {
+      var childTabs = Polymer.dom(this).querySelectorAll('paper-tab');
+      childTabs.forEach(noink ? this._setNoinkAttribute : this._removeNoinkAttribute);
+    },
+
+    _setNoinkAttribute: function(element) {
+      element.setAttribute('noink', '');
+    },
+
+    _removeNoinkAttribute: function(element) {
+      element.removeAttribute('noink');
+    },
+
     _computeScrollButtonClass: function(hideThisButton, scrollable, hideScrollButtons) {
       if (!scrollable || hideScrollButtons) {
         return 'hidden';
@@ -212,7 +248,7 @@
     },
 
     _computeTabsContentClass: function(scrollable) {
-      return scrollable ? 'scrollable' : 'horizontal layout';
+      return scrollable ? 'scrollable' : 'horizontal';
     },
 
     _computeSelectionBarClass: function(noBar, alignBottom) {
@@ -253,24 +289,43 @@
       );
     },
 
-    _scroll: function() {
-      var scrollLeft;
 
+    _scroll: function(e, detail) {
       if (!this.scrollable) {
         return;
       }
 
-      scrollLeft = this.$.tabsContainer.scrollLeft;
+      var ddx = (detail && -detail.ddx) || 0;
+      this._affectScroll(ddx);
+    },
+
+    _down: function(e) {
+      // go one beat async to defeat IronMenuBehavior
+      // autorefocus-on-no-selection timeout
+      this.async(function() {
+        if (this._defaultFocusAsync) {
+          this.cancelAsync(this._defaultFocusAsync);
+          this._defaultFocusAsync = null;
+        }
+      }, 1);
+    },
+
+    _affectScroll: function(dx) {
+      this.$.tabsContainer.scrollLeft += dx;
+
+      var scrollLeft = this.$.tabsContainer.scrollLeft;
 
       this._leftHidden = scrollLeft === 0;
       this._rightHidden = scrollLeft === this._tabContainerScrollSize;
     },
 
     _onLeftScrollButtonDown: function() {
+      this._scrollToLeft();
       this._holdJob = setInterval(this._scrollToLeft.bind(this), this._holdDelay);
     },
 
     _onRightScrollButtonDown: function() {
+      this._scrollToRight();
       this._holdJob = setInterval(this._scrollToRight.bind(this), this._holdDelay);
     },
 
@@ -280,11 +335,11 @@
     },
 
     _scrollToLeft: function() {
-      this.$.tabsContainer.scrollLeft -= this._step;
+      this._affectScroll(-this._step);
     },
 
     _scrollToRight: function() {
-      this.$.tabsContainer.scrollLeft += this._step;
+      this._affectScroll(this._step);
     },
 
     _tabChanged: function(tab, old) {

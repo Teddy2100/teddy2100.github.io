@@ -1,13 +1,15 @@
-<link rel=import href=../polymer/polymer.html><link rel=import href=../paper-styles/paper-styles.html><link rel=import href=paper-input-addon-behavior.html><dom-module id=paper-input-error><template><style>
+<link rel=import href=../polymer/polymer.html><link rel=import href=../paper-styles/color.html><link rel=import href=../paper-styles/typography.html><link rel=import href=paper-input-addon-behavior.html><dom-module id=paper-input-error><template><style>
       :host {
         display: inline-block;
         visibility: hidden;
-        float: left;
 
         color: var(--paper-input-container-invalid-color, --google-red-500);
 
         @apply(--paper-font-caption);
         @apply(--paper-input-error);
+        position: absolute;
+        left:0;
+        right:0;
       }
 
       :host([invalid]) {

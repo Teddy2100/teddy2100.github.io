@@ -1,0 +1,17 @@
+<link rel=import href=../polymer/polymer.html><link rel=import href=../iron-behaviors/iron-control-state.html><link rel=import href=../iron-behaviors/iron-button-state.html><script>
+  /** @polymerBehavior Polymer.PaperItemBehavior */
+  Polymer.PaperItemBehaviorImpl = {
+    hostAttributes: {
+      role: 'option',
+      tabindex: '0'
+    }
+  };
+
+  /** @polymerBehavior */
+  Polymer.PaperItemBehavior = [
+    Polymer.IronControlState,
+    Polymer.IronButtonState,
+    Polymer.PaperItemBehaviorImpl
+  ];
+
+</script>

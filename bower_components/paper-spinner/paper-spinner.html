@@ -1,7 +1,5 @@
-<link rel=import href=../polymer/polymer.html><link rel=import href=../paper-styles/color.html><link rel=import href=../iron-flex-layout/iron-flex-layout.html><dom-module id=paper-spinner><link rel=import type=css href=paper-spinner.css><template><div id=spinnerContainer class-name=[[_spinnerContainerClassName]]><div class="spinner-layer layer-1"><div class="circle-clipper left"><div class=circle></div></div><div class=gap-patch><div class=circle></div></div><div class="circle-clipper right"><div class=circle></div></div></div><div class="spinner-layer layer-2"><div class="circle-clipper left"><div class=circle></div></div><div class=gap-patch><div class=circle></div></div><div class="circle-clipper right"><div class=circle></div></div></div><div class="spinner-layer layer-3"><div class="circle-clipper left"><div class=circle></div></div><div class=gap-patch><div class=circle></div></div><div class="circle-clipper right"><div class=circle></div></div></div><div class="spinner-layer layer-4"><div class="circle-clipper left"><div class=circle></div></div><div class=gap-patch><div class=circle></div></div><div class="circle-clipper right"><div class=circle></div></div></div></div></template><script>
-
+<link rel=import href=../polymer/polymer.html><link rel=import href=../iron-flex-layout/iron-flex-layout.html><link rel=import href=../paper-styles/color.html><link rel=import href=paper-spinner-styles.html><dom-module id=paper-spinner><template><style include=paper-spinner-styles></style><div id=spinnerContainer class-name=[[_spinnerContainerClassName]]><div class="spinner-layer layer-1"><div class="circle-clipper left"><div class=circle></div></div><div class=gap-patch><div class=circle></div></div><div class="circle-clipper right"><div class=circle></div></div></div><div class="spinner-layer layer-2"><div class="circle-clipper left"><div class=circle></div></div><div class=gap-patch><div class=circle></div></div><div class="circle-clipper right"><div class=circle></div></div></div><div class="spinner-layer layer-3"><div class="circle-clipper left"><div class=circle></div></div><div class=gap-patch><div class=circle></div></div><div class="circle-clipper right"><div class=circle></div></div></div><div class="spinner-layer layer-4"><div class="circle-clipper left"><div class=circle></div></div><div class=gap-patch><div class=circle></div></div><div class="circle-clipper right"><div class=circle></div></div></div></div></template><script>
     Polymer({
-
       is: 'paper-spinner',
 
       listeners: {
@@ -10,7 +8,6 @@
       },
 
       properties: {
-
         /**
          * Displays the spinner.
          *
@@ -53,7 +50,6 @@
           type: String,
           computed: '_computeSpinnerContainerClassName(active, _coolingDown)'
         }
-
       },
 
       _computeSpinnerContainerClassName: function(active, coolingDown) {
@@ -65,9 +61,7 @@
 
       _activeChanged: function(active, old) {
         this._setAriaHidden(!active);
-        if (!active && old) {
-          this._coolingDown = true;
-        }
+        this._coolingDown = !active && old;
       },
 
       _altChanged: function(alt) {
@@ -93,7 +87,5 @@
         this.active = false;
         this._coolingDown = false;
       }
-
     });
-
   </script></dom-module>

@@ -1,9 +1,15 @@
-<link rel=import href=../polymer/polymer.html><link rel=import href=../paper-styles/default-theme.html><link rel=import href=../paper-input/paper-input.html><link rel=import href=../paper-menu-button/paper-menu-button.html><link rel=import href=../paper-ripple/paper-ripple.html><link rel=import href=../iron-a11y-keys-behavior/iron-a11y-keys-behavior.html><link rel=import href=../iron-behaviors/iron-control-state.html><link rel=import href=../iron-behaviors/iron-button-state.html><link rel=import href=../iron-icons/iron-icons.html><link rel=import href=../iron-icon/iron-icon.html><link rel=import href=../iron-selector/iron-selectable.html><dom-module id=paper-dropdown-menu><style>
+<link rel=import href=../polymer/polymer.html><link rel=import href=../paper-styles/default-theme.html><link rel=import href=../paper-input/paper-input.html><link rel=import href=../paper-menu-button/paper-menu-button.html><link rel=import href=../paper-ripple/paper-ripple.html><link rel=import href=../iron-a11y-keys-behavior/iron-a11y-keys-behavior.html><link rel=import href=../iron-behaviors/iron-control-state.html><link rel=import href=../iron-behaviors/iron-button-state.html><link rel=import href=../iron-icons/iron-icons.html><link rel=import href=../iron-icon/iron-icon.html><link rel=import href=../iron-selector/iron-selectable.html><link rel=import href=../iron-form-element-behavior/iron-form-element-behavior.html><link rel=import href=../iron-validatable-behavior/iron-validatable-behavior.html><dom-module id=paper-dropdown-menu><style>
     :host {
       display: inline-block;
       position: relative;
       text-align: left;
       cursor: pointer;
+
+      /* NOTE(cdata): Both values are needed, since some phones require the
+       * value to be `transparent`.
+       */
+      -webkit-tap-highlight-color: rgba(0,0,0,0);
+      -webkit-tap-highlight-color: transparent;
 
       --paper-input-container-input: {
         overflow: hidden;
@@ -30,15 +36,17 @@
     }
 
     paper-ripple {
-      top: 20px;
-      left: 8px;
-      bottom: 16px;
-      right: 8px;
+      top: 12px;
+      left: 0px;
+      bottom: 8px;
+      right: 0px;
 
       @apply(--paper-dropdown-menu-ripple);
     }
 
     paper-menu-button {
+      display: block;
+      padding: 0;
       @apply(--paper-dropdown-menu-button);
     }
 
@@ -52,7 +60,7 @@
       @apply(--paper-dropdown-menu-icon);
     }
 
-  </style><template><paper-menu-button id=menuButton vertical-align=top horizontal-align=right vertical-offset=[[_computeMenuVerticalOffset(noLabelFloat)]] disabled=[[disabled]] no-animations=[[noAnimations]] on-iron-select=_onIronSelect opened={{opened}}><div class=dropdown-trigger><paper-ripple></paper-ripple><paper-input readonly disabled=[[disabled]] value=[[selectedItemLabel]] placeholder=[[placeholder]] always-float-label=[[alwaysFloatLabel]] no-label-float=[[noLabelFloat]] label=[[label]]><iron-icon icon=arrow-drop-down suffix></iron-icon></paper-input></div><content id=content select=.dropdown-content></content></paper-menu-button></template></dom-module><script>
+  </style><template><div role=button></div><paper-menu-button id=menuButton vertical-align=top horizontal-align=right vertical-offset=[[_computeMenuVerticalOffset(noLabelFloat)]] disabled=[[disabled]] no-animations=[[noAnimations]] on-iron-select=_onIronSelect on-iron-deselect=_onIronDeselect opened={{opened}}><div class=dropdown-trigger><paper-ripple></paper-ripple><paper-input type=text invalid=[[invalid]] readonly disabled=[[disabled]] value=[[selectedItemLabel]] placeholder=[[placeholder]] always-float-label=[[alwaysFloatLabel]] no-label-float=[[noLabelFloat]] label=[[label]]><iron-icon icon=arrow-drop-down suffix></iron-icon></paper-input></div><content id=content select=.dropdown-content></content></paper-menu-button></template></dom-module><script>
   (function() {
     'use strict';
 
@@ -73,7 +81,9 @@
 
       behaviors: [
         Polymer.IronControlState,
-        Polymer.IronButtonState
+        Polymer.IronButtonState,
+        Polymer.IronFormElementBehavior,
+        Polymer.IronValidatableBehavior
       ],
 
       properties: {
@@ -85,16 +95,29 @@
         selectedItemLabel: {
           type: String,
           notify: true,
-          computed: '_computeSelectedItemLabel(selectedItem)'
+          readOnly: true
         },
 
         /**
          * The last selected item. An item is selected if the dropdown menu has
          * a child with class `dropdown-content`, and that child triggers an
          * `iron-select` event with the selected `item` in the `detail`.
+         *
+         * @type {?Object}
          */
         selectedItem: {
           type: Object,
+          notify: true,
+          readOnly: true
+        },
+
+        /**
+         * The value for this element that will be used when submitting in
+         * a form. It is read only, and will always have the same value
+         * as `selectedItemLabel`.
+         */
+        value: {
+          type: String,
           notify: true,
           readOnly: true
         },
@@ -119,7 +142,8 @@
         opened: {
           type: Boolean,
           notify: true,
-          value: false
+          value: false,
+          observer: '_openedChanged'
         },
 
         /**
@@ -161,9 +185,14 @@
       },
 
       hostAttributes: {
-        role: 'group',
+        role: 'combobox',
+        'aria-autocomplete': 'none',
         'aria-haspopup': 'true'
       },
+
+      observers: [
+        '_selectedItemChanged(selectedItem)'
+      ],
 
       attached: function() {
         // NOTE(cdata): Due to timing, a preselected value in a `IronSelectable`
@@ -207,6 +236,15 @@
       },
 
       /**
+       * A handler that is called when `iron-deselect` is fired.
+       *
+       * @param {CustomEvent} event An `iron-deselect` event.
+       */
+      _onIronDeselect: function(event) {
+        this._setSelectedItem(null);
+      },
+
+      /**
        * A handler that is called when the dropdown is tapped.
        *
        * @param {CustomEvent} event A tap event.
@@ -223,12 +261,16 @@
        * @param {Element} selectedItem A selected Element item, with an
        * optional `label` property.
        */
-      _computeSelectedItemLabel: function(selectedItem) {
+      _selectedItemChanged: function(selectedItem) {
+        var value = '';
         if (!selectedItem) {
-          return '';
+          value = '';
+        } else {
+          value = selectedItem.label || selectedItem.textContent.trim();
         }
 
-        return selectedItem.label || selectedItem.textContent.trim();
+        this._setValue(value);
+        this._setSelectedItemLabel(value);
       },
 
       /**
@@ -243,7 +285,25 @@
         // derived from the metrics of elements internal to `paper-input`'s
         // template. The metrics will change depending on whether or not the
         // input has a floating label.
-        return noLabelFloat ? -4 : 16;
+        return noLabelFloat ? -4 : 8;
+      },
+
+      /**
+       * Returns false if the element is required and does not have a selection,
+       * and true otherwise.
+       * @return {boolean} true if `required` is false, or if `required` is true
+       * and the element has a valid selection.
+       */
+      _getValidity: function() {
+        return this.disabled || !this.required || (this.required && this.value);
+      },
+
+      _openedChanged: function() {
+        var openState = this.opened ? 'true' : 'false';
+        var e = this.contentElement;
+        if (e) {
+          e.setAttribute('aria-expanded', openState);
+        }
       }
     });
   })();
