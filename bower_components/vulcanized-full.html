@@ -8585,6 +8585,27 @@ this.fire('dom-change');
 
 </script><script>
 
+  Polymer({
+
+    is: 'fade-out-animation',
+
+    behaviors: [
+      Polymer.NeonAnimationBehavior
+    ],
+
+    configure: function(config) {
+      var node = config.node;
+      this._effect = new KeyframeEffect(node, [
+        {'opacity': '1'},
+        {'opacity': '0'}
+      ], this.timingFromConfig(config));
+      return this._effect;
+    }
+
+  });
+
+</script><script>
+
   /**
    * Use `Polymer.NeonSharedElementAnimationBehavior` to implement shared element animations.
    * @polymerBehavior Polymer.NeonSharedElementAnimationBehavior
@@ -9120,10 +9141,7 @@ this.fire('dom-change');
     };
 
     --layout-horizontal: {
-      /* @apply(--layout); */
-      display: -ms-flexbox;
-      display: -webkit-flex;
-      display: flex;
+      @apply(--layout);
 
       -ms-flex-direction: row;
       -webkit-flex-direction: row;
@@ -9131,16 +9149,15 @@ this.fire('dom-change');
     };
 
     --layout-horizontal-reverse: {
+      @apply(--layout);
+
       -ms-flex-direction: row-reverse;
       -webkit-flex-direction: row-reverse;
       flex-direction: row-reverse;
     };
 
     --layout-vertical: {
-      /* @apply(--layout); */
-      display: -ms-flexbox;
-      display: -webkit-flex;
-      display: flex;
+      @apply(--layout);
 
       -ms-flex-direction: column;
       -webkit-flex-direction: column;
@@ -9148,6 +9165,8 @@ this.fire('dom-change');
     };
 
     --layout-vertical-reverse: {
+      @apply(--layout);
+
       -ms-flex-direction: column-reverse;
       -webkit-flex-direction: column-reverse;
       flex-direction: column-reverse;
@@ -9304,13 +9323,8 @@ this.fire('dom-change');
     };
 
     --layout-center-center: {
-      /* @apply(--layout-center --layout-center-justified); */
-      -ms-flex-align: center;
-      -webkit-align-items: center;
-      align-items: center;
-      -ms-flex-pack: center;
-      -webkit-justify-content: center;
-      justify-content: center;
+      @apply(--layout-center);
+      @apply(--layout-center-justified);
     };
 
     /* self alignment */
@@ -11350,60 +11364,74 @@ CSS properties               | Action
 
 </script><script>
 
-  Polymer.IronOverlayManager = (function() {
+  Polymer.IronOverlayManager = {
 
-    var overlays = [];
-    var DEFAULT_Z = 10;
-    var backdrops = [];
+    _overlays: [],
+
+    // iframes have a default z-index of 100, so this default should be at least
+    // that.
+    _minimumZ: 101,
+
+    _backdrops: [],
+
+    _applyOverlayZ: function(overlay, aboveZ) {
+      this._setZ(overlay, aboveZ + 2);
+    },
+
+    _setZ: function(element, z) {
+      element.style.zIndex = z;
+    },
 
     // track overlays for z-index and focus managemant
-    function addOverlay(overlay) {
-      var z0 = currentOverlayZ();
-      overlays.push(overlay);
-      var z1 = currentOverlayZ();
-      if (z1 <= z0) {
-        applyOverlayZ(overlay, z0);
+    addOverlay: function(overlay) {
+      var minimumZ = Math.max(this.currentOverlayZ(), this._minimumZ);
+      this._overlays.push(overlay);
+      var newZ = this.currentOverlayZ();
+      if (newZ <= minimumZ) {
+        this._applyOverlayZ(overlay, minimumZ);
       }
-    }
+    },
 
-    function removeOverlay(overlay) {
-      var i = overlays.indexOf(overlay);
+    removeOverlay: function(overlay) {
+      var i = this._overlays.indexOf(overlay);
       if (i >= 0) {
-        overlays.splice(i, 1);
-        setZ(overlay, '');
+        this._overlays.splice(i, 1);
+        this._setZ(overlay, '');
       }
-    }
+    },
 
-    function applyOverlayZ(overlay, aboveZ) {
-      setZ(overlay, aboveZ + 2);
-    }
-
-    function setZ(element, z) {
-      element.style.zIndex = z;
-    }
-
-    function currentOverlay() {
-      var i = overlays.length - 1;
-      while (overlays[i] && !overlays[i].opened) {
+    currentOverlay: function() {
+      var i = this._overlays.length - 1;
+      while (this._overlays[i] && !this._overlays[i].opened) {
         --i;
       }
-      return overlays[i];
-    }
+      return this._overlays[i];
+    },
 
-    function currentOverlayZ() {
-      var z;
-      var current = currentOverlay();
+    currentOverlayZ: function() {
+      var z = this._minimumZ;
+      var current = this.currentOverlay();
       if (current) {
         var z1 = window.getComputedStyle(current).zIndex;
         if (!isNaN(z1)) {
           z = Number(z1);
         }
       }
-      return z || DEFAULT_Z;
-    }
+      return z;
+    },
 
-    function focusOverlay() {
-      var current = currentOverlay();
+    /**
+     * Ensures that the minimum z-index of new overlays is at least `minimumZ`.
+     * This does not effect the z-index of any existing overlays.
+     *
+     * @param {number} minimumZ
+     */
+    ensureMinimumZ: function(minimumZ) {
+      this._minimumZ = Math.max(this._minimumZ, minimumZ);
+    },
+
+    focusOverlay: function() {
+      var current = this.currentOverlay();
       // We have to be careful to focus the next overlay _after_ any current
       // transitions are complete (due to the state being toggled prior to the
       // transition). Otherwise, we risk infinite recursion when a transitioning
@@ -11415,36 +11443,26 @@ CSS properties               | Action
       if (current && !current.transitioning) {
         current._applyFocus();
       }
-    }
+    },
 
-    function trackBackdrop(element) {
+    trackBackdrop: function(element) {
       // backdrops contains the overlays with a backdrop that are currently
       // visible
       if (element.opened) {
-        backdrops.push(element);
+        this._backdrops.push(element);
       } else {
-        var index = backdrops.indexOf(element);
+        var index = this._backdrops.indexOf(element);
         if (index >= 0) {
-          backdrops.splice(index, 1);
+          this._backdrops.splice(index, 1);
         }
       }
+    },
+
+    getBackdrops: function() {
+      return this._backdrops;
     }
 
-    function getBackdrops() {
-      return backdrops;
-    }
-
-    return {
-      addOverlay: addOverlay,
-      removeOverlay: removeOverlay,
-      currentOverlay: currentOverlay,
-      currentOverlayZ: currentOverlayZ,
-      focusOverlay: focusOverlay,
-      trackBackdrop: trackBackdrop,
-      getBackdrops: getBackdrops
-    };
-
-  })();
+  };
 
 </script><script>
 
@@ -11863,6 +11881,12 @@ context. You should place this element as a child of `<body>` whenever possible.
 /**
  * Fired after the `iron-overlay` opens.
  * @event iron-overlay-opened
+ */
+
+/**
+ * Fired when the `iron-overlay` is canceled, but before it is closed.
+ * Cancel the event to prevent the `iron-overlay` from closing.
+ * @event iron-overlay-canceled
  */
 
 /**
@@ -14768,6 +14792,80 @@ is separate from validation, and `allowed-pattern` does not affect how the input
   }
 
 };
+</script><script>
+
+  /** @polymerBehavior */
+  Polymer.PaperSpinnerBehavior = {
+
+    listeners: {
+      'animationend': '__reset',
+      'webkitAnimationEnd': '__reset'
+    },
+
+    properties: {
+      /**
+       * Displays the spinner.
+       */
+      active: {
+        type: Boolean,
+        value: false,
+        reflectToAttribute: true,
+        observer: '__activeChanged'
+      },
+
+      /**
+       * Alternative text content for accessibility support.
+       * If alt is present, it will add an aria-label whose content matches alt when active.
+       * If alt is not present, it will default to 'loading' as the alt value.
+       */
+      alt: {
+        type: String,
+        value: 'loading',
+        observer: '__altChanged'
+      },
+
+      __coolingDown: {
+        type: Boolean,
+        value: false
+      }
+    },
+
+    __computeContainerClasses: function(active, coolingDown) {
+      return [
+        active || coolingDown ? 'active' : '',
+        coolingDown ? 'cooldown' : ''
+      ].join(' ');
+    },
+
+    __activeChanged: function(active, old) {
+      this.__setAriaHidden(!active);
+      this.__coolingDown = !active && old;
+    },
+
+    __altChanged: function(alt) {
+      // user-provided `aria-label` takes precedence over prototype default
+      if (alt === this.getPropertyInfo('alt').value) {
+        this.alt = this.getAttribute('aria-label') || alt;
+      } else {
+        this.__setAriaHidden(alt==='');
+        this.setAttribute('aria-label', alt);
+      }
+    },
+
+    __setAriaHidden: function(hidden) {
+      var attr = 'aria-hidden';
+      if (hidden) {
+        this.setAttribute(attr, 'true');
+      } else {
+        this.removeAttribute(attr);
+      }
+    },
+
+    __reset: function() {
+      this.active = false;
+      this.__coolingDown = false;
+    }
+  };
 </script><script>
 
   /**
@@ -20571,15 +20669,15 @@ is separate from validation, and `allowed-pattern` does not affect how the input
         return Polymer.PaperInkyFocusBehaviorImpl._createRipple.call(this);
       }
     })
-  </script></dom-module><dom-module id="paper-radio-group" assetpath="www/bower_components/paper-radio-group/"><style>
-    :host {
-      display: inline-block;
-    }
+  </script></dom-module><dom-module id="paper-radio-group" assetpath="www/bower_components/paper-radio-group/"><template><style>
+      :host {
+        display: inline-block;
+      }
 
-    :host ::content > * {
-      padding: 12px;
-    }
-  </style><template><content id="items" select="*"></content></template></dom-module><script>
+      :host ::content > * {
+        padding: 12px;
+      }
+    </style><content id="items" select="*"></content></template></dom-module><script>
   Polymer({
     is: 'paper-radio-group',
 
@@ -21873,6 +21971,7 @@ is separate from validation, and `allowed-pattern` does not affect how the input
         height: 100%;
         opacity: 0;
         white-space: nowrap;
+        border-color: var(--paper-spinner-color, --google-blue-500);
       }
 
       .layer-1 {
@@ -21904,6 +22003,13 @@ is separate from validation, and `allowed-pattern` does not affect how the input
        * specific properties properly, treats them as -webkit-animation, and overrides the
        * other animation rules. See https://github.com/Polymer/platform/issues/53.
        */
+      .active .spinner-layer {
+        /* durations: 4 * ARCTIME */
+        -webkit-animation: fill-unfill-rotate 5332ms cubic-bezier(0.4, 0.0, 0.2, 1) infinite both;
+        animation: fill-unfill-rotate 5332ms cubic-bezier(0.4, 0.0, 0.2, 1) infinite both;
+        opacity: 1;
+      }
+
       .active .spinner-layer.layer-1 {
         /* durations: 4 * ARCTIME */
         -webkit-animation: fill-unfill-rotate 5332ms cubic-bezier(0.4, 0.0, 0.2, 1) infinite both, layer-1-fade-in-out 5332ms cubic-bezier(0.4, 0.0, 0.2, 1) infinite both;
@@ -22139,626 +22245,532 @@ is separate from validation, and `allowed-pattern` does not affect how the input
         from { opacity: 0.99; }
         to { opacity: 0; }
       }
-    </style></template></dom-module><dom-module id="paper-spinner" assetpath="www/bower_components/paper-spinner/"><template><style include="paper-spinner-styles"></style><div id="spinnerContainer" class-name="[[_spinnerContainerClassName]]"><div class="spinner-layer layer-1"><div class="circle-clipper left"><div class="circle"></div></div><div class="gap-patch"><div class="circle"></div></div><div class="circle-clipper right"><div class="circle"></div></div></div><div class="spinner-layer layer-2"><div class="circle-clipper left"><div class="circle"></div></div><div class="gap-patch"><div class="circle"></div></div><div class="circle-clipper right"><div class="circle"></div></div></div><div class="spinner-layer layer-3"><div class="circle-clipper left"><div class="circle"></div></div><div class="gap-patch"><div class="circle"></div></div><div class="circle-clipper right"><div class="circle"></div></div></div><div class="spinner-layer layer-4"><div class="circle-clipper left"><div class="circle"></div></div><div class="gap-patch"><div class="circle"></div></div><div class="circle-clipper right"><div class="circle"></div></div></div></div></template><script>
+    </style></template></dom-module><dom-module id="paper-spinner" assetpath="www/bower_components/paper-spinner/"><template><style include="paper-spinner-styles"></style><div id="spinnerContainer" class-name="[[__computeContainerClasses(active, __coolingDown)]]"><div class="spinner-layer layer-1"><div class="circle-clipper left"><div class="circle"></div></div><div class="gap-patch"><div class="circle"></div></div><div class="circle-clipper right"><div class="circle"></div></div></div><div class="spinner-layer layer-2"><div class="circle-clipper left"><div class="circle"></div></div><div class="gap-patch"><div class="circle"></div></div><div class="circle-clipper right"><div class="circle"></div></div></div><div class="spinner-layer layer-3"><div class="circle-clipper left"><div class="circle"></div></div><div class="gap-patch"><div class="circle"></div></div><div class="circle-clipper right"><div class="circle"></div></div></div><div class="spinner-layer layer-4"><div class="circle-clipper left"><div class="circle"></div></div><div class="gap-patch"><div class="circle"></div></div><div class="circle-clipper right"><div class="circle"></div></div></div></div></template><script>
     Polymer({
       is: 'paper-spinner',
 
-      listeners: {
-        'animationend': 'reset',
-        'webkitAnimationEnd': 'reset'
+      behaviors: [
+        Polymer.PaperSpinnerBehavior
+      ]
+    });
+  </script></dom-module><iron-iconset-svg name="paper-tabs" size="24"><svg><defs><g id="chevron-left"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path></g><g id="chevron-right"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></g></defs></svg></iron-iconset-svg><dom-module id="paper-tab" assetpath="www/bower_components/paper-tabs/"><template><style>
+      :host {
+        @apply(--layout-inline);
+        @apply(--layout-center);
+        @apply(--layout-center-justified);
+        @apply(--layout-flex);
+
+        position: relative;
+        padding: 0 12px;
+        overflow: hidden;
+        cursor: pointer;
+
+        @apply(--paper-tab);
+      }
+
+      :host(:focus) {
+        outline: none;
+      }
+
+      :host([link]) {
+        padding: 0;
+      }
+
+      .tab-content {
+        height: 100%;
+        transform: translateZ(0);
+          -webkit-transform: translateZ(0);
+        transition: opacity 0.1s cubic-bezier(0.4, 0.0, 1, 1);
+        @apply(--layout-horizontal);
+        @apply(--layout-center-center);
+        @apply(--layout-flex-auto);
+        @apply(--paper-tab-content);
+      }
+
+      :host(:not(.iron-selected)) > .tab-content {
+        opacity: 0.8;
+
+        @apply(--paper-tab-content-unselected);
+      }
+
+      :host(:focus) .tab-content {
+        opacity: 1;
+        font-weight: 700;
+      }
+
+      paper-ripple {
+        color: var(--paper-tab-ink, --paper-yellow-a100);
+      }
+
+      .tab-content > ::content > a {
+        height: 100%;
+        /* flex */
+          -ms-flex: 1 1 0.000000001px;
+          -webkit-flex: 1;
+        flex: 1;
+          -webkit-flex-basis: 0.000000001px;
+        flex-basis: 0.000000001px;
+      }
+    </style><div class="tab-content"><content></content></div></template><script>
+    Polymer({
+      is: 'paper-tab',
+
+      behaviors: [
+        Polymer.IronControlState,
+        Polymer.IronButtonState,
+        Polymer.PaperRippleBehavior
+      ],
+
+      hostAttributes: {
+        role: 'tab'
       },
+
+      listeners: {
+        down: '_updateNoink'
+      },
+
+      ready: function() {
+        var ripple = this.getRipple();
+        ripple.initialOpacity = 0.95;
+        ripple.opacityDecayVelocity = 0.98;
+      },
+
+      attached: function() {
+        this._updateNoink();
+      },
+
+      get _parentNoink () {
+        var parent = Polymer.dom(this).parentNode;
+        return !!parent && !!parent.noink;
+      },
+
+      _updateNoink: function() {
+        this.noink = !!this.noink || !!this._parentNoink;
+      }
+    });
+  </script></dom-module><dom-module id="paper-tabs" assetpath="www/bower_components/paper-tabs/"><template><style>
+      :host {
+        @apply(--layout);
+        @apply(--layout-center);
+
+        height: 48px;
+        font-size: 14px;
+        font-weight: 500;
+        overflow: hidden;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          -webkit-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+
+        @apply(--paper-tabs);
+      }
+
+      :host-context([dir=rtl]) {
+        @apply(--layout-horizontal-reverse);
+      }
+
+      #tabsContainer {
+        position: relative;
+        height: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        @apply(--layout-flex);
+      }
+
+      #tabsContent {
+        height: 100%;
+      }
+
+      #tabsContent.scrollable {
+        position: absolute;
+        white-space: nowrap;
+      }
+
+      #tabsContent.horizontal {
+        @apply(--layout-horizontal);
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .not-visible {
+        opacity: 0;
+        cursor: default;
+      }
+
+      paper-icon-button {
+        width: 48px;
+        height: 48px;
+        padding: 12px;
+        margin: 0 4px;
+      }
+
+      #selectionBar {
+        position: absolute;
+        height: 2px;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: var(--paper-tabs-selection-bar-color, --paper-yellow-a100);
+          -webkit-transform: scale(0);
+        transform: scale(0);
+          -webkit-transform-origin: left center;
+        transform-origin: left center;
+          transition: -webkit-transform;
+        transition: transform;
+
+        @apply(--paper-tabs-selection-bar);
+      }
+
+      #selectionBar.align-bottom {
+        top: 0;
+        bottom: auto;
+      }
+
+      #selectionBar.expand {
+        transition-duration: 0.15s;
+        transition-timing-function: cubic-bezier(0.4, 0.0, 1, 1);
+      }
+
+      #selectionBar.contract {
+        transition-duration: 0.18s;
+        transition-timing-function: cubic-bezier(0.0, 0.0, 0.2, 1);
+      }
+
+      #tabsContent > ::content > *:not(#selectionBar) {
+        height: 100%;
+      }
+    </style><paper-icon-button icon="paper-tabs:chevron-left" class$="[[_computeScrollButtonClass(_leftHidden, scrollable, hideScrollButtons)]]" on-up="_onScrollButtonUp" on-down="_onLeftScrollButtonDown" tabindex="-1"></paper-icon-button><div id="tabsContainer" on-track="_scroll" on-down="_down"><div id="tabsContent" class$="[[_computeTabsContentClass(scrollable)]]"><content select="*"></content><div id="selectionBar" class$="[[_computeSelectionBarClass(noBar, alignBottom)]]" on-transitionend="_onBarTransitionEnd"></div></div></div><paper-icon-button icon="paper-tabs:chevron-right" class$="[[_computeScrollButtonClass(_rightHidden, scrollable, hideScrollButtons)]]" on-up="_onScrollButtonUp" on-down="_onRightScrollButtonDown" tabindex="-1"></paper-icon-button></template><script>
+    Polymer({
+      is: 'paper-tabs',
+
+      behaviors: [
+        Polymer.IronResizableBehavior,
+        Polymer.IronMenubarBehavior
+      ],
 
       properties: {
         /**
-         * Displays the spinner.
-         *
-         * @attribute active
-         * @type boolean
-         * @default false
+         * If true, ink ripple effect is disabled. When this property is changed,
+         * all descendant `<paper-tab>` elements have their `noink` property
+         * changed to the new value as well.
          */
-        active: {
+        noink: {
           type: Boolean,
           value: false,
-          reflectToAttribute: true,
-          observer: '_activeChanged'
+          observer: '_noinkChanged'
         },
 
         /**
-         * Alternative text content for accessibility support.
-         * If alt is present, it will add an aria-label whose content matches alt when active.
-         * If alt is not present, it will default to 'loading' as the alt value.
-         *
-         * @attribute alt
-         * @type string
-         * @default 'loading'
+         * If true, the bottom bar to indicate the selected tab will not be shown.
          */
-        alt: {
-          type: String,
-          value: 'loading',
-          observer: '_altChanged'
-        },
-
-        /**
-         * True when the spinner is going from active to inactive. This is represented by a fade
-         * to 0% opacity to the user.
-         */
-        _coolingDown: {
+        noBar: {
           type: Boolean,
           value: false
         },
 
-        _spinnerContainerClassName: {
+        /**
+         * If true, the slide effect for the bottom bar is disabled.
+         */
+        noSlide: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * If true, tabs are scrollable and the tab width is based on the label width.
+         */
+        scrollable: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * If true, dragging on the tabs to scroll is disabled.
+         */
+        disableDrag: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * If true, scroll buttons (left/right arrow) will be hidden for scrollable tabs.
+         */
+        hideScrollButtons: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * If true, the tabs are aligned to bottom (the selection bar appears at the top).
+         */
+        alignBottom: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * Gets or sets the selected element. The default is to use the index of the item.
+         */
+        selected: {
           type: String,
-          computed: '_computeSpinnerContainerClassName(active, _coolingDown)'
+          notify: true
+        },
+
+        selectable: {
+          type: String,
+          value: 'paper-tab'
+        },
+
+        _step: {
+          type: Number,
+          value: 10
+        },
+
+        _holdDelay: {
+          type: Number,
+          value: 1
+        },
+
+        _leftHidden: {
+          type: Boolean,
+          value: false
+        },
+
+        _rightHidden: {
+          type: Boolean,
+          value: false
+        },
+
+        _previousTab: {
+          type: Object
         }
       },
 
-      _computeSpinnerContainerClassName: function(active, coolingDown) {
-        return [
-          active || coolingDown ? 'active' : '',
-          coolingDown ? 'cooldown' : ''
-        ].join(' ');
+      hostAttributes: {
+        role: 'tablist'
       },
 
-      _activeChanged: function(active, old) {
-        this._setAriaHidden(!active);
-        this._coolingDown = !active && old;
+      listeners: {
+        'iron-resize': '_onResize',
+        'iron-select': '_onIronSelect',
+        'iron-deselect': '_onIronDeselect'
       },
 
-      _altChanged: function(alt) {
-        // user-provided `aria-label` takes precedence over prototype default
-        if (alt === this.getPropertyInfo('alt').value) {
-          this.alt = this.getAttribute('aria-label') || alt;
+      created: function() {
+        this._holdJob = null;
+      },
+
+      ready: function() {
+        this.setScrollDirection('y', this.$.tabsContainer);
+      },
+
+      _noinkChanged: function(noink) {
+        var childTabs = Polymer.dom(this).querySelectorAll('paper-tab');
+        childTabs.forEach(noink ? this._setNoinkAttribute : this._removeNoinkAttribute);
+      },
+
+      _setNoinkAttribute: function(element) {
+        element.setAttribute('noink', '');
+      },
+
+      _removeNoinkAttribute: function(element) {
+        element.removeAttribute('noink');
+      },
+
+      _computeScrollButtonClass: function(hideThisButton, scrollable, hideScrollButtons) {
+        if (!scrollable || hideScrollButtons) {
+          return 'hidden';
+        }
+
+        if (hideThisButton) {
+          return 'not-visible';
+        }
+
+        return '';
+      },
+
+      _computeTabsContentClass: function(scrollable) {
+        return scrollable ? 'scrollable' : 'horizontal';
+      },
+
+      _computeSelectionBarClass: function(noBar, alignBottom) {
+        if (noBar) {
+          return 'hidden';
+        } else if (alignBottom) {
+          return 'align-bottom';
+        }
+      },
+
+      // TODO(cdata): Add `track` response back in when gesture lands.
+
+      _onResize: function() {
+        this.debounce('_onResize', function() {
+          this._scroll();
+          this._tabChanged(this.selectedItem);
+        }, 10);
+      },
+
+      _onIronSelect: function(event) {
+        this._tabChanged(event.detail.item, this._previousTab);
+        this._previousTab = event.detail.item;
+        this.cancelDebouncer('tab-changed');
+      },
+
+      _onIronDeselect: function(event) {
+        this.debounce('tab-changed', function() {
+          this._tabChanged(null, this._previousTab);
+        // See polymer/polymer#1305
+        }, 1);
+      },
+
+      get _tabContainerScrollSize () {
+        return Math.max(
+          0,
+          this.$.tabsContainer.scrollWidth -
+            this.$.tabsContainer.offsetWidth
+        );
+      },
+
+
+      _scroll: function(e, detail) {
+        if (!this.scrollable) {
+          return;
+        }
+
+        var ddx = (detail && -detail.ddx) || 0;
+        this._affectScroll(ddx);
+      },
+
+      _down: function(e) {
+        // go one beat async to defeat IronMenuBehavior
+        // autorefocus-on-no-selection timeout
+        this.async(function() {
+          if (this._defaultFocusAsync) {
+            this.cancelAsync(this._defaultFocusAsync);
+            this._defaultFocusAsync = null;
+          }
+        }, 1);
+      },
+
+      _affectScroll: function(dx) {
+        this.$.tabsContainer.scrollLeft += dx;
+
+        var scrollLeft = this.$.tabsContainer.scrollLeft;
+
+        this._leftHidden = scrollLeft === 0;
+        this._rightHidden = scrollLeft === this._tabContainerScrollSize;
+      },
+
+      _onLeftScrollButtonDown: function() {
+        this._scrollToLeft();
+        this._holdJob = setInterval(this._scrollToLeft.bind(this), this._holdDelay);
+      },
+
+      _onRightScrollButtonDown: function() {
+        this._scrollToRight();
+        this._holdJob = setInterval(this._scrollToRight.bind(this), this._holdDelay);
+      },
+
+      _onScrollButtonUp: function() {
+        clearInterval(this._holdJob);
+        this._holdJob = null;
+      },
+
+      _scrollToLeft: function() {
+        this._affectScroll(-this._step);
+      },
+
+      _scrollToRight: function() {
+        this._affectScroll(this._step);
+      },
+
+      _tabChanged: function(tab, old) {
+        if (!tab) {
+          this._positionBar(0, 0);
+          return;
+        }
+
+        var r = this.$.tabsContent.getBoundingClientRect();
+        var w = r.width;
+        var tabRect = tab.getBoundingClientRect();
+        var tabOffsetLeft = tabRect.left - r.left;
+
+        this._pos = {
+          width: this._calcPercent(tabRect.width, w),
+          left: this._calcPercent(tabOffsetLeft, w)
+        };
+
+        if (this.noSlide || old == null) {
+          // position bar directly without animation
+          this._positionBar(this._pos.width, this._pos.left);
+          return;
+        }
+
+        var oldRect = old.getBoundingClientRect();
+        var oldIndex = this.items.indexOf(old);
+        var index = this.items.indexOf(tab);
+        var m = 5;
+
+        // bar animation: expand
+        this.$.selectionBar.classList.add('expand');
+
+        if (oldIndex < index) {
+          this._positionBar(this._calcPercent(tabRect.left + tabRect.width - oldRect.left, w) - m,
+              this._left);
         } else {
-          this._setAriaHidden(alt==='');
-          this.setAttribute('aria-label', alt);
+          this._positionBar(this._calcPercent(oldRect.left + oldRect.width - tabRect.left, w) - m,
+              this._calcPercent(tabOffsetLeft, w) + m);
+        }
+
+        if (this.scrollable) {
+          this._scrollToSelectedIfNeeded(tabRect.width, tabOffsetLeft);
         }
       },
 
-      _setAriaHidden: function(hidden) {
-        var attr = 'aria-hidden';
-        if (hidden) {
-          this.setAttribute(attr, 'true');
+      _scrollToSelectedIfNeeded: function(tabWidth, tabOffsetLeft) {
+        var l = tabOffsetLeft - this.$.tabsContainer.scrollLeft;
+        if (l < 0) {
+          this.$.tabsContainer.scrollLeft += l;
         } else {
-          this.removeAttribute(attr);
+          l += (tabWidth - this.$.tabsContainer.offsetWidth);
+          if (l > 0) {
+            this.$.tabsContainer.scrollLeft += l;
+          }
         }
       },
 
-      reset: function() {
-        this.active = false;
-        this._coolingDown = false;
+      _calcPercent: function(w, w0) {
+        return 100 * w / w0;
+      },
+
+      _positionBar: function(width, left) {
+        width = width || 0;
+        left = left || 0;
+
+        this._width = width;
+        this._left = left;
+        this.transform(
+            'translate3d(' + left + '%, 0, 0) scaleX(' + (width / 100) + ')',
+            this.$.selectionBar);
+      },
+
+      _onBarTransitionEnd: function(e) {
+        var cl = this.$.selectionBar.classList;
+        // bar animation: expand -> contract
+        if (cl.contains('expand')) {
+          cl.remove('expand');
+          cl.add('contract');
+          this._positionBar(this._pos.width, this._pos.left);
+        // bar animation done
+        } else if (cl.contains('contract')) {
+          cl.remove('contract');
+        }
       }
     });
-  </script></dom-module><iron-iconset-svg name="paper-tabs" size="24"><svg><defs><g id="chevron-left"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path></g><g id="chevron-right"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></g></defs></svg></iron-iconset-svg><dom-module id="paper-tab" assetpath="www/bower_components/paper-tabs/"><style>
-
-    :host {
-      @apply(--layout-inline);
-      @apply(--layout-center);
-      @apply(--layout-center-justified);
-      @apply(--layout-flex);
-
-      position: relative;
-      padding: 0 12px;
-      overflow: hidden;
-      cursor: pointer;
-
-      @apply(--paper-tab);
-    }
-
-    :host(:focus) {
-      outline: none;
-    }
-
-    :host([link]) {
-      padding: 0;
-    }
-
-    .tab-content {
-      height: 100%;
-      -webkit-transform: translateZ(0);
-      transform: translateZ(0);
-      transition: opacity 0.1s cubic-bezier(0.4, 0.0, 1, 1);
-      @apply(--layout-horizontal);
-      @apply(--layout-center-center);
-      @apply(--layout-flex-auto);
-      @apply(--paper-tab-content);
-    }
-
-    :host(:not(.iron-selected)) > .tab-content {
-      opacity: 0.8;
-
-      @apply(--paper-tab-content-unselected);
-    }
-
-    :host(:focus) .tab-content {
-      opacity: 1;
-      font-weight: 700;
-    }
-
-    paper-ripple {
-      color: var(--paper-tab-ink, --paper-yellow-a100);
-    }
-
-    .tab-content > ::content > a {
-      height: 100%;
-      /* flex */
-      -ms-flex: 1 1 0.000000001px;
-      -webkit-flex: 1;
-      flex: 1;
-      -webkit-flex-basis: 0.000000001px;
-      flex-basis: 0.000000001px;
-    }
-
-  </style><template><div class="tab-content"><content></content></div></template></dom-module><script>
-
-  Polymer({
-
-    is: 'paper-tab',
-
-    behaviors: [
-      Polymer.IronControlState,
-      Polymer.IronButtonState,
-      Polymer.PaperRippleBehavior
-    ],
-
-    hostAttributes: {
-      role: 'tab'
-    },
-
-    listeners: {
-      down: '_updateNoink'
-    },
-
-    ready: function() {
-      var ripple = this.getRipple();
-      ripple.initialOpacity = 0.95;
-      ripple.opacityDecayVelocity = 0.98;
-    },
-
-    attached: function() {
-      this._updateNoink();
-    },
-
-    get _parentNoink () {
-      var parent = Polymer.dom(this).parentNode;
-      return !!parent && !!parent.noink;
-    },
-
-    _updateNoink: function() {
-      this.noink = !!this.noink || !!this._parentNoink;
-    }
-  });
-
-</script><dom-module id="paper-tabs" assetpath="www/bower_components/paper-tabs/"><style>
-
-    :host {
-      @apply(--layout);
-      @apply(--layout-center);
-
-      height: 48px;
-      font-size: 14px;
-      font-weight: 500;
-      overflow: hidden;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
-      -webkit-tap-highlight-color: rgba(0,0,0,0);
-
-      @apply(--paper-tabs);
-    }
-
-    :host-context([dir=rtl]) {
-      @apply(--layout-horizontal-reverse);
-    }
-
-    #tabsContainer {
-      position: relative;
-      height: 100%;
-      white-space: nowrap;
-      overflow: hidden;
-      @apply(--layout-flex);
-    }
-
-    #tabsContent {
-      height: 100%;
-    }
-
-    #tabsContent.scrollable {
-      position: absolute;
-      white-space: nowrap;
-    }
-
-    #tabsContent.horizontal {
-      @apply(--layout-horizontal);
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .not-visible {
-      opacity: 0;
-      cursor: default;
-    }
-
-    paper-icon-button {
-      width: 48px;
-      height: 48px;
-      padding: 12px;
-      margin: 0 4px;
-    }
-
-    #selectionBar {
-      position: absolute;
-      height: 2px;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background-color: var(--paper-tabs-selection-bar-color, --paper-yellow-a100);
-      -webkit-transform-origin: left center;
-      transform-origin: left center;
-      -webkit-transform: scale(0);
-      transform: scale(0);
-      transition: -webkit-transform;
-      transition: transform;
-
-      @apply(--paper-tabs-selection-bar);
-    }
-
-    #selectionBar.align-bottom {
-      top: 0;
-      bottom: auto;
-    }
-
-    #selectionBar.expand {
-      transition-duration: 0.15s;
-      transition-timing-function: cubic-bezier(0.4, 0.0, 1, 1);
-    }
-
-    #selectionBar.contract {
-      transition-duration: 0.18s;
-      transition-timing-function: cubic-bezier(0.0, 0.0, 0.2, 1);
-    }
-
-    #tabsContent > ::content > *:not(#selectionBar) {
-      height: 100%;
-    }
-
-  </style><template><paper-icon-button icon="paper-tabs:chevron-left" class$="[[_computeScrollButtonClass(_leftHidden, scrollable, hideScrollButtons)]]" on-up="_onScrollButtonUp" on-down="_onLeftScrollButtonDown" tabindex="-1"></paper-icon-button><div id="tabsContainer" on-track="_scroll" on-down="_down"><div id="tabsContent" class$="[[_computeTabsContentClass(scrollable)]]"><content select="*"></content><div id="selectionBar" class$="[[_computeSelectionBarClass(noBar, alignBottom)]]" on-transitionend="_onBarTransitionEnd"></div></div></div><paper-icon-button icon="paper-tabs:chevron-right" class$="[[_computeScrollButtonClass(_rightHidden, scrollable, hideScrollButtons)]]" on-up="_onScrollButtonUp" on-down="_onRightScrollButtonDown" tabindex="-1"></paper-icon-button></template></dom-module><script>
-
-  Polymer({
-
-    is: 'paper-tabs',
-
-    behaviors: [
-      Polymer.IronResizableBehavior,
-      Polymer.IronMenubarBehavior
-    ],
-
-    properties: {
-
-      /**
-       * If true, ink ripple effect is disabled. When this property is changed,
-       * all descendant `<paper-tab>` elements have their `noink` property
-       * changed to the new value as well.
-       */
-      noink: {
-        type: Boolean,
-        value: false,
-        observer: '_noinkChanged'
-      },
-
-      /**
-       * If true, the bottom bar to indicate the selected tab will not be shown.
-       */
-      noBar: {
-        type: Boolean,
-        value: false
-      },
-
-      /**
-       * If true, the slide effect for the bottom bar is disabled.
-       */
-      noSlide: {
-        type: Boolean,
-        value: false
-      },
-
-      /**
-       * If true, tabs are scrollable and the tab width is based on the label width.
-       */
-      scrollable: {
-        type: Boolean,
-        value: false
-      },
-
-      /**
-       * If true, dragging on the tabs to scroll is disabled.
-       */
-      disableDrag: {
-        type: Boolean,
-        value: false
-      },
-
-      /**
-       * If true, scroll buttons (left/right arrow) will be hidden for scrollable tabs.
-       */
-      hideScrollButtons: {
-        type: Boolean,
-        value: false
-      },
-
-      /**
-       * If true, the tabs are aligned to bottom (the selection bar appears at the top).
-       */
-      alignBottom: {
-        type: Boolean,
-        value: false
-      },
-
-      /**
-       * Gets or sets the selected element. The default is to use the index of the item.
-       */
-      selected: {
-        type: String,
-        notify: true
-      },
-
-      selectable: {
-        type: String,
-        value: 'paper-tab'
-      },
-
-      _step: {
-        type: Number,
-        value: 10
-      },
-
-      _holdDelay: {
-        type: Number,
-        value: 1
-      },
-
-      _leftHidden: {
-        type: Boolean,
-        value: false
-      },
-
-      _rightHidden: {
-        type: Boolean,
-        value: false
-      },
-
-      _previousTab: {
-        type: Object
-      }
-    },
-
-    hostAttributes: {
-      role: 'tablist'
-    },
-
-    listeners: {
-      'iron-resize': '_onResize',
-      'iron-select': '_onIronSelect',
-      'iron-deselect': '_onIronDeselect'
-    },
-
-    created: function() {
-      this._holdJob = null;
-    },
-
-    ready: function() {
-      this.setScrollDirection('y', this.$.tabsContainer);
-    },
-
-    _noinkChanged: function(noink) {
-      var childTabs = Polymer.dom(this).querySelectorAll('paper-tab');
-      childTabs.forEach(noink ? this._setNoinkAttribute : this._removeNoinkAttribute);
-    },
-
-    _setNoinkAttribute: function(element) {
-      element.setAttribute('noink', '');
-    },
-
-    _removeNoinkAttribute: function(element) {
-      element.removeAttribute('noink');
-    },
-
-    _computeScrollButtonClass: function(hideThisButton, scrollable, hideScrollButtons) {
-      if (!scrollable || hideScrollButtons) {
-        return 'hidden';
-      }
-
-      if (hideThisButton) {
-        return 'not-visible';
-      }
-
-      return '';
-    },
-
-    _computeTabsContentClass: function(scrollable) {
-      return scrollable ? 'scrollable' : 'horizontal';
-    },
-
-    _computeSelectionBarClass: function(noBar, alignBottom) {
-      if (noBar) {
-        return 'hidden';
-      } else if (alignBottom) {
-        return 'align-bottom';
-      }
-    },
-
-    // TODO(cdata): Add `track` response back in when gesture lands.
-
-    _onResize: function() {
-      this.debounce('_onResize', function() {
-        this._scroll();
-        this._tabChanged(this.selectedItem);
-      }, 10);
-    },
-
-    _onIronSelect: function(event) {
-      this._tabChanged(event.detail.item, this._previousTab);
-      this._previousTab = event.detail.item;
-      this.cancelDebouncer('tab-changed');
-    },
-
-    _onIronDeselect: function(event) {
-      this.debounce('tab-changed', function() {
-        this._tabChanged(null, this._previousTab);
-      // See polymer/polymer#1305
-      }, 1);
-    },
-
-    get _tabContainerScrollSize () {
-      return Math.max(
-        0,
-        this.$.tabsContainer.scrollWidth -
-          this.$.tabsContainer.offsetWidth
-      );
-    },
-
-
-    _scroll: function(e, detail) {
-      if (!this.scrollable) {
-        return;
-      }
-
-      var ddx = (detail && -detail.ddx) || 0;
-      this._affectScroll(ddx);
-    },
-
-    _down: function(e) {
-      // go one beat async to defeat IronMenuBehavior
-      // autorefocus-on-no-selection timeout
-      this.async(function() {
-        if (this._defaultFocusAsync) {
-          this.cancelAsync(this._defaultFocusAsync);
-          this._defaultFocusAsync = null;
-        }
-      }, 1);
-    },
-
-    _affectScroll: function(dx) {
-      this.$.tabsContainer.scrollLeft += dx;
-
-      var scrollLeft = this.$.tabsContainer.scrollLeft;
-
-      this._leftHidden = scrollLeft === 0;
-      this._rightHidden = scrollLeft === this._tabContainerScrollSize;
-    },
-
-    _onLeftScrollButtonDown: function() {
-      this._scrollToLeft();
-      this._holdJob = setInterval(this._scrollToLeft.bind(this), this._holdDelay);
-    },
-
-    _onRightScrollButtonDown: function() {
-      this._scrollToRight();
-      this._holdJob = setInterval(this._scrollToRight.bind(this), this._holdDelay);
-    },
-
-    _onScrollButtonUp: function() {
-      clearInterval(this._holdJob);
-      this._holdJob = null;
-    },
-
-    _scrollToLeft: function() {
-      this._affectScroll(-this._step);
-    },
-
-    _scrollToRight: function() {
-      this._affectScroll(this._step);
-    },
-
-    _tabChanged: function(tab, old) {
-      if (!tab) {
-        this._positionBar(0, 0);
-        return;
-      }
-
-      var r = this.$.tabsContent.getBoundingClientRect();
-      var w = r.width;
-      var tabRect = tab.getBoundingClientRect();
-      var tabOffsetLeft = tabRect.left - r.left;
-
-      this._pos = {
-        width: this._calcPercent(tabRect.width, w),
-        left: this._calcPercent(tabOffsetLeft, w)
-      };
-
-      if (this.noSlide || old == null) {
-        // position bar directly without animation
-        this._positionBar(this._pos.width, this._pos.left);
-        return;
-      }
-
-      var oldRect = old.getBoundingClientRect();
-      var oldIndex = this.items.indexOf(old);
-      var index = this.items.indexOf(tab);
-      var m = 5;
-
-      // bar animation: expand
-      this.$.selectionBar.classList.add('expand');
-
-      if (oldIndex < index) {
-        this._positionBar(this._calcPercent(tabRect.left + tabRect.width - oldRect.left, w) - m,
-            this._left);
-      } else {
-        this._positionBar(this._calcPercent(oldRect.left + oldRect.width - tabRect.left, w) - m,
-            this._calcPercent(tabOffsetLeft, w) + m);
-      }
-
-      if (this.scrollable) {
-        this._scrollToSelectedIfNeeded(tabRect.width, tabOffsetLeft);
-      }
-    },
-
-    _scrollToSelectedIfNeeded: function(tabWidth, tabOffsetLeft) {
-      var l = tabOffsetLeft - this.$.tabsContainer.scrollLeft;
-      if (l < 0) {
-        this.$.tabsContainer.scrollLeft += l;
-      } else {
-        l += (tabWidth - this.$.tabsContainer.offsetWidth);
-        if (l > 0) {
-          this.$.tabsContainer.scrollLeft += l;
-        }
-      }
-    },
-
-    _calcPercent: function(w, w0) {
-      return 100 * w / w0;
-    },
-
-    _positionBar: function(width, left) {
-      width = width || 0;
-      left = left || 0;
-
-      this._width = width;
-      this._left = left;
-      this.transform(
-          'translate3d(' + left + '%, 0, 0) scaleX(' + (width / 100) + ')',
-          this.$.selectionBar);
-    },
-
-    _onBarTransitionEnd: function(e) {
-      var cl = this.$.selectionBar.classList;
-      // bar animation: expand -> contract
-      if (cl.contains('expand')) {
-        cl.remove('expand');
-        cl.add('contract');
-        this._positionBar(this._pos.width, this._pos.left);
-      // bar animation done
-      } else if (cl.contains('contract')) {
-        cl.remove('contract');
-      }
-    }
-
-  });
-
-</script><dom-module id="iron-a11y-announcer" assetpath="www/bower_components/iron-a11y-announcer/"><style>
+  </script></dom-module><dom-module id="iron-a11y-announcer" assetpath="www/bower_components/iron-a11y-announcer/"><style>
     :host {
       display: inline-block;
       position: fixed;
@@ -22832,9 +22844,8 @@ is separate from validation, and `allowed-pattern` does not affect how the input
       :host {
         display: block;
         position: fixed;
-
-        background: #323232;
-        color: #f1f1f1;
+        background-color: var(--paper-toast-background-color, #323232);
+        color: var(--paper-toast-color, #f1f1f1);
         min-height: 48px;
         min-width: 288px;
         padding: 16px 24px 12px;
@@ -22842,17 +22853,16 @@ is separate from validation, and `allowed-pattern` does not affect how the input
         box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
         border-radius: 2px;
         left: 0;
+        bottom: 0;
         margin: 12px;
         font-size: 14px;
         cursor: default;
         -webkit-transition: visibility 0.3s, -webkit-transform 0.3s, opacity 0.3s;
         transition: visibility 0.3s, transform 0.3s, opacity 0.3s;
-
         visibility: hidden;
-        bottom: -100px;
         opacity: 0;
-        -webkit-transform: translateY(0px);
-        transform: translateY(0px);
+        -webkit-transform: translateY(100px);
+        transform: translateY(100px);
       }
 
       :host(.capsule) {
@@ -22869,12 +22879,15 @@ is separate from validation, and `allowed-pattern` does not affect how the input
       :host(.paper-toast-open) {
         visibility: visible;
         opacity: 1;
-        -webkit-transform: translateY(-100px);
-        transform: translateY(-100px);
+        -webkit-transform: translateY(0px);
+        transform: translateY(0px);
       }
     </style><span id="label">{{text}}</span><content></content></template><script>
     (function() {
-      var PaperToast = Polymer({
+      // Keeps track of the toast currently opened.
+      var currentToast = null;
+
+      Polymer({
         is: 'paper-toast',
 
         behaviors: [
@@ -22884,6 +22897,8 @@ is separate from validation, and `allowed-pattern` does not affect how the input
         properties: {
           /**
            * The duration in milliseconds to show the toast.
+           * Set to `0`, a negative number, or `Infinity`, to disable the
+           * toast auto-closing.
            */
           duration: {
             type: Number,
@@ -22899,6 +22914,7 @@ is separate from validation, and `allowed-pattern` does not affect how the input
           },
 
           /**
+           * Overridden from `IronOverlayBehavior`.
            * Set to false to enable closing of the toast by clicking outside it.
            */
           noCancelOnOutsideClick: {
@@ -22907,9 +22923,22 @@ is separate from validation, and `allowed-pattern` does not affect how the input
           },
         },
 
+        /**
+         * Read-only. Deprecated. Use `opened` from `IronOverlayBehavior`.
+         * @property visible
+         * @deprecated
+         */
         get visible() {
           console.warn('`visible` is deprecated, use `opened` instead');
           return this.opened;
+        },
+
+        /**
+         * Read-only. Can auto-close if duration is a positive finite number.
+         * @property _canAutoClose
+         */
+        get _canAutoClose() {
+          return this.duration > 0 && this.duration !== Infinity;
         },
 
         created: function() {
@@ -22917,15 +22946,14 @@ is separate from validation, and `allowed-pattern` does not affect how the input
         },
 
         /**
-         * Show the toast.
-         * @method show
+         * Show the toast. Same as `open()` from `IronOverlayBehavior`.
          */
         show: function() {
           this.open();
         },
 
         /**
-         * Hide the toast
+         * Hide the toast. Same as `close()` from `IronOverlayBehavior`.
          */
         hide: function() {
           this.close();
@@ -22937,19 +22965,18 @@ is separate from validation, and `allowed-pattern` does not affect how the input
          */
         _openedChanged: function() {
           if (this.opened) {
-            if (PaperToast.currentToast && PaperToast.currentToast !== this) {
-              PaperToast.currentToast.close();
+            if (currentToast && currentToast !== this) {
+              currentToast.close();
             }
-            PaperToast.currentToast = this;
+            currentToast = this;
             this.fire('iron-announce', {
               text: this.text
             });
-            // auto-close if duration is a positive finite number
-            if (this.duration > 0 && this.duration !== Infinity) {
+            if (this._canAutoClose) {
               this.debounce('close', this.close, this.duration);
             }
-          } else if (PaperToast.currentToast === this) {
-            PaperToast.currentToast = null;
+          } else if (currentToast === this) {
+            currentToast = null;
           }
           Polymer.IronOverlayBehaviorImpl._openedChanged.apply(this, arguments);
         },
@@ -22960,6 +22987,7 @@ is separate from validation, and `allowed-pattern` does not affect how the input
         _renderOpened: function() {
           this.classList.add('paper-toast-open');
         },
+
         /**
          * Overridden from `IronOverlayBehavior`.
          */
@@ -22972,13 +23000,21 @@ is separate from validation, and `allowed-pattern` does not affect how the input
          * iron-fit-behavior will set the inline style position: static, which
          * causes the toast to be rendered incorrectly when opened by default.
          */
-        _onIronResize: function(){
+        _onIronResize: function() {
           Polymer.IronOverlayBehaviorImpl._onIronResize.apply(this, arguments);
           if (this.opened) {
             // Make sure there is no inline style for position.
             this.style.position = '';
           }
         }
+
+        /**
+         * Fired when `paper-toast` is opened.
+         *
+         * @event 'iron-announce'
+         * @param {Object} detail
+         * @param {String} detail.text The text that will be announced.
+         */
       });
     })();
   </script></dom-module><dom-module id="paper-toggle-button" assetpath="www/bower_components/paper-toggle-button/"><template strip-whitespace=""><style>
