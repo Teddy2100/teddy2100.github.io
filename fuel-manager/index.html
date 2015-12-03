@@ -2,7 +2,7 @@
 <html lang="en" data-framework="polymer">
 <head>
  <meta charset="utf-8">
- <title>Fuel Usage Manager</title>
+ <title>Fuel Manager</title>
  <meta name="language" content="english"/>
  <meta name="theme-color" content="#4713B7">
  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -11,12 +11,13 @@
  <script type="text/javascript" src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
  <link rel="import" href="../bower_components/google-chart/google-chart.html"/>
  <link rel="import" href="../bower_components/polymer-full.html"/>
+ <link rel="import" href="./elements/paper-tabs-holder.html"/>
  <link rel="import" href="./elements/event-listener.html"/>
  <link rel="import" href="./app-setup.html"/>
 </head>
 <body unresolved>
 <event-listener id="ee-gui">
- <paper-drawer-panel id="page" responsive-width="800px" no-force-narrow>
+ <paper-drawer-panel id="page" responsive-width="800px" force-narrow>
   <paper-material id="drawer" elevation="5" drawer>
    <paper-menu class="list" style="padding:0px;">
     <div class="ui-header-widget"><b></b><small></small><img/></div>
@@ -28,15 +29,22 @@
   <paper-header-panel id="main" mode="standard" main>
    <paper-toolbar mode="none">
     <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
-    <span class="title" style="display:block;">Fuel Usage Manager</span>
+    <span class="title" style="display:block;">Fuel Manager</span>
     <paper-icon-button id="action-btn"></paper-icon-button>
    </paper-toolbar>
-   <neon-animated-pages selected="0" entry-animation="slide-from-right-animation" exit-animation="slide-left-animation">
-    <neon-animatable page="usage-overview" icon="cached" style="padding:15px;">
-     <paper-material elevation="3" id="chart1"><paper-spinner active></paper-spinner></paper-material>
-     
-     <paper-material elevation="3"><artical><paper-spinner active></paper-spinner></artical></paper-material>
-     
+   <neon-animated-pages selected="0">
+    <neon-animatable page="usage-overview" icon="cached">
+     <paper-tabs-holder>
+      <div title="Overview">
+       <paper-card heading="Loading" id="chart1"><artical></artical></paper-card>
+      </div>
+      <div title="Gas">
+       <paper-card heading="Loading"><artical></artical></paper-card>
+      </div>
+      <div title="Electric">
+       <paper-card heading="Loading"><artical></artical></paper-card>
+      </div>
+     </paper-tabs-holder>
     </neon-animatable>
     <neon-animatable page="add-reading" icon="save" style="padding:20px;">
      <h1>Loading Usage Please Wait</h1><artical></artical>
@@ -84,12 +92,15 @@ $(window).on("update",function(e,obj){
  }});while(rows.length>10){rows.shift();raw.shift();}
  while(raw.length>5){raw.shift();}
  
+ 
+ var options={chartArea:{width:'100%',height:'80%',top:10},curveType:'function'};
  var cols=[{label:'Date',type:'string'},{label:'Gas £',type:'number'},{label:'Electric £',type:'number'}];
- var options={title:'Fuel cost over last '+rows.length+' readings',chartArea:{width:'85%'},curveType:'function'};
   options=$.extend(options,{vAxis:{format:'£#'},backgroundColor:'transparent',colors:['orange','blue'],legend:'none'});
- var chart=$("<google-chart>").attr("type","line").attr("options",JSON.stringify(options));
-  chart.attr("cols",JSON.stringify(cols)).attr("rows",JSON.stringify(rows));
- $("paper-material#chart1").html(chart);
+ var chart=$("<google-chart>").attr("type","line").attr("options",JSON.stringify(options)).width("100%");
+  chart.attr("cols",JSON.stringify(cols)).attr("rows",JSON.stringify(rows)).height("200px");
+ $("paper-card#chart1").attr("heading","Your Last "+rows.length+" Readings");
+ $("paper-card#chart1 artical").html(chart);
+ 
 
  var duration=Date.parse(raw[raw.length-1][0])-Date.parse(raw[0][0]);
  var total={gas:-raw[0][1],electric:-raw[0][2]},hours=(duration/3600000),days=(hours/24);
@@ -101,22 +112,8 @@ $(window).on("update",function(e,obj){
  console.log("ELECTRIC",getNumber(total.electric/days,2));
  
  console.log(raw);
- 
-  //var sum=rows.map(function(v){console.log(v);return v[2];});
-/*
-console.log(r);  
- 
-  var timesince=parseFloat((new Date().getTime()-Date.parse(r[0]))/3600000).toFixed(1);
- 
-  $("neon-animatable[page='usage-overview'] artical").append(r[0]+"<br>");
-  $("neon-animatable[page='usage-overview'] artical").append(timesince+" Hour since last reading<br>");
-  //$("neon-animatable[page='usage-overview'] artical").append(timesince*costperhour);
- });*/
- 
 
 });
-
-
 
 $(window).on("load resize",function(){
  $("google-chart").each(function(){this.drawChart();});

@@ -1,0 +1,31 @@
+<dom-module is="paper-tabs-holder">
+ <style>
+  iron-pages{text-align:center;margin:15px;}
+  iron-pages div{margin:15px auto;width:100%;max-width:800px;}
+  paper-tabs{background:#DADADA;color:#000000;}
+ </style>
+ <template> 
+  <paper-tabs selected="{{selected}}">
+   <template is="dom-repeat" items="{{names}}">
+    <paper-tab>{{item.title}}</paper-tab>
+   </template>
+  </paper-tabs>
+  <iron-pages selected="{{selected}}">
+   <content></content>
+  </iron-pages>
+ </template>
+</dom-module>
+<script>
+Polymer({
+ is:'paper-tabs-holder',
+ ready:function(){
+  var divs=this.querySelectorAll("div[title]");
+  var tabs=[];[].forEach.call(divs,function(div){
+   tabs.push({title:div.title});
+  });this.names=tabs;
+ },
+ properties:{
+  selected:{type:Number,value:0}
+ }
+});
+</script>

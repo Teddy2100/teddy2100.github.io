@@ -18,9 +18,6 @@ Polymer({
  },
  
  registered:function(){
-  $("paper-drawer-panel").on("selected-changed",function(){
-   $("paper-toast-stack").animate({"left":(this.selected=="main"?"12px":"268px")});
-  });
   $("neon-animated-pages").on("neon-animation-finish",function(){
    $("paper-drawer-panel").get(0).closeDrawer();
   });
