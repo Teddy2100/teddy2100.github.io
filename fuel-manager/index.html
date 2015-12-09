@@ -10,10 +10,11 @@
  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
  <meta name="google-signin-client_id" content="147460070429-5svh32tvvv2tqpve7v9i9h11e93jb8fm.apps.googleusercontent.com">
  <script type="text/javascript" src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
- <script type="text/javascript" src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
+ <script type="text/javascript" src="https://apis.google.com/js/platform.js" async defer></script>
  <script type="text/javascript" src="../bower_components/jquery/dist/jquery.min.js"></script>
  <link rel="import" href="../bower_components/google-chart/google-chart.html"/>
  <link rel="import" href="../bower_components/polymer-full.html"/>
+ <link rel="import" href="./elements/paper-item-icon-button.html"/>
  <link rel="import" href="./elements/event-listener.html"/>
  <link rel="import" href="./app-setup.html"/>
 </head>
@@ -68,13 +69,18 @@
    </neon-animated-pages>
   </paper-header-panel>
  </paper-drawer-panel>
+ <paper-dialog id="connect" entry-animation="scale-up-animation" exit-animation="fade-out-animation" modal>
+  <h2>Enter Username</h2><paper-input type="text" size="15" no-label-float></paper-input><div class="buttons">
+   <paper-button dialog-confirm>Accept</paper-button>
+  </div>
+ </paper-dialog>
 </event-listener>
 <script type="text/javascript">
 $(document).on("ready",function(){
  $("paper-card#drawer div#placeholder").removeAttr("hidden");
  $("paper-card#drawer div#placeholder").append($("<div id='toolbar-end'>&nbsp;</div>"));
  $("paper-card#drawer div#placeholder").append($("<div id='tabs-end'>&nbsp;</div>"));
- 
+ $("paper-dialog#connect").get(0).open();
 });
 
 $(window).on("load",function(e){

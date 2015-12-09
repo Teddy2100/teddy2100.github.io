@@ -1,30 +1,13 @@
 <script type="text/javascript">
 $.ajaxSetup({
  url:"https://script.google.com/macros/s/AKfycbz6uzzzZOL_Vw-z-2zRtgYwBMApe2dNvM_30BEpZqpLtjEjhxs/exec",
- type:"post",dataType:"jsonp",jsonpCallback:"update",statusCode:{404:function(){alert("page not found");}},
- xhrFields:{withCredentials:true},crossDomain:true,timeout:2000
+ dataType:"jsonp",jsonpCallback:"update",statusCode:{404:function(){alert("Resource Not Found");}},
+ xhrFields:{withCredentials:true},crossDomain:true,type:"get",timeout:2000
 });
-
-function onLoad() {
-      gapi.load('auth2,signin2', function() {
-        var auth2 = gapi.auth2.init();
-        auth2.then(function() {
-          // Current values
-          var isSignedIn = auth2.isSignedIn.get();
-          var currentUser = auth2.currentUser.get();
-
-          if (!isSignedIn) {
-            // Rendering g-signin2 button.
-            gapi.signin2.render('google-signin-button', {
-              'onsuccess': 'onSignIn'  
-            });
-          }
-        });
-      });
-    }
 
 function onSignIn(googleUser){
  var profile=googleUser.getBasicProfile();
+ console.log("ID: " + profile.getId());
  console.log("Name: " + profile.getName());
  console.log("Image URL: " + profile.getImageUrl());
  console.log("Email: " + profile.getEmail());
@@ -77,6 +60,7 @@ paper-drawer-panel::shadow{
 
 paper-card{width:100%;}
 paper-item{cursor:pointer;}
+neon-animatable{text-align:center;}
 google-chart{margin:auto;width:100%;}
 paper-item{padding:0px 10px!important;}
 paper-item iron-icon{margin-right:10px;}
@@ -87,17 +71,14 @@ body{-webkit-user-select:none;-moz-user-select:none;user-select:none;}
 
 paper-card#drawer::shadow{border-radius:0px;}
 paper-card#drawer::shadow div.title-text{top:0px;text-shadow:2px 2px 0px #FFFFFF;}
-
 paper-toolbar#tabs::shadow paper-ripple{color:var(--paper-toolbar-background);opacity:0.4;}
 paper-toolbar#tabs::shadow div#selectionBar{background:var(--paper-toolbar-background);height:4px;}
 paper-toolbar#tabs::shadow{background:var(--paper-tabs-background);max-height:var(--paper-tabs-height);}
 paper-toolbar#tabs::shadow div#topBar{height:var(--paper-tabs-height);max-height:var(--paper-tabs-height);color:var(--paper-tabs-color);}
-
-paper-toolbar::shadow div#dropShadow{box-shadow:inset 0px 10px 6px -8px rgba(0, 0, 0, 0.4)!important;}
-
-neon-animatable{text-align:center;}
 neon-animatable paper-card{margin:10px auto;width:95%;max-width:800px;margin-bottom:20px;border-radius:10px;padding:5px;}
-paper-menu, paper-card{background:var(--paper-drawer-background);color:var(--paper-drawer-color);}
+paper-menu, paper-card,paper-dialog{background:var(--paper-drawer-background);color:var(--paper-drawer-color);}
+paper-toolbar::shadow div#dropShadow{box-shadow:inset 0px 10px 6px -8px rgba(0, 0, 0, 0.4)!important;}
+paper-dialog::shadow input.paper-input{font-size:25px;}
 
 div#toolbar-end{
  position:absolute;top:0px;right:-15px;
@@ -115,8 +96,6 @@ div#tabs-end{
  height:calc(var(--paper-tabs-height) + var(--paper-toolbar-sm-height));
  width:var(--paper-tabs-height);
 }
-
-div#___signin_0{width:113px!important;height:31px!important;}
 
 paper-header-panel::shadow #mainContainer::-webkit-scrollbar{width:14px;}
 paper-header-panel::shadow #mainContainer::-webkit-scrollbar-thumb{
