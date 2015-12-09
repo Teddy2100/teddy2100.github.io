@@ -4,71 +4,82 @@
  <meta charset="utf-8">
  <title>Fuel Manager</title>
  <meta name="language" content="english"/>
- <meta name="theme-color" content="#4713B7">
+ <meta name="theme-color" content="#E00421">
+ <meta name="google-signin-scope" content="profile email">
  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
- <script type="text/javascript" src="../bower_components/jquery/dist/jquery.min.js"></script>
+ <meta name="google-signin-client_id" content="147460070429-5svh32tvvv2tqpve7v9i9h11e93jb8fm.apps.googleusercontent.com">
  <script type="text/javascript" src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+ <script type="text/javascript" src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
+ <script type="text/javascript" src="../bower_components/jquery/dist/jquery.min.js"></script>
  <link rel="import" href="../bower_components/google-chart/google-chart.html"/>
  <link rel="import" href="../bower_components/polymer-full.html"/>
- <link rel="import" href="./elements/paper-tabs-holder.html"/>
  <link rel="import" href="./elements/event-listener.html"/>
  <link rel="import" href="./app-setup.html"/>
 </head>
 <body unresolved>
-<event-listener id="ee-gui">
- <paper-drawer-panel id="page" responsive-width="800px" force-narrow>
-  <paper-material id="drawer" elevation="5" drawer>
+<event-listener id="fuel-gui">
+ <paper-drawer-panel id="page" responsive-width="800px" no-force-narrow>
+  <paper-card id="drawer" elevation="0" heading="Fuel Manager" image="./images/header.png" drawer>
    <paper-menu class="list" style="padding:0px;">
-    <div class="ui-header-widget"><b></b><small></small><img/></div>
-    <paper-item page="usage-overview"><iron-icon icon="assessment"></iron-icon>Usage Overview</paper-item>
+    <paper-item page="view-overview"><iron-icon icon="assessment"></iron-icon>View Your Usage</paper-item>
     <paper-item page="add-reading"><iron-icon icon="social:whatshot"></iron-icon>Add Reading</paper-item>
     <paper-item page="add-topup"><iron-icon icon="add-shopping-cart"></iron-icon>Add Topup</paper-item>
    </paper-menu>
-  </paper-material>
+  </paper-card>
   <paper-header-panel id="main" mode="standard" main>
-   <paper-toolbar mode="none">
+   <paper-toolbar id="title">
     <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
     <span class="title" style="display:block;">Fuel Manager</span>
-    <paper-icon-button id="action-btn"></paper-icon-button>
+    <div class="g-signin2" data-onsuccess="onSignIn" data-theme="light"></div>
    </paper-toolbar>
-   <neon-animated-pages selected="0">
-    <neon-animatable page="usage-overview" icon="cached">
-     <paper-tabs-holder>
-      <div title="Overview">
-       <paper-card heading="Loading" id="chart1"><artical></artical></paper-card>
-      </div>
-      <div title="Gas">
-       <paper-card heading="Loading"><artical></artical></paper-card>
-      </div>
-      <div title="Electric">
-       <paper-card heading="Loading"><artical></artical></paper-card>
-      </div>
-     </paper-tabs-holder>
+   <paper-toolbar id="tabs">
+    <paper-tabs class="fit" selected="0">
+     <paper-tab page="view-overview">Overview</paper-tab>
+     <paper-tab page="view-gas">Gas</paper-tab>
+     <paper-tab page="view-electric">Electric</paper-tab>
+    </paper-tabs>
+    <div id="dropShadow" class="style-scope paper-header-panel has-shadow"></div>
+   </paper-toolbar>
+   <neon-animated-pages selected="0" class="fit">
+    <neon-animatable page="view-overview" icon="cached">
+     <paper-card heading="Loading" id="chart1"><artical></artical></paper-card>
     </neon-animatable>
-    <neon-animatable page="add-reading" icon="save" style="padding:20px;">
-     <h1>Loading Usage Please Wait</h1><artical></artical>
-     <input name="reading" value="0"/>
-     <input type="button" id="test1" value="READING"> 
+    <neon-animatable page="view-gas" icon="cached">
+     <paper-card heading="Loading"><artical></artical></paper-card>
     </neon-animatable>
-    <neon-animatable page="add-topup" icon="save" style="padding:15px;">
-     <h1>Loading Usage Please Wait</h1><artical></artical>
-     <input name="topup" value="10"/>
-     <input type="button" id="test2" value="TOPUP"> 
+    <neon-animatable page="view-electric" icon="cached">
+     <paper-card heading="Loading"><artical></artical></paper-card>
+    </neon-animatable>
+    <neon-animatable page="add-reading" icon="save">
+     <paper-card heading="Loading">
+      <h1>Loading Usage Please Wait</h1><artical></artical>
+      <input name="reading" value="0"/>
+      <input type="button" id="test1" value="READING">
+     </paper-card>
+    </neon-animatable>
+    <neon-animatable page="add-topup" icon="save">
+     <paper-card heading="Loading">
+      <h1>Loading Usage Please Wait</h1><artical></artical>
+      <input name="topup" value="10"/>
+      <input type="button" id="test2" value="TOPUP"> 
+     </paper-card>
     </neon-animatable>
    </neon-animated-pages>
   </paper-header-panel>
  </paper-drawer-panel>
- <paper-material id="drawer-fake" elevation="5">
-  **FAKE DRAWER : DO NOT USE**
- </paper-material>
 </event-listener>
 <script type="text/javascript">
+$(document).on("ready",function(){
+ $("paper-card#drawer div#placeholder").removeAttr("hidden");
+ $("paper-card#drawer div#placeholder").append($("<div id='toolbar-end'>&nbsp;</div>"));
+ $("paper-card#drawer div#placeholder").append($("<div id='tabs-end'>&nbsp;</div>"));
+ 
+});
+
 $(window).on("load",function(e){
- $.ajax({data:"user="+btoa("aronfeerick@gmail.com")});
- $("paper-item[page]").on("click",function(){
-  $(window).trigger("changePage",this);
- });
+ //$.ajax({data:"user="+btoa("aronfeerick@gmail.com")});
+ $("paper-item").eq(0).click();
 });
 
 $("#test1").on("click",function(){
@@ -117,16 +128,27 @@ $(window).on("update",function(e,obj){
 
 $(window).on("load resize",function(){
  $("google-chart").each(function(){this.drawChart();});
+ if($("paper-drawer-panel").is("[narrow]")){
+  $("paper-card#drawer").attr("elevation","5"); 
+  $("div#placeholder").hide();
+ }else{
+  $("paper-card#drawer").attr("elevation","0");
+  $("div#placeholder").show();
+ }
 });
 
-$(window).on("changePage",function(e,obj){try{
- var pageHandle=$("neon-animated-pages").get(0),data=$(obj);
- var requestedPage=$("neon-animatable[page='"+data.attr("page")+"']").index();
-  pageHandle.exitAnimation="slide-"+(requestedPage<pageHandle.selected?"right":"left")+"-animation";
-  pageHandle.entryAnimation="slide-from-"+(requestedPage<pageHandle.selected?"left":"right")+"-animation";  
- if(requestedPage!=pageHandle.selected){pageHandle.selected=requestedPage;}
- if(data.text().length!=0){$("span.title").html(data.text());}
-}catch(e){alert("Opps Can't Display Requested Item");}});
+$("body").on("click mouseup","[page]",function(){
+ try{var pageHandle=$("neon-animated-pages").get(0),data=$(this);
+  var requestedPage=$("neon-animatable[page='"+data.attr("page")+"']").index();
+  if($.inArray(data.attr("page"),["add-reading","add-topup"])!=-1){sTabs=false;}else{sTabs=true;}
+   pageHandle.exitAnimation="slide-"+(requestedPage<pageHandle.selected?"right":"left")+"-animation";
+   pageHandle.entryAnimation="slide-from-"+(requestedPage<pageHandle.selected?"left":"right")+"-animation"; 
+  $("paper-toolbar#tabs,div#tabs-end").map(function(){if(sTabs){$(this).show();}else{$(this).hide();}});
+  if(this.nodeName=="PAPER-ITEM" && data.text().length!=0){$("span.title").html(data.text());}
+  if((requestedPage!=pageHandle.selected)==true){pageHandle.selected=requestedPage;}
+  if(this.nodeName){$("google-chart").each(function(){this.drawChart();});}
+ }catch(e){console.log("Error",e);}
+});
 </script>
 </body>
 </html>
