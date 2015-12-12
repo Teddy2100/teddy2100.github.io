@@ -70,13 +70,12 @@
   </paper-header-panel>
  </paper-drawer-panel>
  <paper-dialog id="connect" entry-animation="scale-up-animation" exit-animation="fade-out-animation" modal>
-  <h2>Enter Email Address</h2><paper-input name="token" type="text" placeholder="sample@example.com" no-label-float></paper-input>
+  <h2>Enter Email Address</h2><paper-input name="token" type="email" placeholder="sample@example.com" no-label-float></paper-input>
   <div class="buttons"><paper-button dialog-confirm>Get Data</paper-button></div>
  </paper-dialog>
 </event-listener>
 <script type="text/javascript">
 var data=[],rows=[],raw=[];
-
 $(document).on("ready",function(){
  $("paper-dialog#connect").get(0).open();
  $("paper-card#drawer div#placeholder").removeAttr("hidden");
