@@ -27,11 +27,14 @@
       margin-top: 20px;
     }
 
-    paper-material {
+    iron-dropdown {
+      @apply(--paper-menu-button-dropdown);
+    }
+
+    .dropdown-content {
       border-radius: 2px;
       background-color: var(--paper-menu-button-dropdown-background, --primary-background-color);
-
-      @apply(--paper-menu-button-dropdown);
+      @apply(--paper-menu-button-content);
     }
   </style><template><div id=trigger on-tap=open><content select=.dropdown-trigger></content></div><iron-dropdown id=dropdown opened={{opened}} horizontal-align=[[horizontalAlign]] vertical-align=[[verticalAlign]] horizontal-offset=[[horizontalOffset]] vertical-offset=[[verticalOffset]] open-animation-config=[[openAnimationConfig]] close-animation-config=[[closeAnimationConfig]] no-animations=[[noAnimations]] focus-target=[[_dropdownContent]]><paper-material class=dropdown-content><content id=content select=.dropdown-content></content></paper-material></iron-dropdown></template></dom-module><script>
   (function() {

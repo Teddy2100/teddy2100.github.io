@@ -1,4 +1,4 @@
-<link rel=import href=../polymer/polymer.html><link rel=import href=../paper-material/paper-material.html><link rel=import href=../paper-ripple/paper-ripple.html><link rel=import href=../paper-behaviors/paper-button-behavior.html><link rel=import href=../iron-flex-layout/iron-flex-layout.html><dom-module id=paper-button><template strip-whitespace><style include=paper-material>
+<link rel="import" href="../polymer/polymer.html"><link rel="import" href="../paper-material/paper-material.html"><link rel="import" href="../paper-ripple/paper-ripple.html"><link rel="import" href="../paper-behaviors/paper-button-behavior.html"><link rel="import" href="../iron-flex-layout/iron-flex-layout.html"><dom-module id="paper-button"><template strip-whitespace><style include="paper-material">
       :host {
         display: inline-block;
         position: relative;
@@ -70,7 +70,7 @@
 
     _calculateElevation: function() {
       if (!this.raised) {
-        this.elevation = 0;
+        this._setElevation(0);
       } else {
         Polymer.PaperButtonBehaviorImpl._calculateElevation.apply(this);
       }
@@ -83,9 +83,6 @@
 
     @event transitionend
     @param {{node: Object}} detail Contains the animated node.
-    */
-  });
-</script>.
     */
   });
 </script>

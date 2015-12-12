@@ -15,16 +15,18 @@ Polymer({
  ], 
  listeners:{
   'iron-resize':'resized'
- },
- 
+ }, 
  registered:function(){
   $("neon-animated-pages").on("neon-animation-finish",function(){
    $("paper-drawer-panel").get(0).closeDrawer();
   });
  }, 
  resized:function(){
-  $("paper-dialog").each(function(k){if(this.opened){
-   //this.style.minHeight=this.offsetHeight+"px";   
+  var isNarrow=$("paper-drawer-panel").is("[narrow]");
+  $("paper-card#drawer").attr("elevation",isNarrow?"0":"0");
+  $("div#placeholder").css("display",isNarrow?"none":"block");
+  $("google-chart").each(function(){this.drawChart();});
+  $("paper-dialog").each(function(){if(this.opened){
    this.resetFit();this.refit();
   }});
  }

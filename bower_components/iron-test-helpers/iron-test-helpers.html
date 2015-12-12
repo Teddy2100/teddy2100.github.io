@@ -1,4 +1,4 @@
-<script src=mock-interactions.js></script><script src=test-helpers.js></script><script>
+<link rel="import" href="mock-interactions.html"><link rel="import" href="test-helpers.html"><script>
   (function(global) {
     'use strict';
 
@@ -7,5 +7,6 @@
     TestHelpers.flushAsynchronousOperations = flushAsynchronousOperations;
     TestHelpers.forceXIfStamp = forceXIfStamp;
     TestHelpers.fireEvent = fireEvent;
+    TestHelpers.skipUnless = skipUnless;
   })(this);
 </script>

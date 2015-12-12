@@ -8,152 +8,151 @@
  <meta name="google-signin-scope" content="profile email">
  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
- <meta name="google-signin-client_id" content="147460070429-5svh32tvvv2tqpve7v9i9h11e93jb8fm.apps.googleusercontent.com">
  <script type="text/javascript" src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
- <script type="text/javascript" src="https://apis.google.com/js/platform.js" async defer></script>
  <script type="text/javascript" src="../bower_components/jquery/dist/jquery.min.js"></script>
- <link rel="import" href="../bower_components/google-chart/google-chart.html"/>
- <link rel="import" href="../bower_components/polymer-full.html"/>
- <link rel="import" href="./elements/paper-item-icon-button.html"/>
+ <link rel="import" href="../bower_components/vulcanized-full.html"/>
  <link rel="import" href="./elements/event-listener.html"/>
  <link rel="import" href="./app-setup.html"/>
 </head>
 <body unresolved>
 <event-listener id="fuel-gui">
- <paper-drawer-panel id="page" responsive-width="800px" no-force-narrow>
-  <paper-card id="drawer" elevation="0" heading="Fuel Manager" image="./images/header.png" drawer>
+ <paper-drawer-panel id="page" responsive-width="800px">
+  <paper-card id="drawer" elevation="0" heading="Fuel Manager" image="./images/header.png" fadeImage drawer>
    <paper-menu class="list" style="padding:0px;">
-    <paper-item page="view-overview"><iron-icon icon="assessment"></iron-icon>View Your Usage</paper-item>
-    <paper-item page="add-reading"><iron-icon icon="social:whatshot"></iron-icon>Add Reading</paper-item>
-    <paper-item page="add-topup"><iron-icon icon="add-shopping-cart"></iron-icon>Add Topup</paper-item>
+    <paper-item goto="view-overview"><iron-icon icon="assessment"></iron-icon>View Your Usage</paper-item>
+    <paper-item goto="add-reading"><iron-icon icon="social:whatshot"></iron-icon>Add Reading</paper-item>
+    <paper-item goto="add-credit"><iron-icon icon="add-shopping-cart"></iron-icon>Add Credit</paper-item>
    </paper-menu>
   </paper-card>
   <paper-header-panel id="main" mode="standard" main>
    <paper-toolbar id="title">
     <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
     <span class="title" style="display:block;">Fuel Manager</span>
-    <div class="g-signin2" data-onsuccess="onSignIn" data-theme="light"></div>
+    <paper-icon-button id="actionButton"></paper-icon-button>
    </paper-toolbar>
    <paper-toolbar id="tabs">
     <paper-tabs class="fit" selected="0">
-     <paper-tab page="view-overview">Overview</paper-tab>
-     <paper-tab page="view-gas">Gas</paper-tab>
-     <paper-tab page="view-electric">Electric</paper-tab>
+     <paper-tab goto="view-overview">Overview</paper-tab>
+     <paper-tab goto="view-gas">Gas</paper-tab>
+     <paper-tab goto="view-electric">Electric</paper-tab>
     </paper-tabs>
     <div id="dropShadow" class="style-scope paper-header-panel has-shadow"></div>
    </paper-toolbar>
    <neon-animated-pages selected="0" class="fit">
     <neon-animatable page="view-overview" icon="cached">
-     <paper-card heading="Loading" id="chart1"><artical></artical></paper-card>
-    </neon-animatable>
+     <paper-card heading="Loading"><div class="content"></div></paper-card>
+    </neon-animatable>    
     <neon-animatable page="view-gas" icon="cached">
-     <paper-card heading="Loading"><artical></artical></paper-card>
-    </neon-animatable>
+     <paper-card heading="Loading"><div class="content"></div></paper-card>
+    </neon-animatable>    
     <neon-animatable page="view-electric" icon="cached">
-     <paper-card heading="Loading"><artical></artical></paper-card>
+     <paper-card heading="Loading"><div class="content"></div></paper-card>
     </neon-animatable>
     <neon-animatable page="add-reading" icon="save">
-     <paper-card heading="Loading">
-      <h1>Loading Usage Please Wait</h1><artical></artical>
-      <input name="reading" value="0"/>
-      <input type="button" id="test1" value="READING">
-     </paper-card>
-    </neon-animatable>
-    <neon-animatable page="add-topup" icon="save">
-     <paper-card heading="Loading">
-      <h1>Loading Usage Please Wait</h1><artical></artical>
-      <input name="topup" value="10"/>
-      <input type="button" id="test2" value="TOPUP"> 
-     </paper-card>
-    </neon-animatable>
+     <input type="hidden" name="action" value="READING"/>
+     <paper-card heading="Add Gas Reading" image="./images/gas.png" size="half"><div class="content">
+       <paper-input type="number" name="gas" placeholder="0.00" no-label-float><div prefix>£</div></paper-input>
+     </div></paper-card>
+     <paper-card heading="Add Electric Reading" image="./images/electric.png" size="half"><div class="content">
+       <paper-input type="number" name="electric" placeholder="0.00" no-label-float><div prefix>£</div></paper-input>
+     </div></paper-card>
+    </neon-animatable>    
+    <neon-animatable page="add-credit" icon="save">
+     <input type="hidden" name="action" value="CREDIT"/>
+     <paper-card heading="Add Gas Credit" image="./images/gas.png" size="half"><div class="content">
+       <paper-input type="number" name="gas" placeholder="0.00" no-label-float><div prefix>£</div></paper-input>
+     </div></paper-card>
+     <paper-card heading="Add Electric Credit" image="./images/electric.png" size="half"><div class="content">
+       <paper-input type="number" name="electric" placeholder="0.00" no-label-float><div prefix>£</div></paper-input>
+     </div></paper-card>
+    </neon-animatable>    
    </neon-animated-pages>
   </paper-header-panel>
  </paper-drawer-panel>
  <paper-dialog id="connect" entry-animation="scale-up-animation" exit-animation="fade-out-animation" modal>
-  <h2>Enter Username</h2><paper-input type="text" size="15" no-label-float></paper-input><div class="buttons">
-   <paper-button dialog-confirm>Accept</paper-button>
-  </div>
+  <h2>Enter Email Address</h2><paper-input name="token" type="text" placeholder="sample@example.com" no-label-float></paper-input>
+  <div class="buttons"><paper-button dialog-confirm>Get Data</paper-button></div>
  </paper-dialog>
 </event-listener>
 <script type="text/javascript">
+var data=[],rows=[],raw=[];
+
 $(document).on("ready",function(){
- $("paper-card#drawer div#placeholder").removeAttr("hidden");
- $("paper-card#drawer div#placeholder").append($("<div id='toolbar-end'>&nbsp;</div>"));
- $("paper-card#drawer div#placeholder").append($("<div id='tabs-end'>&nbsp;</div>"));
  $("paper-dialog#connect").get(0).open();
+ $("paper-card#drawer div#placeholder").removeAttr("hidden");
+ $("paper-card#drawer div#placeholder").html($("<div id='tabs-end'>&nbsp;</div>"));
+ $("paper-card#drawer div#placeholder").append($("<div id='toolbar-end'>&nbsp;</div>"));
+ $(document).on("iron-overlay-closed",function(){
+  $("#actionButton").click();
+ });
 });
 
-$(window).on("load",function(e){
- //$.ajax({data:"user="+btoa("aronfeerick@gmail.com")});
- $("paper-item").eq(0).click();
-});
-
-$("#test1").on("click",function(){
- var obj=$("[name='reading']").get(0).value;
- $.ajax({data:"user="+btoa("aronfeerick@gmail.com")+"&reading="+obj});
-});
-
-$("#test2").on("click",function(){
- var obj=$("[name='topup']").get(0).value;
- $.ajax({data:"user="+btoa("aronfeerick@gmail.com")+"&topup="+obj});
-});
-
-$(window).on("update",function(e,obj){
- var data=$(obj.data).get(),rows=[],raw=[];//data.shift();
- $("neon-animatable[page='usage-overview'] artical").html("");
+$(document).on("update",function(e,obj){try{
+ if(obj){data=$(obj.data).get();rows=[];raw=[];}
  $.each(data,function(k,r){if(data[k-1]&&r[1]=="READING"){var used=[];
   used['electric']=Number(parseFloat(data[k-1][3]-data[k][3]).toFixed(2));
   used['gas']=Number(parseFloat(data[k-1][2]-data[k][2]).toFixed(2));
   rows.push([getDate(data[k][0]),used['gas'],used['electric']]);
   raw.push([r[0],used['gas'],used['electric']]);//RAW DATA  
  }});while(rows.length>10){rows.shift();raw.shift();}
- while(raw.length>5){raw.shift();}
  
- 
- var options={chartArea:{width:'100%',height:'80%',top:10},curveType:'function'};
- var cols=[{label:'Date',type:'string'},{label:'Gas £',type:'number'},{label:'Electric £',type:'number'}];
+ $("neon-animatable[page='view-overview']").each(function(){
+  var options={chartArea:{width:'100%',height:'80%',top:10},curveType:'function'};
+  if(data.length<4){$("paper-card",this).attr("heading","Not Enough Readings");return false;}
+  var cols=[{label:'Date',type:'string'},{label:'Gas £',type:'number'},{label:'Electric £',type:'number'}];
   options=$.extend(options,{vAxis:{format:'£#'},backgroundColor:'transparent',colors:['orange','blue'],legend:'none'});
- var chart=$("<google-chart>").attr("type","line").attr("options",JSON.stringify(options)).width("100%");
+  var chart=$("<google-chart>").attr("type","line").attr("options",JSON.stringify(options)).width("100%");
   chart.attr("cols",JSON.stringify(cols)).attr("rows",JSON.stringify(rows)).height("200px");
- $("paper-card#chart1").attr("heading","Your Last "+rows.length+" Readings");
- $("paper-card#chart1 artical").html(chart);
- 
+  $("paper-card",this).attr("heading","Your Last "+rows.length+" Readings");
+  $("div.content",this).html(chart);
+ });
 
+ $("neon-animatable[page='view-gas']").each(function(){
+  $("paper-card",this).attr("heading","Data Coming Soon");
+ });
+
+ $("neon-animatable[page='view-electric']").each(function(){
+  $("paper-card",this).attr("heading","Data Coming Soon");
+ });
+
+ /*
+ while(raw.length>5){raw.shift();}
  var duration=Date.parse(raw[raw.length-1][0])-Date.parse(raw[0][0]);
  var total={gas:-raw[0][1],electric:-raw[0][2]},hours=(duration/3600000),days=(hours/24);
- 
- 
  $.each(raw,function(k,r){total.gas+=r[1];total.electric+=r[2];});
- 
  console.log("GAS",getNumber(total.gas/days,2));
  console.log("ELECTRIC",getNumber(total.electric/days,2));
- 
  console.log(raw);
+ */
+}catch(error){alert("Something Went Wrong:\n\n"+error.message);}finally{
+ $("paper-icon-button#actionButton").removeAttr("disabled");
+ $("neon-animatable paper-input").val("");  
+ $("paper-item").eq(0).click(); 
+}});
 
-});
+$("body").on("click","#actionButton",function(){try{
+ var send={token:btoa($("input[name='token']").get(0).value)};
+ var actionHandle=$("neon-animatable").hasClass("iron-selected");
+ $("input",actionHandle).map(function(){send[this.name]=this.value});
+ if(!send['token']){$("paper-dialog#connect").get(0).open();return false;} 
+ $.each(send,function(k,v){if(v==""){throw new Error("Invalid "+k+" value");}});
+ if(send['action']=="CREDIT"){send['electric']=parseFloat(send['electric'])+data[data.length-1][3];}
+ if(send['action']=="CREDIT"){send['gas']=parseFloat(send['gas'])+data[data.length-1][2];}
+}catch(error){alert("Something Went Wrong:\n\n"+error.message);}finally{
+ if(send['token']){$("#actionButton").attr("disabled","disabled");}
+ if(send['token']){$.ajax({data:$.param(send)});}
+}});
 
-$(window).on("load resize",function(){
- $("google-chart").each(function(){this.drawChart();});
- if($("paper-drawer-panel").is("[narrow]")){
-  $("paper-card#drawer").attr("elevation","5"); 
-  $("div#placeholder").hide();
- }else{
-  $("paper-card#drawer").attr("elevation","0");
-  $("div#placeholder").show();
- }
-});
-
-$("body").on("click mouseup","[page]",function(){
- try{var pageHandle=$("neon-animated-pages").get(0),data=$(this);
-  var requestedPage=$("neon-animatable[page='"+data.attr("page")+"']").index();
-  if($.inArray(data.attr("page"),["add-reading","add-topup"])!=-1){sTabs=false;}else{sTabs=true;}
+$("body").on("click","*[goto]",function(){
+ try{var pageHandle=$("neon-animated-pages").get(0),obj=$(this);
+  var requestedPage=$("neon-animatable[page='"+obj.attr("goto")+"']").index();
+  $("paper-toolbar#tabs,div#tabs-end").css("display",(requestedPage<3)?"block":"none");
    pageHandle.exitAnimation="slide-"+(requestedPage<pageHandle.selected?"right":"left")+"-animation";
-   pageHandle.entryAnimation="slide-from-"+(requestedPage<pageHandle.selected?"left":"right")+"-animation"; 
-  $("paper-toolbar#tabs,div#tabs-end").map(function(){if(sTabs){$(this).show();}else{$(this).hide();}});
-  if(this.nodeName=="PAPER-ITEM" && data.text().length!=0){$("span.title").html(data.text());}
-  if((requestedPage!=pageHandle.selected)==true){pageHandle.selected=requestedPage;}
-  if(this.nodeName){$("google-chart").each(function(){this.drawChart();});}
- }catch(e){console.log("Error",e);}
+   pageHandle.entryAnimation="slide-from-"+(requestedPage<pageHandle.selected?"left":"right")+"-animation";  
+  if(this.nodeName=="PAPER-ITEM" && obj.text().length!=0){$("span.title").html(obj.text());}
+  $("#actionButton").attr("icon",$("neon-animatable").eq(requestedPage).attr("icon"));
+  if(requestedPage!=pageHandle.selected){pageHandle.selected=requestedPage;}
+ }catch(error){alert("Something Went Wrong:\n\n"+error.message);}
 });
 </script>
 </body>

@@ -1,26 +1,10 @@
 <script type="text/javascript">
 $.ajaxSetup({
- url:"https://script.google.com/macros/s/AKfycbz6uzzzZOL_Vw-z-2zRtgYwBMApe2dNvM_30BEpZqpLtjEjhxs/exec",
+ //url:"https://script.google.com/macros/s/AKfycbxY7f1d4yj4mnY_8xVwBfsce8-GEGSiH0UahQpuDMc/dev",
+ url:"https://script.google.com/macros/s/AKfycbz6uzzzZOL_Vw-z-2zRtgYwBMApe2dNvM_30BEpZqpLtjEjhxs/exec", 
  dataType:"jsonp",jsonpCallback:"update",statusCode:{404:function(){alert("Resource Not Found");}},
  xhrFields:{withCredentials:true},crossDomain:true,type:"get",timeout:2000
 });
-
-function onSignIn(googleUser){
- var profile=googleUser.getBasicProfile();
- console.log("ID: " + profile.getId());
- console.log("Name: " + profile.getName());
- console.log("Image URL: " + profile.getImageUrl());
- console.log("Email: " + profile.getEmail());
- 
- $.ajax({data:"user="+btoa(profile.getEmail())});
-};
-
-function onSignOut(){
- var profile=gapi.auth2.getAuthInstance();
-  profile.signOut().then(function(){console.log('User signed out.');});
-  profile.disconnect().then(function(){console.log('Disconected.');});
- return false;
-}
 
 function getDate(stamp){
  var today=new Date(stamp),dd=today.getDate();
@@ -43,9 +27,12 @@ function getNumber(x,d){
  --paper-toolbar-sm-height:var(--paper-toolbar-height);
  --paper-input-container-input:{text-align:center;color:var(--primary-text-color);}
  --paper-input-container-label:{text-align:center;color:var(--default-primary-color);}
- --paper-toolbar-background:#E00421;--paper-toolbar-color:#FFFFFF; 
- --paper-drawer-background:#F0F0F0;--paper-drawer-color:#000000;
- --paper-tabs-background:#DCDCCC;--paper-tabs-color:#000000; 
+ --paper-toolbar-background:#E00421;
+ --paper-drawer-background:#F0F0F0;
+ --paper-tabs-background:#DCDCCC;
+ --paper-toolbar-color:#FFFFFF; 
+ --paper-drawer-color:#000000;
+ --paper-tabs-color:#000000; 
 }
 
 paper-drawer-panel::shadow{
@@ -60,25 +47,35 @@ paper-drawer-panel::shadow{
 
 paper-card{width:100%;}
 paper-item{cursor:pointer;}
-neon-animatable{text-align:center;}
+body{-webkit-user-select:none;}
 google-chart{margin:auto;width:100%;}
 paper-item{padding:0px 10px!important;}
 paper-item iron-icon{margin-right:10px;}
+paper-card#drawer::shadow{border-radius:0px;}
 paper-icon-item{padding:5px!important;height:48px;}
 paper-spinner{width:75px;height:75px;margin-top:10px;}
+paper-icon-button#actionButton:not([icon]){display:none;}
+paper-card#drawer::shadow div.title-text{top:0px!important;}
 div#mainContainer.paper-header-panel{overflow-y:scroll!important;}
-body{-webkit-user-select:none;-moz-user-select:none;user-select:none;}
-
-paper-card#drawer::shadow{border-radius:0px;}
-paper-card#drawer::shadow div.title-text{top:0px;text-shadow:2px 2px 0px #FFFFFF;}
+paper-card::shadow div.title-text{-webkit-filter:drop-shadow(0px 0px 5px #FFF);}
 paper-toolbar#tabs::shadow paper-ripple{color:var(--paper-toolbar-background);opacity:0.4;}
 paper-toolbar#tabs::shadow div#selectionBar{background:var(--paper-toolbar-background);height:4px;}
 paper-toolbar#tabs::shadow{background:var(--paper-tabs-background);max-height:var(--paper-tabs-height);}
 paper-toolbar#tabs::shadow div#topBar{height:var(--paper-tabs-height);max-height:var(--paper-tabs-height);color:var(--paper-tabs-color);}
-neon-animatable paper-card{margin:10px auto;width:95%;max-width:800px;margin-bottom:20px;border-radius:10px;padding:5px;}
-paper-menu, paper-card,paper-dialog{background:var(--paper-drawer-background);color:var(--paper-drawer-color);}
+paper-menu,paper-card,paper-dialog{background:var(--paper-drawer-background);color:var(--paper-drawer-color);}
 paper-toolbar::shadow div#dropShadow{box-shadow:inset 0px 10px 6px -8px rgba(0, 0, 0, 0.4)!important;}
-paper-dialog::shadow input.paper-input{font-size:25px;}
+
+neon-animatable paper-card::shadow div.content{padding:5px;}
+neon-animatable{text-align:center;padding:5px;height:auto;font-size:0px;}
+neon-animatable paper-card::shadow div.header img{-webkit-filter:drop-shadow(0px 0px 5px #FFF);}
+neon-animatable paper-card{margin:5px;width:calc(100% - 10px);max-width:800px;box-sizing:border-box;}
+neon-animatable paper-card::shadow div.header img{margin:15px auto;width:auto!important;height:100px!important;margin-right:25px;}
+neon-animatable paper-card[heading*='Gas']::shadow div.header{background:linear-gradient(to bottom,#FFE082 0%,#FFC107 98%,rgba(0,0,0,0) 100%);}
+neon-animatable paper-card[heading*='Electric']::shadow div.header{background:linear-gradient(to bottom,#81D4FA 0%,#03A9F4 98%,rgba(0,0,0,0) 100%);}
+neon-animatable paper-input::shadow input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+neon-animatable paper-input::shadow input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
+neon-animatable paper-input::shadow input.paper-input{font-size:50px;line-height:60px;}
+neon-animatable paper-input::shadow div[prefix]{font-size:50px;line-height:60px;}
 
 div#toolbar-end{
  position:absolute;top:0px;right:-15px;
@@ -101,5 +98,9 @@ paper-header-panel::shadow #mainContainer::-webkit-scrollbar{width:14px;}
 paper-header-panel::shadow #mainContainer::-webkit-scrollbar-thumb{
  border:2px solid var(--primary-background-color);
  background-color:var(--paper-toolbar-background);
-}*.hide{display:none;}
+}
+
+@media screen and (min-width:1076px){
+ neon-animatable paper-card[size='half']{max-width:395px;}
+}
 </style>

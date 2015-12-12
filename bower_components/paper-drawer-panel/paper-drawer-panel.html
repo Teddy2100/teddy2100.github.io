@@ -1,4 +1,4 @@
-<link rel=import href=../polymer/polymer.html><link rel=import href=../iron-media-query/iron-media-query.html><link rel=import href=../iron-selector/iron-selector.html><link rel=import href=../iron-resizable-behavior/iron-resizable-behavior.html><dom-module id=paper-drawer-panel><template><style>
+<link rel="import" href="../polymer/polymer.html"><link rel="import" href="../iron-media-query/iron-media-query.html"><link rel="import" href="../iron-selector/iron-selector.html"><link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html"><dom-module id="paper-drawer-panel"><template><style>
       :host {
         display: block;
         position: absolute;
@@ -143,7 +143,7 @@
       iron-selector:not(.narrow-layout) #main ::content [paper-drawer-toggle] {
         display: none;
       }
-    </style><iron-media-query id=mq on-query-matches-changed=_onQueryMatchesChanged query="[[_computeMediaQuery(forceNarrow, responsiveWidth)]]"></iron-media-query><iron-selector attr-for-selected=id class$="[[_computeIronSelectorClass(narrow, _transition, dragging, rightDrawer, peeking)]]" activate-event selected=[[selected]]><div id=main style$="[[_computeMainStyle(narrow, rightDrawer, drawerWidth)]]" on-transitionend=_onMainTransitionEnd><content select=[main]></content><div id=scrim on-tap=closeDrawer></div></div><div id=drawer style$=[[_computeDrawerStyle(drawerWidth)]]><content select=[drawer]></content></div></iron-selector></template><script>
+    </style><iron-media-query id="mq" on-query-matches-changed="_onQueryMatchesChanged" query="[[_computeMediaQuery(forceNarrow, responsiveWidth)]]"></iron-media-query><iron-selector attr-for-selected="id" class$="[[_computeIronSelectorClass(narrow, _transition, dragging, rightDrawer, peeking)]]" activate-event="" selected="[[selected]]"><div id="main" style$="[[_computeMainStyle(narrow, rightDrawer, drawerWidth)]]" on-transitionend="_onMainTransitionEnd"><content select="[main]"></content><div id="scrim" on-tap="closeDrawer"></div></div><div id="drawer" style$="[[_computeDrawerStyle(drawerWidth)]]"><content select="[drawer]"></content></div></iron-selector></template><script>
     (function() {
       'use strict';
 
