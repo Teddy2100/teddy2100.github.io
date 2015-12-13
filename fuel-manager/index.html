@@ -101,11 +101,11 @@ $(document).on("update",function(e,obj){try{
  if(obj){data=$(obj.data).get();rows=[];raw=[];} 
  if($.cookie("token")!=""){$("paper-menu").eq(1).show();}
  $.each(data,function(k,r){if(data[k-1]&&r[1]=="READING"){var used=[];
-  used['electric']=Number(parseFloat(data[k-1][3]-data[k][3]).toFixed(2));
-  used['gas']=Number(parseFloat(data[k-1][2]-data[k][2]).toFixed(2));
-  rows.push([getDate(data[k][0]),used['gas'],used['electric']]);
-  raw.push([r[0],used['gas'],used['electric']]);//RAW DATA  
- }});while(rows.length>10){rows.shift();raw.shift();}
+  //used['electric']=Number(parseFloat(data[k-1][3]-data[k][3]).toFixed(2));
+  //used['gas']=Number(parseFloat(data[k-1][2]-data[k][2]).toFixed(2));
+  //rows.push([getDate(data[k][0]),used['gas'],used['electric']]);
+  rows.push([getDate(data[k][0]),data[k][2],data[k][3]]);
+ }});while(rows.length>10){rows.shift();}
  
  $("neon-animatable[page='view-overview']").each(function(){
   var options={chartArea:{width:'100%',height:'80%',top:10},curveType:'function'};
@@ -114,7 +114,7 @@ $(document).on("update",function(e,obj){try{
   options=$.extend(options,{vAxis:{format:'£#'},backgroundColor:'transparent',colors:['orange','blue'],legend:'none'});
   var chart=$("<google-chart>").attr("type","line").attr("options",JSON.stringify(options)).width("100%");
   chart.attr("cols",JSON.stringify(cols)).attr("rows",JSON.stringify(rows)).height("200px");
-  $("paper-card",this).attr("heading","Usage Timeline ("+rows.length+" Readings)");
+  $("paper-card",this).attr("heading","Credit Timeline ("+rows.length+" Readings)");
   $("div.content",this).html(chart);
  });
 
