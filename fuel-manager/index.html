@@ -114,7 +114,7 @@ $(document).on("update",function(e,obj){try{
   options=$.extend(options,{vAxis:{format:'£#'},backgroundColor:'transparent',colors:['orange','blue'],legend:'none'});
   var chart=$("<google-chart>").attr("type","line").attr("options",JSON.stringify(options)).width("100%");
   chart.attr("cols",JSON.stringify(cols)).attr("rows",JSON.stringify(rows)).height("200px");
-  $("paper-card",this).attr("heading","Usage Cost Timeline ("+rows.length+" Readings)");
+  $("paper-card",this).attr("heading","Usage Timeline ("+rows.length+" Readings)");
   $("div.content",this).html(chart);
  });
 
