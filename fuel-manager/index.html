@@ -162,19 +162,17 @@ $("body").on("click","*[goto]",function(){
  }catch(error){alert("Navigation Error:\n\n"+error.message);}
 });
 
-$("body").on("click","#actionButton",function(){try{
- var send={token:$.cookie("token"),user:$.cookie("user")};
- var actionHandle=$("neon-animatable.iron-selected[page!='']");
- $("input",actionHandle).map(function(){send[this.name]=this.value;});
- if(!send['token']){$("paper-dialog#connect").get(0).open();return false;} 
- $.each(send,function(k,v){if(v==""){throw new Error("Invalid "+k+" value");}});
- if(send['action']=="CREDIT"){send['electric']=parseFloat(send['electric'])+data[data.length-1][3];}
- if(send['action']=="CREDIT"){send['gas']=parseFloat(send['gas'])+data[data.length-1][2];}
-}catch(error){alert("Data Collection Error:\n\n"+error.message);}finally{
- if(send['token']){$("#actionButton").attr("disabled","disabled");}
- if(send['token']!=""){$.cookie("token",send['token']);}
- if(send['token']){$.ajax({data:$.param(send)});}
-}});
+$("body").on("click","#actionButton",function(){
+ try{var send={token:$.cookie("token"),user:$.cookie("user")};
+  var actionHandle=$("neon-animatable.iron-selected[page!='']");
+  $("input",actionHandle).map(function(){send[this.name]=this.value;});
+  if(!send['token']){$("paper-dialog#connect").get(0).open();return false;} 
+  $.each(send,function(k,v){if(v==""){throw new Error("Invalid "+k+" value");}});
+  if(send['action']=="CREDIT"){send['electric']=parseFloat(send['electric'])+data[data.length-1][3];}
+  if(send['action']=="CREDIT"){send['gas']=parseFloat(send['gas'])+data[data.length-1][2];}
+  $("#actionButton").attr("disabled","disabled");$.ajax({data:$.param(send)});
+ }catch(error){alert("Submission Error:\n\n"+error.message);}
+});
 </script>
 </body>
 </html>
