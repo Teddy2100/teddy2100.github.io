@@ -10,6 +10,8 @@
  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
  <script type="text/javascript" src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
  <script type="text/javascript" src="../bower_components/jquery/dist/jquery.min.js"></script>
+ <script type="text/javascript" src="./elements/jquery-cookie.min.js"></script>
+ <script type="text/javascript" src="./elements/hmac-sha1.min.js"></script>
  <link rel="import" href="../bower_components/vulcanized-full.html"/>
  <link rel="import" href="./elements/event-listener.html"/>
  <link rel="import" href="./app-setup.html"/>
@@ -23,6 +25,9 @@
     <paper-item goto="add-reading"><iron-icon icon="social:whatshot"></iron-icon>Add Reading</paper-item>
     <paper-item goto="add-credit"><iron-icon icon="add-shopping-cart"></iron-icon>Add Credit</paper-item>
    </paper-menu>
+   <paper-menu class="list stretch" style="padding:0px;display:none;">
+    <paper-item goto="logout"><iron-icon icon="exit-to-app"></iron-icon>Logout</paper-item>
+   </paper-menu>   
   </paper-card>
   <paper-header-panel id="main" mode="standard" main>
    <paper-toolbar id="title">
@@ -70,24 +75,31 @@
   </paper-header-panel>
  </paper-drawer-panel>
  <paper-dialog id="connect" entry-animation="scale-up-animation" exit-animation="fade-out-animation" modal>
-  <h2>Enter Email Address</h2><paper-input name="token" type="email" placeholder="sample@example.com" no-label-float></paper-input>
-  <div class="buttons"><paper-button dialog-confirm>Get Data</paper-button></div>
+  <paper-input name="message" type="username" placeholder="username" no-label-float></paper-input>
+  <paper-input name="secret" type="password" placeholder="password" no-label-float></paper-input>
+  <div class="buttons"><paper-button dialog-confirm>Login</paper-button></div>
  </paper-dialog>
 </event-listener>
 <script type="text/javascript">
 var data=[],rows=[],raw=[];
 $(document).on("ready",function(){
- $("paper-dialog#connect").get(0).open();
  $("paper-card#drawer div#placeholder").removeAttr("hidden");
  $("paper-card#drawer div#placeholder").html($("<div id='tabs-end'>&nbsp;</div>"));
  $("paper-card#drawer div#placeholder").append($("<div id='toolbar-end'>&nbsp;</div>"));
- $(document).on("iron-overlay-closed",function(){
+ $("paper-item").eq(0).click();$("paper-icon-button#actionButton").click();
+ $(document).on("iron-overlay-closed",function(event){
+  var message=$("*[name='message']").get(0).value;
+  var secret=$("*[name='secret']").get(0).value;
+  var hash=CryptoJS.HmacSHA1(message,secret);
+  $.cookie("user",message.toUpperCase());
+  $.cookie("token",hash.toString());
   $("#actionButton").click();
- });
+ }); 
 });
 
 $(document).on("update",function(e,obj){try{
- if(obj){data=$(obj.data).get();rows=[];raw=[];}
+ if(obj){data=$(obj.data).get();rows=[];raw=[];} 
+ if($.cookie("token")!=""){$("paper-menu").eq(1).show();}
  $.each(data,function(k,r){if(data[k-1]&&r[1]=="READING"){var used=[];
   used['electric']=Number(parseFloat(data[k-1][3]-data[k][3]).toFixed(2));
   used['gas']=Number(parseFloat(data[k-1][2]-data[k][2]).toFixed(2));
@@ -108,10 +120,12 @@ $(document).on("update",function(e,obj){try{
 
  $("neon-animatable[page='view-gas']").each(function(){
   $("paper-card",this).attr("heading","Data Coming Soon");
+  $("div.content",this).html("Im still working on this, sorry.");
  });
 
  $("neon-animatable[page='view-electric']").each(function(){
   $("paper-card",this).attr("heading","Data Coming Soon");
+  $("div.content",this).html("Im still working on this, sorry.");
  });
 
  /*
@@ -123,27 +137,21 @@ $(document).on("update",function(e,obj){try{
  console.log("ELECTRIC",getNumber(total.electric/days,2));
  console.log(raw);
  */
-}catch(error){alert("Something Went Wrong:\n\n"+error.message);}finally{
+}catch(error){alert("Update Error:\n\n"+error.message);}finally{
  $("paper-icon-button#actionButton").removeAttr("disabled");
- $("neon-animatable paper-input").val("");  
- $("paper-item").eq(0).click(); 
+ $("paper-input","neon-animatable,paper-dialog").val("");  
+ $("paper-item").eq(0).click();
 }});
 
-$("body").on("click","#actionButton",function(){try{
- var send={token:btoa($("input[name='token']").get(0).value)};
- var actionHandle=$("neon-animatable").hasClass("iron-selected");
- $("input",actionHandle).map(function(){send[this.name]=this.value});
- if(!send['token']){$("paper-dialog#connect").get(0).open();return false;} 
- $.each(send,function(k,v){if(v==""){throw new Error("Invalid "+k+" value");}});
- if(send['action']=="CREDIT"){send['electric']=parseFloat(send['electric'])+data[data.length-1][3];}
- if(send['action']=="CREDIT"){send['gas']=parseFloat(send['gas'])+data[data.length-1][2];}
-}catch(error){alert("Something Went Wrong:\n\n"+error.message);}finally{
- if(send['token']){$("#actionButton").attr("disabled","disabled");}
- if(send['token']){$.ajax({data:$.param(send)});}
-}});
+$(document).on("logout",function(){
+ $("paper-item").eq(0).click();$("paper-menu").eq(1).hide();
+ $.cookie("token","");$.cookie("user","");
+ $("#actionButton").click();
+});
 
 $("body").on("click","*[goto]",function(){
  try{var pageHandle=$("neon-animated-pages").get(0),obj=$(this);
+  if(obj.attr("goto")=="logout"){$(document).trigger("logout");return;}
   var requestedPage=$("neon-animatable[page='"+obj.attr("goto")+"']").index();
   $("paper-toolbar#tabs,div#tabs-end").css("display",(requestedPage<3)?"block":"none");
    pageHandle.exitAnimation="slide-"+(requestedPage<pageHandle.selected?"right":"left")+"-animation";
@@ -151,8 +159,22 @@ $("body").on("click","*[goto]",function(){
   if(this.nodeName=="PAPER-ITEM" && obj.text().length!=0){$("span.title").html(obj.text());}
   $("#actionButton").attr("icon",$("neon-animatable").eq(requestedPage).attr("icon"));
   if(requestedPage!=pageHandle.selected){pageHandle.selected=requestedPage;}
- }catch(error){alert("Something Went Wrong:\n\n"+error.message);}
+ }catch(error){alert("Navigation Error:\n\n"+error.message);}
 });
+
+$("body").on("click","#actionButton",function(){try{
+ var send={token:$.cookie("token"),user:$.cookie("user")};
+ var actionHandle=$("neon-animatable.iron-selected[page!='']");
+ $("input",actionHandle).map(function(){send[this.name]=this.value;});
+ if(!send['token']){$("paper-dialog#connect").get(0).open();return false;} 
+ $.each(send,function(k,v){if(v==""){throw new Error("Invalid "+k+" value");}});
+ if(send['action']=="CREDIT"){send['electric']=parseFloat(send['electric'])+data[data.length-1][3];}
+ if(send['action']=="CREDIT"){send['gas']=parseFloat(send['gas'])+data[data.length-1][2];}
+}catch(error){alert("Data Collection Error:\n\n"+error.message);}finally{
+ if(send['token']){$("#actionButton").attr("disabled","disabled");}
+ if(send['token']!=""){$.cookie("token",send['token']);}
+ if(send['token']){$.ajax({data:$.param(send)});}
+}});
 </script>
 </body>
 </html>
