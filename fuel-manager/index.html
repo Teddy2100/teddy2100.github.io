@@ -162,7 +162,7 @@ $("body").on("click","*[goto]",function(){
  }catch(error){alert("Navigation Error:\n\n"+error.message);}
 });
 
-$("body").on("click","#actionButton",function(){
+$("body").on("click","*#actionButton",function(){
  try{var send={token:$.cookie("token"),user:$.cookie("user")};
   var actionHandle=$("neon-animatable.iron-selected[page!='']");
   $("input",actionHandle).map(function(){send[this.name]=this.value;});
