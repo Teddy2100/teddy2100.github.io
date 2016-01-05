@@ -3,11 +3,6 @@
   :root {
 
     /* Shared Styles */
-
-    /*
-    Unfortunately, we can't use nested rules
-    See https://github.com/Polymer/polymer/issues/1399
-    */
     --paper-font-common-base: {
       font-family: 'Roboto', 'Noto', sans-serif;
       -webkit-font-smoothing: antialiased;
@@ -31,14 +26,8 @@
     /* Material Font Styles */
 
     --paper-font-display4: {
-      /* @apply(--paper-font-common-base) */
-      font-family: 'Roboto', 'Noto', sans-serif;
-      -webkit-font-smoothing: antialiased;
-
-      /* @apply(--paper-font-common-nowrap); */
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      @apply(--paper-font-common-base);
+      @apply(--paper-font-common-nowrap);
 
       font-size: 112px;
       font-weight: 300;
@@ -47,14 +36,8 @@
     };
 
     --paper-font-display3: {
-      /* @apply(--paper-font-common-base) */
-      font-family: 'Roboto', 'Noto', sans-serif;
-      -webkit-font-smoothing: antialiased;
-
-      /* @apply(--paper-font-common-nowrap); */
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      @apply(--paper-font-common-base);
+      @apply(--paper-font-common-nowrap);
 
       font-size: 56px;
       font-weight: 400;
@@ -63,10 +46,7 @@
     };
 
     --paper-font-display2: {
-      /* @apply(--paper-font-common-base) */
-      font-family: 'Roboto', 'Noto', sans-serif;
-      -webkit-font-smoothing: antialiased;
-
+      @apply(--paper-font-common-base);
 
       font-size: 45px;
       font-weight: 400;
@@ -75,10 +55,7 @@
     };
 
     --paper-font-display1: {
-      /* @apply(--paper-font-common-base) */
-      font-family: 'Roboto', 'Noto', sans-serif;
-      -webkit-font-smoothing: antialiased;
-
+      @apply(--paper-font-common-base);
 
       font-size: 34px;
       font-weight: 400;
@@ -87,10 +64,7 @@
     };
 
     --paper-font-headline: {
-      /* @apply(--paper-font-common-base) */
-      font-family: 'Roboto', 'Noto', sans-serif;
-      -webkit-font-smoothing: antialiased;
-
+      @apply(--paper-font-common-base);
 
       font-size: 24px;
       font-weight: 400;
@@ -99,14 +73,8 @@
     };
 
     --paper-font-title: {
-      /* @apply(--paper-font-common-base) */
-      font-family: 'Roboto', 'Noto', sans-serif;
-      -webkit-font-smoothing: antialiased;
-
-      /* @apply(--paper-font-common-nowrap); */
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      @apply(--paper-font-common-base);
+      @apply(--paper-font-common-nowrap);
 
       font-size: 20px;
       font-weight: 500;
@@ -114,10 +82,7 @@
     };
 
     --paper-font-subhead: {
-      /* @apply(--paper-font-common-base) */
-      font-family: 'Roboto', 'Noto', sans-serif;
-      -webkit-font-smoothing: antialiased;
-
+      @apply(--paper-font-common-base);
 
       font-size: 16px;
       font-weight: 400;
@@ -125,9 +90,7 @@
     };
 
     --paper-font-body2: {
-      /* @apply(--paper-font-common-base) */
-      font-family: 'Roboto', 'Noto', sans-serif;
-      -webkit-font-smoothing: antialiased;
+      @apply(--paper-font-common-base);
 
       font-size: 14px;
       font-weight: 500;
@@ -135,9 +98,7 @@
     };
 
     --paper-font-body1: {
-      /* @apply(--paper-font-common-base) */
-      font-family: 'Roboto', 'Noto', sans-serif;
-      -webkit-font-smoothing: antialiased;
+      @apply(--paper-font-common-base);
 
       font-size: 14px;
       font-weight: 400;
@@ -145,13 +106,8 @@
     };
 
     --paper-font-caption: {
-      /* @apply(--paper-font-common-base) */
-      font-family: 'Roboto', 'Noto', sans-serif;
-      -webkit-font-smoothing: antialiased;
-      /* @apply(--paper-font-common-nowrap); */
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      @apply(--paper-font-common-base);
+      @apply(--paper-font-common-nowrap);
 
       font-size: 12px;
       font-weight: 400;
@@ -160,14 +116,8 @@
     };
 
     --paper-font-menu: {
-      /* @apply(--paper-font-common-base) */
-      font-family: 'Roboto', 'Noto', sans-serif;
-      -webkit-font-smoothing: antialiased;
-
-      /* @apply(--paper-font-common-nowrap); */
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      @apply(--paper-font-common-base);
+      @apply(--paper-font-common-nowrap);
 
       font-size: 13px;
       font-weight: 500;
@@ -175,14 +125,8 @@
     };
 
     --paper-font-button: {
-      /* @apply(--paper-font-common-base) */
-      font-family: 'Roboto', 'Noto', sans-serif;
-      -webkit-font-smoothing: antialiased;
-
-      /* @apply(--paper-font-common-nowrap); */
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      @apply(--paper-font-common-base);
+      @apply(--paper-font-common-nowrap);
 
       font-size: 14px;
       font-weight: 500;
@@ -192,9 +136,7 @@
     };
 
     --paper-font-code2: {
-      /* @apply(--paper-font-common-code); */
-      font-family: 'Roboto Mono', 'Consolas', 'Menlo', monospace;
-      -webkit-font-smoothing: antialiased;
+      @apply(--paper-font-common-code);
 
       font-size: 14px;
       font-weight: 700;
@@ -202,9 +144,7 @@
     };
 
     --paper-font-code1: {
-      /* @apply(--paper-font-common-code); */
-      font-family: 'Roboto Mono', 'Consolas', 'Menlo', monospace;
-      -webkit-font-smoothing: antialiased;
+      @apply(--paper-font-common-code);
 
       font-size: 14px;
       font-weight: 500;

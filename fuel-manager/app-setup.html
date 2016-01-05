@@ -2,8 +2,8 @@
 $.ajaxSetup({
  //url:"https://script.google.com/macros/s/AKfycbxY7f1d4yj4mnY_8xVwBfsce8-GEGSiH0UahQpuDMc/dev",
  url:"https://script.google.com/macros/s/AKfycbz6uzzzZOL_Vw-z-2zRtgYwBMApe2dNvM_30BEpZqpLtjEjhxs/exec", 
- dataType:"jsonp",jsonpCallback:"update",statusCode:{404:function(){alert("Resource Not Found");}},
- xhrFields:{withCredentials:true},crossDomain:true,type:"get",timeout:2000
+ dataType:"jsonp",statusCode:{404:function(){alert("Resource Not Found");}},type:"get",
+ xhrFields:{withCredentials:true},crossDomain:true,timeout:2000
 });
 
 function getDate(stamp){
@@ -17,6 +17,12 @@ function getDate(stamp){
 function getNumber(x,d){
  x=parseFloat(x).toFixed(d);
  return Number(x);
+};
+
+function getPrice(x){
+ var parts=x.toString().split(".");if(!parts[1]){parts[1]="00";}
+ if(parts[1] && parts[1].length==1){parts[1]=parts[1]+"0";}
+ return parseFloat(parts.join(".")).toFixed(2);
 };
 </script>
 <style is="custom-style">

@@ -1,4 +1,4 @@
-<link rel="import" href="../polymer/polymer.html"><link rel="import" href="../paper-styles/default-theme.html"><link rel="import" href="../paper-styles/typography.html"><link rel="import" href="../iron-flex-layout/iron-flex-layout.html"><dom-module id="paper-toolbar"><template><style>
+<link rel=import href=../polymer/polymer.html><link rel=import href=../paper-styles/default-theme.html><link rel=import href=../paper-styles/typography.html><link rel=import href=../iron-flex-layout/iron-flex-layout.html><dom-module id=paper-toolbar><template><style>
       :host {
         /* technical */
         display: block;
@@ -166,7 +166,7 @@
       .justified {
         @apply(--layout-justified);
       }
-    </style><div id="topBar" class$="toolbar-tools [[_computeBarExtraClasses(justify)]]"><content select=":not(.middle):not(.bottom)"></content></div><div id="middleBar" class$="toolbar-tools [[_computeBarExtraClasses(middleJustify)]]"><content select=".middle"></content></div><div id="bottomBar" class$="toolbar-tools [[_computeBarExtraClasses(bottomJustify)]]"><content select=".bottom"></content></div></template><script>
+    </style><div id=topBar class$="toolbar-tools [[_computeBarExtraClasses(justify)]]"><content select=:not(.middle):not(.bottom)></content></div><div id=middleBar class$="toolbar-tools [[_computeBarExtraClasses(middleJustify)]]"><content select=.middle></content></div><div id=bottomBar class$="toolbar-tools [[_computeBarExtraClasses(bottomJustify)]]"><content select=.bottom></content></div></template><script>
     Polymer({
       is: 'paper-toolbar',
 

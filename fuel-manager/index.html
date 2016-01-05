@@ -5,7 +5,6 @@
  <title>Fuel Manager</title>
  <meta name="language" content="english"/>
  <meta name="theme-color" content="#E00421">
- <meta name="google-signin-scope" content="profile email">
  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
  <script type="text/javascript" src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
@@ -77,45 +76,64 @@
  <paper-dialog id="connect" entry-animation="scale-up-animation" exit-animation="fade-out-animation" modal>
   <paper-input name="message" type="username" placeholder="username" no-label-float></paper-input>
   <paper-input name="secret" type="password" placeholder="password" no-label-float></paper-input>
-  <div class="buttons"><paper-button dialog-confirm>Login</paper-button></div>
+  <div class="buttons"><paper-button>Login</paper-button></div>
  </paper-dialog>
 </event-listener>
 <script type="text/javascript">
 var data=[],rows=[],raw=[];
-$(document).on("ready",function(){
+$(window).on("load",function(){
  $("paper-card#drawer div#placeholder").removeAttr("hidden");
  $("paper-card#drawer div#placeholder").html($("<div id='tabs-end'>&nbsp;</div>"));
  $("paper-card#drawer div#placeholder").append($("<div id='toolbar-end'>&nbsp;</div>"));
- $("paper-item").eq(0).click();$("paper-icon-button#actionButton").click();
- $(document).on("iron-overlay-closed",function(event){
-  var message=$("*[name='message']").get(0).value;
-  var secret=$("*[name='secret']").get(0).value;
-  var hash=CryptoJS.HmacSHA1(message,secret);
-  $.cookie("user",message.toUpperCase());
-  $.cookie("token",hash.toString());
-  $("#actionButton").click();
- }); 
+ $("paper-button","paper-dialog#connect").on("click",function(){
+  var secret=$("*[name='secret']").get(0).value.toString().toUpperCase();
+  var username=$("*[name='message']").get(0).value.toString().toUpperCase();  
+  $.cookie("token",CryptoJS.HmacSHA1(username,secret).toString().toUpperCase());
+  $.cookie("username",username);$(window).trigger("connect","retry");
+ });$(window).trigger("connect","auto");
+ $("paper-item").eq(0).click();
 });
 
-$(document).on("update",function(e,obj){try{
- if(obj){data=$(obj.data).get();rows=[];raw=[];} 
- if($.cookie("token")!=""){$("paper-menu").eq(1).show();}
- $.each(data,function(k,r){if(data[k-1]&&r[1]=="READING"){var used=[];
-  //used['electric']=Number(parseFloat(data[k-1][3]-data[k][3]).toFixed(2));
-  //used['gas']=Number(parseFloat(data[k-1][2]-data[k][2]).toFixed(2));
-  //rows.push([getDate(data[k][0]),used['gas'],used['electric']]);
-  rows.push([getDate(data[k][0]),data[k][2],data[k][3]]);
- }});while(rows.length>10){rows.shift();}
- 
- $("neon-animatable[page='view-overview']").each(function(){
-  var options={chartArea:{width:'100%',height:'80%',top:10},curveType:'function'};
-  if(data.length<4){$("paper-card",this).attr("heading","Not Enough Readings");return false;}
-  var cols=[{label:'Date',type:'string'},{label:'Gas £',type:'number'},{label:'Electric £',type:'number'}];
-  options=$.extend(options,{vAxis:{format:'£#'},backgroundColor:'transparent',colors:['orange','blue'],legend:'none'});
-  var chart=$("<google-chart>").attr("type","line").attr("options",JSON.stringify(options)).width("100%");
-  chart.attr("cols",JSON.stringify(cols)).attr("rows",JSON.stringify(rows)).height("200px");
+$(window).on("connect",function(e,extra){
+ var send={token:$.cookie("token"),username:$.cookie("username")};
+ if(send && extra && typeof extra=="object"){send=$.extend(send,extra);}
+ if(!send.token&&!send.username){$("paper-dialog#connect").get(0).open();return;}
+ $.ajax({data:$.param(send),dataType:"jsonp",timeout:2000,crossDomain:true,async:false,
+  beforeSend:function(){$("paper-button","paper-dialog#connect").attr("disabled","disabled");},
+  complete:function(){$("paper-button","paper-dialog#connect").removeAttr("disabled");},
+  success:function(responce){$(window).trigger(responce.action,responce);}
+ });
+});
+
+$(window).on("logout",function(e,results){
+ $("paper-item").eq(0).click();$("paper-menu").eq(1).hide();
+ $.each($.cookie(),function(k,v){$.cookie(k,"");});
+ if(results && results.msg){alert(results.msg);}
+ send={};$(window).trigger("connect");
+});
+
+$(window).on("update",function(e,obj){try{
+ if(obj){data=$(obj.data).get();rows=[];raw=[];}  
+ $("neon-animatable[page='view-overview']").each(function(object){
+  if(data.length<3){$("paper-card",this).attr("heading","Not Enough Readings");return;}
+  var options={chartArea:{width:'100%',height:'80%',top:10},curveType:'function'},rows=[],temp=data;records=10;
+   options=$.extend(options,{vAxis:{format:'£#'},hAxis:{format:'DD/MM'},backgroundColor:'transparent',colors:['orange','blue'],legend:'none'});
+   $.each(temp,function(k,r){if(r[1]=="READING"){rows.push([getDate(r[0]),r[2],"Gas £"+getPrice(r[2]),r[3],"Electric £"+getPrice(r[3])]);}});
+  var cols=[{label:'Date',type:'string'},{label:'Gas £',type:'number'},{type:'string',role:'tooltip'},{label:'Electric £',type:'number'},{type:'string',role:'tooltip'}];
+  
+  //$.each(temp,function(k,r){if(r[1]=="READING"){rows.push([r[0],r[2],"Gas £"+getPrice(r[2]),r[3],"Electric £"+getPrice(r[3])]);}});
+  //var cols=[{label:'Date',type:'datetime'},{label:'Gas £',type:'number'},{type:'string',role:'tooltip'},{label:'Electric £',type:'number'},{type:'string',role:'tooltip'}];
+  
+  var chart=$("<google-chart>").attr("type","line").attr("options",JSON.stringify(options)).width("100%");while(rows.length>records){rows.shift();}
+   chart.attr("cols",JSON.stringify(cols)).attr("rows",JSON.stringify(rows)).height("200px");$("div.content",this).html(chart);
+
+   $.each(temp,function(k,r){if(data[k-1]&&r[1]=="READING"){var used=[];
+    used['electric']=Number(parseFloat(data[k-1][3]-data[k][3]).toFixed(2));
+    used['gas']=Number(parseFloat(data[k-1][2]-data[k][2]).toFixed(2));
+    //console.log([data[k][0],used['gas'],used['electric']]);
+   }});
+   
   $("paper-card",this).attr("heading","Credit Timeline ("+rows.length+" Readings)");
-  $("div.content",this).html(chart);
  });
 
  $("neon-animatable[page='view-gas']").each(function(){
@@ -127,31 +145,17 @@ $(document).on("update",function(e,obj){try{
   $("paper-card",this).attr("heading","Data Coming Soon");
   $("div.content",this).html("Im still working on this, sorry.");
  });
-
- /*
- while(raw.length>5){raw.shift();}
- var duration=Date.parse(raw[raw.length-1][0])-Date.parse(raw[0][0]);
- var total={gas:-raw[0][1],electric:-raw[0][2]},hours=(duration/3600000),days=(hours/24);
- $.each(raw,function(k,r){total.gas+=r[1];total.electric+=r[2];});
- console.log("GAS",getNumber(total.gas/days,2));
- console.log("ELECTRIC",getNumber(total.electric/days,2));
- console.log(raw);
- */
-}catch(error){alert("Update Error:\n\n"+error.message);}finally{
+ 
+ $("paper-dialog#connect").get(0).close();$("paper-menu").eq(1).show();
+}catch(error){alert("Update Error:\n"+error.message);}finally{
  $("paper-icon-button#actionButton").removeAttr("disabled");
  $("paper-input","neon-animatable,paper-dialog").val("");  
  $("paper-item").eq(0).click();
 }});
 
-$(document).on("logout",function(){
- $("paper-item").eq(0).click();$("paper-menu").eq(1).hide();
- $.cookie("token","");$.cookie("user","");
- $("#actionButton").click();
-});
-
 $("body").on("click","*[goto]",function(){
  try{var pageHandle=$("neon-animated-pages").get(0),obj=$(this);
-  if(obj.attr("goto")=="logout"){$(document).trigger("logout");return;}
+  if(obj.attr("goto")=="logout"){$(window).trigger("logout");return;}
   var requestedPage=$("neon-animatable[page='"+obj.attr("goto")+"']").index();
   $("paper-toolbar#tabs,div#tabs-end").css("display",(requestedPage<3)?"block":"none");
    pageHandle.exitAnimation="slide-"+(requestedPage<pageHandle.selected?"right":"left")+"-animation";
@@ -159,19 +163,17 @@ $("body").on("click","*[goto]",function(){
   if(this.nodeName=="PAPER-ITEM" && obj.text().length!=0){$("span.title").html(obj.text());}
   $("#actionButton").attr("icon",$("neon-animatable").eq(requestedPage).attr("icon"));
   if(requestedPage!=pageHandle.selected){pageHandle.selected=requestedPage;}
- }catch(error){alert("Navigation Error:\n\n"+error.message);}
+ }catch(error){alert("Navigation Error:\n"+error.message);}
 });
 
-$("body").on("click","*#actionButton",function(){
- try{var send={token:$.cookie("token"),user:$.cookie("user")};
-  var actionHandle=$("neon-animatable.iron-selected[page!='']");
-  $("input",actionHandle).map(function(){send[this.name]=this.value;});
-  if(!send['token']){$("paper-dialog#connect").get(0).open();return false;} 
-  $.each(send,function(k,v){if(v==""){throw new Error("Invalid "+k+" value");}});
-  if(send['action']=="CREDIT"){send['electric']=parseFloat(send['electric'])+data[data.length-1][3];}
-  if(send['action']=="CREDIT"){send['gas']=parseFloat(send['gas'])+data[data.length-1][2];}
-  $("#actionButton").attr("disabled","disabled");$.ajax({data:$.param(send)});
- }catch(error){alert("Submission Error:\n\n"+error.message);}
+$("body").on("click","*#actionButton",function(){var temp={};
+ try{var actionHandle=$("neon-animatable.iron-selected[page!='']");
+  $("input",actionHandle).map(function(){temp[this.name]=this.value;});
+  $.each(temp,function(k,v){if(v==""){throw new Error("Invalid "+k+" value");}});
+  if(temp['action']=="CREDIT"){temp['gas']=parseFloat(temp['gas'])+data[data.length-1][2];}
+  if(temp['action']=="CREDIT"){temp['electric']=parseFloat(temp['electric'])+data[data.length-1][3];}
+  $("#actionButton").attr("disabled","disabled");$(window).trigger("connect",temp);
+ }catch(error){alert("Submision Error:\n"+error.message);}
 });
 </script>
 </body>

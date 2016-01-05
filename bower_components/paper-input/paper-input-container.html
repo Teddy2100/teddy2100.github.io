@@ -1,4 +1,4 @@
-<link rel="import" href="../polymer/polymer.html"><link rel="import" href="../iron-flex-layout/iron-flex-layout.html"><link rel="import" href="../paper-styles/color.html"><link rel="import" href="../paper-styles/default-theme.html"><link rel="import" href="../paper-styles/typography.html"><dom-module id="paper-input-container"><template><style>
+<link rel=import href=../polymer/polymer.html><link rel=import href=../iron-flex-layout/iron-flex-layout.html><link rel=import href=../paper-styles/color.html><link rel=import href=../paper-styles/default-theme.html><link rel=import href=../paper-styles/typography.html><dom-module id=paper-input-container><template><style>
       :host {
         display: block;
         padding: 8px 0;
@@ -193,7 +193,7 @@
       .add-on-content.is-highlighted ::content * {
         color: var(--paper-input-container-focus-color, --default-primary-color);
       }
-    </style><template is="dom-if" if="[[!noLabelFloat]]"><div class="floated-label-placeholder">&nbsp;</div></template><div class$="[[_computeInputContentClass(noLabelFloat,alwaysFloatLabel,focused,invalid,_inputHasContent)]]"><content select="[prefix]" id="prefix"></content><div class="label-and-input-container" id="labelAndInputContainer"><content select=":not([add-on]):not([prefix]):not([suffix])"></content></div><content select="[suffix]"></content></div><div class$="[[_computeUnderlineClass(focused,invalid)]]"><div class="unfocused-line"></div><div class="focused-line"></div></div><div class$="[[_computeAddOnContentClass(focused,invalid)]]"><content id="addOnContent" select="[add-on]"></content></div></template></dom-module><script>
+    </style><template is=dom-if if=[[!noLabelFloat]]><div class=floated-label-placeholder>&nbsp;</div></template><div class$=[[_computeInputContentClass(noLabelFloat,alwaysFloatLabel,focused,invalid,_inputHasContent)]]><content select=[prefix] id=prefix></content><div class=label-and-input-container id=labelAndInputContainer><content select=:not([add-on]):not([prefix]):not([suffix])></content></div><content select=[suffix]></content></div><div class$=[[_computeUnderlineClass(focused,invalid)]]><div class=unfocused-line></div><div class=focused-line></div></div><div class$=[[_computeAddOnContentClass(focused,invalid)]]><content id=addOnContent select=[add-on]></content></div></template></dom-module><script>
   Polymer({
     is: 'paper-input-container',
 

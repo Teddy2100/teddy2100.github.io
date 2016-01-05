@@ -1,4 +1,4 @@
-<link rel="import" href="../polymer/polymer.html"><link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html"><dom-module id="paper-scroll-header-panel"><style>
+<link rel=import href=../polymer/polymer.html><link rel=import href=../iron-resizable-behavior/iron-resizable-behavior.html><dom-module id=paper-scroll-header-panel><style>
     :host {
       display: block;
       position: relative;
@@ -60,7 +60,7 @@
     #condensedHeaderBg {
       opacity: 0;
     }
-  </style><template><div id="mainContainer"><content id="mainContent" select=":not(paper-toolbar):not(.paper-header)"></content></div><div id="headerContainer"><div class="bg-container"><div id="condensedHeaderBg"></div><div id="headerBg"></div></div><content id="headerContent" select="paper-toolbar, .paper-header"></content></div></template></dom-module><script>
+  </style><template><div id=mainContainer><content id=mainContent select=:not(paper-toolbar):not(.paper-header)></content></div><div id=headerContainer><div class=bg-container><div id=condensedHeaderBg></div><div id=headerBg></div></div><content id=headerContent select="paper-toolbar, .paper-header"></content></div></template></dom-module><script>
 (function() {
 
   'use strict';
@@ -443,7 +443,7 @@
       var y = Math.max(0, (this.noReveal) ? scrollTop : this._y + deltaScrollTop);
 
       if (y > this._headerMaxDelta) {
-        y = this._headerMaxDelta + 1;
+        y = this._headerMaxDelta;
 
         if (this.keepCondensedHeader) {
           this._setHeaderState(ctx.HEADER_STATE_CONDENSED);
