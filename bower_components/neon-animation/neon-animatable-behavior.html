@@ -1,4 +1,4 @@
-<link rel=import href=../polymer/polymer.html><link rel=import href=animations/opaque-animation.html><script>
+<link rel="import" href="../polymer/polymer.html"><link rel="import" href="animations/opaque-animation.html"><script>
 
   /**
    * `Polymer.NeonAnimatableBehavior` is implemented by elements containing animations for use with
@@ -129,7 +129,7 @@
      * or a map of animation type to array of configuration objects.
      */
     getAnimationConfig: function(type) {
-      var map = [];
+      var map = {};
       var allConfigs = [];
       this._getAnimationConfigRecursive(type, map, allConfigs);
       // append the configurations saved in the map to the array

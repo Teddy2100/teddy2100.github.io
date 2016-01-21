@@ -135,8 +135,6 @@
       if (error) {
         // an error occurred while attempting login
         this.fire('error', error);
-      } else {
-        this._authHandler(user);
       }
     },
 
@@ -262,9 +260,9 @@
      * @param {string} password
      */
     createUser: function(email, password) {
-        this.ref.createUser({email: email, password: password}, function(error) {
+        this.ref.createUser({email: email, password: password}, function(error, user) {
           if (!error) {
-            this.fire('user-created');
+            this.fire('user-created', {user: user});
           } else {
             this.fire('error', error);
           }

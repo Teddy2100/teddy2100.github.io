@@ -37,39 +37,41 @@
    <paper-toolbar id="tabs">
     <paper-tabs class="fit" selected="0">
      <paper-tab goto="view-overview">Overview</paper-tab>
-     <paper-tab goto="view-gas">Gas</paper-tab>
      <paper-tab goto="view-electric">Electric</paper-tab>
+     <paper-tab goto="view-gas">Gas</paper-tab>
     </paper-tabs>
     <div id="dropShadow" class="style-scope paper-header-panel has-shadow"></div>
    </paper-toolbar>
    <neon-animated-pages selected="0" class="fit">
     <neon-animatable page="view-overview" icon="cached">
-     <paper-card heading="Gas Required" image="./images/gas.png" size="half"></paper-card>
-     <paper-card heading="Electric Required" image="./images/electric.png" size="half"></paper-card>
-     <paper-card heading="Loading"><div class="content"></div></paper-card>
-    </neon-animatable>    
-    <neon-animatable page="view-gas" icon="cached">
-     <paper-card heading="Loading"><div class="content"></div></paper-card>
+     <paper-card heading="Calculating" image="./images/electric.png" size="half"></paper-card>
+     <paper-card heading="Calculating" image="./images/gas.png" size="half"></paper-card>
+     <paper-card heading="Average Daily Cost"><div class="content"></div></paper-card>
     </neon-animatable>    
     <neon-animatable page="view-electric" icon="cached">
      <paper-card heading="Loading" image="./images/electric.png"><div class="content"></div></paper-card>
     </neon-animatable>
+    <neon-animatable page="view-gas" icon="cached">
+     <paper-card heading="Loading" image="./images/gas.png"><div class="content"></div></paper-card>
+    </neon-animatable>    
+    
     <neon-animatable page="add-reading" icon="save">
      <input type="hidden" name="action" value="READING"/>
-     <paper-card heading="Add Gas Reading" image="./images/gas.png" size="half"><div class="content">
-       <paper-input type="number" name="gas" placeholder="0.00" no-label-float><div prefix>&nbsp;£</div></paper-input>
-     </div></paper-card>
      <paper-card heading="Add Electric Reading" image="./images/electric.png" size="half"><div class="content">
-       <paper-input type="number" name="electric" placeholder="0.00" no-label-float><div prefix>&nbsp;£</div></paper-input>
+      <paper-input type="number" name="electric" placeholder="0.00" no-label-float><div prefix>&nbsp;£</div></paper-input>
      </div></paper-card>
-    </neon-animatable>    
+     <paper-card heading="Add Gas Reading" image="./images/gas.png" size="half"><div class="content">
+      <paper-input type="number" name="gas" placeholder="0.00" no-label-float><div prefix>&nbsp;£</div></paper-input>
+     </div></paper-card>
+    </neon-animatable>
+    
     <neon-animatable page="add-credit" icon="save">
      <input type="hidden" name="action" value="CREDIT"/>
-     <paper-card heading="Add Gas Credit" image="./images/gas.png" size="half"><div class="content">
-       <paper-input type="number" name="gas" placeholder="0.00" no-label-float><div prefix>&nbsp;£</div></paper-input>
-     </div></paper-card>
      <paper-card heading="Add Electric Credit" image="./images/electric.png" size="half"><div class="content">
-       <paper-input type="number" name="electric" placeholder="0.00" no-label-float><div prefix>&nbsp;£</div></paper-input>
+      <paper-input type="number" name="electric" placeholder="0.00" no-label-float><div prefix>&nbsp;£</div></paper-input>
+     </div></paper-card>
+     <paper-card heading="Add Gas Credit" image="./images/gas.png" size="half"><div class="content">
+      <paper-input type="number" name="gas" placeholder="0.00" no-label-float><div prefix>&nbsp;£</div></paper-input>
      </div></paper-card>
     </neon-animatable>    
    </neon-animated-pages>
@@ -82,18 +84,18 @@
  </paper-dialog>
 </event-listener>
 <script type="text/javascript">
-var data=[],rows=[],raw=[];
-$(window).on("load",function(){
+var data=[],rows=[],records=25;
+$(window).on("load",function(){var cs={expires:28};
  $("paper-card#drawer div#placeholder").removeAttr("hidden");
  $("paper-card#drawer div#placeholder").html($("<div id='tabs-end'>&nbsp;</div>"));
  $("paper-card#drawer div#placeholder").append($("<div id='toolbar-end'>&nbsp;</div>"));
  $("paper-button","paper-dialog#connect").on("click",function(){
   var secret=$("*[name='secret']").get(0).value.toString().toUpperCase();
   var username=$("*[name='message']").get(0).value.toString().toUpperCase();  
-  $.cookie("token",CryptoJS.HmacSHA1(username,secret).toString().toUpperCase());
-  $.cookie("username",username);$(window).trigger("connect","retry");
- });$(window).trigger("connect","auto");
- $("paper-item").eq(0).click();
+  $.cookie("token",CryptoJS.HmacSHA1(username,secret).toString().toUpperCase(),cs);
+  $.cookie("username",username,cs);$(window).trigger("connect","retry");
+ });$("paper-tab[goto='view-overview']").click();
+ $(window).trigger("connect","auto");
 });
 
 $(window).on("connect",function(e,extra){
@@ -116,42 +118,41 @@ $(window).on("logout",function(e,results){
 });
 
 $(window).on("update",function(e,obj){try{
- if(obj){data=$(obj.data).get();rows=[];raw=[];}  
+ if(obj!=null){data=$(obj.data).get();rows=[];}
  $("neon-animatable[page='view-overview']").each(function(e,holder){
+  var options={chartArea:{width:'100%',height:'100%',top:0},curveType:'function'};
   if(data.length<3){$("paper-card",holder).attr("heading","Not Enough Readings");return;}
-  var options={chartArea:{width:'100%',height:'80%',top:10},curveType:'function'},rows=[],temp=data;records=10;
    options=$.extend(options,{vAxis:{format:'£#'},hAxis:{format:'DD/MM'},backgroundColor:'transparent',colors:['orange','blue'],legend:'none'});
-   $.each(temp,function(k,r){if(r[1]=="READING"){rows.push([getDate(r[0]),r[2],"Gas £"+getPrice(r[2]),r[3],"Electric £"+getPrice(r[3])]);}});//CREDIT TIMELINE   
-   //$.each(temp,function(k,r){if(data[k-1]&&r[1]=="READING"){rows.push([getDate(r[0]),data[k-1][2]-data[k][2],"Gas £"+getPrice(data[k-1][2]-data[k][2]),data[k-1][3]-data[k][3],"Electric £"+getPrice(data[k-1][3]-data[k][3])]);}});
+  var chart=$("<google-chart>").attr("type","line").attr("options",JSON.stringify(options)).width("100%");while(rows.length>records){rows.shift();}//CUT DATA
   var cols=[{label:'Date',type:'string'},{label:'Gas £',type:'number'},{type:'string',role:'tooltip'},{label:'Electric £',type:'number'},{type:'string',role:'tooltip'}];
-  var chart=$("<google-chart>").attr("type","line").attr("options",JSON.stringify(options)).width("100%");while(rows.length>records){rows.shift();}
-   chart.attr("cols",JSON.stringify(cols)).attr("rows",JSON.stringify(rows)).height("200px");$("div.content",holder).last().html(chart);
-  $("paper-card",holder).last().attr("heading","Credit Timeline ("+rows.length+" Readings)");$.each(temp,function(k,r){if(data[k-1]&&r[1]=="READING"){
-   $("paper-card",holder).eq(1).find("div.title-text").html("Electric Required<br><strong>£"+getPrice(data[k-1][3]-data[k][3])+"</strong>");
-   $("paper-card",holder).eq(0).find("div.title-text").html("Gas Required<br><strong>£"+getPrice(data[k-1][2]-data[k][2])+"</strong>");
-  }});  
- });
-
- $("neon-animatable[page='view-gas']").each(function(e,holder){
-  $.each(data,function(k,record){if(data[k-1]&&record[1]=="READING"){
-   $("div.content",holder).prepend($("<div>").html(getDate(record[0],true)+" - £"+getPrice(record[2])));
-  }});$("paper-card",holder).find("div.title-text").html("<font style='font-size:40px;'>Gas<br>Readings</font>");
-  $("paper-card",holder).attr("image","./images/gas.png");
- });
-
- $("neon-animatable[page='view-electric']").each(function(e,holder){
-  $.each(data,function(k,record){if(data[k-1]&&record[1]=="READING"){
-   $("div.content",holder).prepend($("<div>").html(getDate(record[0],true)+" - £"+getPrice(record[3])));
-  }});$("paper-card",holder).find("div.title-text").html("<font style='font-size:40px;'>Electric<br>Readings</font>");
-  $("paper-card",holder).attr("image","./images/electric.png");
+  $.each(data,function(k){if(data[k-1]){var curr=data[k],last=data[k-1],gas=((last[2]-curr[2])/hoursPast(last[0],curr[0])*24),electric=((last[3]-curr[3])/hoursPast(last[0],curr[0])*24);   
+   if(electric>0){$("paper-card[image*='electric'] div.title-text",holder).html("<center>Average Weekly Electric Usage</center><strong>£"+(electric*7).toFixed(2)+"</strong>");}
+   if(gas>0){$("paper-card[image*='gas'] div.title-text",holder).html("<center>Average Weekly Gas Usage</center><strong>£"+(gas*7).toFixed(2)+"</strong>");}
+   if(gas>0&&electric>0){rows.push([getDate(curr[0]),gas,"Gas £"+gas.toFixed(2),electric,"Electric £"+electric.toFixed(2)]);}   
+  }});$("paper-card[image] div.title-text",holder).css({top:"0px",left:"0px",right:"0px",bottom:"0px",padding:"5px"});
+  chart.attr("cols",JSON.stringify(cols)).attr("rows",JSON.stringify(rows)).height("200px");
+  $("div.content",holder).last().html(chart);
  });
  
+ $("neon-animatable[page='view-electric']").each(function(e,holder){
+  $.each(data,function(k,record){if(data[k-1]&&record[1]=="READING"){$("div.content",holder).prepend($("<div>").html(getDate(record[0],true)+" - £"+getPrice(record[3])));}});
+  $("paper-card div.title-text",holder).html("<strong>"+Number($(data).last().get(0)[3]/$(rows).last().get(0)[3]).toFixed(1)+" Days</strong>");
+  $("paper-card div.title-text",holder).prepend("<center>Estimated Electric Remaining</center>");
+ }); 
+
+ $("neon-animatable[page='view-gas']").each(function(e,holder){
+  $.each(data,function(k,record){if(data[k-1]&&record[1]=="READING"){$("div.content",holder).prepend($("<div>").html(getDate(record[0],true)+" - £"+getPrice(record[2])));}});
+  $("paper-card div.title-text",holder).html("<strong>"+Number($(data).last().get(0)[2]/$(rows).last().get(0)[1]).toFixed(1)+" Days</strong>");
+  $("paper-card div.title-text",holder).prepend("<center>Estimated Gas Remaining</center>");
+ });
+
  var logout="<paper-item goto='logout'><iron-icon icon='exit-to-app'></iron-icon>Logout ("+obj.username+")</paper-item>";
+ $("paper-card[image] div.title-text:has(center)").parent().find("iron-image").css({marginTop:"35px"});
  $("paper-dialog#connect").get(0).close();$("paper-menu").eq(1).html(logout).show();
 }catch(error){alert("Update Error:\n"+error.message);}finally{
  $("paper-icon-button#actionButton").removeAttr("disabled");
  $("paper-input","neon-animatable,paper-dialog").val("");  
- $("paper-item").eq(0).click();
+ $("paper-tab[goto='view-overview']").click();
 }});
 
 $("body").on("click","*[goto]",function(){
