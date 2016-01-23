@@ -1,14 +1,8 @@
 <script type="text/javascript">
 $.ajaxSetup({
- url:"https://script.google.com/macros/s/AKfycbxY7f1d4yj4mnY_8xVwBfsce8-GEGSiH0UahQpuDMc/dev",
- //url:"https://script.google.com/macros/s/AKfycbz6uzzzZOL_Vw-z-2zRtgYwBMApe2dNvM_30BEpZqpLtjEjhxs/exec", 
+ //url:"https://script.google.com/macros/s/AKfycbxY7f1d4yj4mnY_8xVwBfsce8-GEGSiH0UahQpuDMc/dev",
+ url:"https://script.google.com/macros/s/AKfycbz6uzzzZOL_Vw-z-2zRtgYwBMApe2dNvM_30BEpZqpLtjEjhxs/exec", 
 });
-
-function hoursPast(ss,ff){
- var s=new Date(ss),f=new Date(ff);
- var h=Number(((f-s)/1000)/3600);
- return h.toFixed(1);
-}
 
 function getDate(stamp,full){
  var today=new Date(stamp),dd=today.getDate();
@@ -16,18 +10,6 @@ function getDate(stamp,full){
  if(dd<10){dd='0'+dd;}if(mm<10){mm='0'+mm;}
  if(full){return dd+'/'+mm+'/'+yyyy;}
  else{return dd+'/'+mm;}
-};
- 
-function dateDiff(first,second){
- var d1=new Date(first).getTime(),d2=new Date(second).getTime();
- var out=((d2-d1)/(1000*60*60*24)).toString().split('.');
- if(!out[1]){out[1]="0";}else{out[1]=out[1].charAt(0);}
- return Number(out.join('.')).toFixed(1);
-};
-
-function getNumber(x,d){
- x=parseFloat(x).toFixed(d);
- return Number(x);
 };
 
 function getPrice(x){
@@ -97,8 +79,8 @@ neon-animatable paper-card{margin:5px;width:calc(100% - 10px);max-width:800px;bo
 neon-animatable paper-card::shadow div.header img{margin:10px auto;width:auto!important;height:75px!important;margin-right:15px;}
 neon-animatable paper-card[image*='gas']::shadow div.header{background:linear-gradient(to bottom,#FFE082 0%,#FFC107 100%,rgba(0,0,0,0) 100%);}
 neon-animatable paper-card[image*='electric']::shadow div.header{background:linear-gradient(to bottom,#81D4FA 0%,#03A9F4 100%,rgba(0,0,0,0) 100%);}
-neon-animatable paper-card[image]::shadow div.title-text strong{position:absolute;bottom:15px;left:0px;right:90px;}
-neon-animatable paper-card[image]::shadow div.title-text{top:0px;left:0px;right:0px;bottom:0px;padding:5px;}
+neon-animatable paper-card[image]::shadow div.title-text.strong strong{position:absolute;bottom:15px;left:0px;right:90px;}
+neon-animatable paper-card[image]::shadow div.title-text.strong{top:0px;left:0px;right:0px;bottom:0px;padding:5px;}
 neon-animatable paper-input::shadow input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 neon-animatable paper-input::shadow input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
 neon-animatable paper-input::shadow input.paper-input{font-size:50px;line-height:60px;}

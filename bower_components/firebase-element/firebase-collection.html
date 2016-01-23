@@ -1,4 +1,61 @@
-<link rel=import href=../polymer/polymer.html><link rel=import href=firebase-query-behavior.html><script>
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="firebase-query-behavior.html">
+
+<!--
+An element wrapper for the Firebase API that provides a view into the provided
+Firebase location as an ordered collection.
+
+By default, Firebase yields values as unsorted document objects, where each of
+the children are accessible via object keys. The `<firebase-collection>`
+element allows Firebase API orderBy*, limitTo* and other query-oriented methods
+to be specified declaratively. The element then produces and maintains an Array
+of ordered child items of the document that is convenient for iterating over
+in other elements such as `<template is="dom-repeat">`.
+
+Example:
+
+      <template is="dom-bind">
+        <firebase-collection
+          order-by-child="height"
+          limit-to-first="3"
+          location="https://dinosaur-facts.firebaseio.com/dinosaurs"
+          data="{{dinosaurs}}"></firebase-collection>
+        <template is="dom-repeat" items="[[dinosaurs]]" as="dinosaur">
+          <h4>[[dinosaur.__firebaseKey__]]</h4>
+          Height: <span>[[dinosaur.height]]</span>m
+        </template>
+      </template>
+
+As you may have noticed above, the original key of each item is available as
+the `__firebaseKey__` property on the item.
+
+The element makes special accomodations for documents whose children are
+primitive values. A primitive value is wrapped in an object with the form:
+
+```javascript
+{
+  value: /* original primitive value */
+  __firebaseKey__: /* key of primitive value in parent document */
+}
+```
+
+Accessor methods such as `add` and `remove` are provided to enable convenient
+manipulation of the collection without direct knowledge of Firebase key values.
+
+@demo demo/index.html
+-->
+
+<script>
   (function() {
     'use strict'
 

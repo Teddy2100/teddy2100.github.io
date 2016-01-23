@@ -1,4 +1,30 @@
-<link rel=import href=../polymer/polymer.html><link rel=import href=../google-apis/google-legacy-loader.html><dom-module id=google-feeds><template><div id=content></div></template></dom-module><script>
+<!--
+ Copyright 2015 The Polymer Authors. All rights reserved.
+ Use of this source code is governed by a BSD-style
+ license that can be found in the LICENSE file.
+-->
+<link rel='import' href='../polymer/polymer.html'>
+<link rel='import' href='../google-apis/google-legacy-loader.html'>
+
+<!--
+Exposes [Google Feeds API](https://developers.google.com/feed/)
+
+<b>Example</b>:
+
+    <template is='dom-bind'>
+      <google-feeds feed='http://www.engadget.com/rss-full.xml'
+      results='{{result}}'></google-feeds>
+      <p>Feed title: <span>{{result.title}}</span></p>
+    </template>
+
+@demo
+-->
+<dom-module id='google-feeds'>
+  <template>
+    <div id='content'></div>
+  </template>
+</dom-module>
+<script>
 (function() {
   Polymer({
 

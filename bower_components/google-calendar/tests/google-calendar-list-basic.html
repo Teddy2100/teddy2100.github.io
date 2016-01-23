@@ -1,4 +1,19 @@
-<!doctype html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes"><title>google-plusone Basic Tests</title><script src=../../webcomponentsjs/webcomponentsjs.min.js></script><script src=../../web-component-tester/browser.js></script><link rel=import href=../google-calendar.html></head><body><google-calendar-list title="What I'm up to"></google-calendar-list><script>
+<!doctype html>
+<!-- Copyright (c) 2014 Google Inc. All rights reserved. -->
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name='viewport' content='width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes'>
+    <title>google-plusone Basic Tests</title>
+    <script src="../../webcomponentsjs/webcomponentsjs.min.js"></script>
+    <script src="../../web-component-tester/browser.js"></script>
+    <link rel="import" href="../google-calendar.html">
+  </head>
+  <body>
+  
+    <google-calendar-list title="What I'm up to"></google-calendar-list>
+
+    <script>
 
       function testFetchesCalendars(calendarListEl) {
         var testCalendar = {
@@ -42,4 +57,6 @@
           done();
         });
       });
-    </script></body></html>
+    </script>
+  </body>
+</html>

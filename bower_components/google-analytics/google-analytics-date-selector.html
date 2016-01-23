@@ -1,4 +1,34 @@
-<link rel=import href=../polymer/polymer.html><dom-module id=google-analytics-date-selector><style>
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+Element for selecting the start and end date values for queries inside a
+`<google-analytics-dashboard>` element.
+
+##### Example
+
+    <google-analytics-dashboard>
+
+      <google-analytics-date-selector
+        start-date="30daysAgo"
+        end-date="today">
+      </google-analytics-date-selector>
+
+      <google-analytics-chart
+        ids="ga:1174"
+        metrics="ga:sessions"
+        dimensions="ga:date">
+      </google-analytics-chart>
+
+    </google-analytics-dashboard>
+
+@element google-analytics-date-selector
+@demo
+@homepage https://googlewebcomponents.github.io/google-analytics
+-->
+
+<dom-module id="google-analytics-date-selector">
+
+  <style>
     :host {
       display: inline-block;
     }
@@ -17,7 +47,32 @@
     input:focus {
       @apply(--google-analytics-date-selector-input-focus);
     }
-  </style><template><span class=control><label for=startDate>Start Date</label> <input id=startDate type=date value={{startDate::change}} min={{minStartDate}} max={{endDate}}></span> <span class=control><label for=endDate>End Date</label> <input id=endDate type=date value={{endDate::change}} min={{startDate}} max={{maxEndDate}}></span></template></dom-module><script>
+  </style>
+
+  <template>
+    <span class="control">
+      <label for="startDate">Start Date</label>
+      <input
+        id="startDate"
+        type="date"
+        value="{{startDate::change}}"
+        min="{{minStartDate}}"
+        max="{{endDate}}">
+    </span>
+    <span class="control">
+      <label for="endDate">End Date</label>
+      <input
+        id="endDate"
+        type="date"
+        value="{{endDate::change}}"
+        min="{{startDate}}"
+        max="{{maxEndDate}}">
+    </span>
+  </template>
+
+</dom-module>
+
+<script>
 
   (function() {
 

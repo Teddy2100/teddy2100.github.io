@@ -1,4 +1,33 @@
-<link rel=import href=../polymer/polymer.html><link rel=import href=google-analytics-loader.html><dom-module id=google-analytics-query><template><google-analytics-loader all-ready={{setupReady}}></google-analytics-loader></template></dom-module><script>
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="google-analytics-loader.html">
+
+<!--
+Element for querying the Google Analytics Core Reporting API.
+
+##### Example
+
+    <google-analytics-query
+      ids="ga:1174"
+      metrics="ga:sessions"
+      dimensions="ga:country"
+      sort="-ga:sessions"
+      max-results="5">
+    </google-analytics-query>
+
+@element google-analytics-query
+@demo
+@homepage https://googlewebcomponents.github.io/google-analytics
+-->
+
+<dom-module id="google-analytics-query">
+
+  <template>
+    <google-analytics-loader all-ready="{{setupReady}}"></google-analytics-loader>
+  </template>
+
+</dom-module>
+
+<script>
 
   (function() {
 

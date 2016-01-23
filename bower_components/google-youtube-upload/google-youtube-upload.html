@@ -1,4 +1,51 @@
-<link rel=import href=../polymer/polymer.html><link rel=import href=../google-signin/google-signin.html><link rel=import href=../google-apis/google-client-loader.html><dom-module id=google-youtube-upload><link rel=import type=css href=google-youtube-upload.css><template><script src=../cors-upload-sample/upload.js></script><google-client-loader on-js-api-load=_clientLoaded></google-client-loader><div id=login-logout><img id=channel-image src={{_channel.thumbnail}} style$={{_computeChannelImageStyle(_channel.thumbnail)}}> <span id=channel-name>{{_channel.name}}</span><google-signin client-id={{clientId}} scopes="https://www.googleapis.com/auth/youtube.upload https://www.googleapis.com/auth/youtube.readonly"></google-signin></div><div style=_computeUploadDivStyle(authenticated)}}><input type=file id=file class=button accept=video/* on-change=_handleFileChanged> <button on-click=_handleUploadClicked style$={{_computeUploadButtonStyle(auto}} disabled={{!_selectedFile}}>Upload Video</button><p id=disclaimer>By uploading a video, you certify that you own all rights to the content or that you are authorized by the owner to make the content publicly available on YouTube, and that it otherwise complies with the YouTube Terms of Service located at <a href=http://www.youtube.com/t/terms target=_blank>http://www.youtube.com/t/terms</a></p></div></template></dom-module><script>
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../google-signin/google-signin.html">
+<link rel="import" href="../google-apis/google-client-loader.html">
+<!--
+Element enabling you to upload videos to YouTube.
+
+##### Examples
+
+Manual upload with a `Video Upload` button once a video file is selected:
+
+    <google-youtube-upload client-id="..."></google-youtube-upload>
+
+Automatic upload on video file select, with a custom title, and 'unlisted' privacy:
+
+    <google-youtube-upload
+      auto
+      video-title="My Awesome Video"
+      privacy-status="unlisted"
+      client-id="...">
+    </google-youtube-upload>
+
+@demo
+-->
+<dom-module id="google-youtube-upload">
+  <link rel="import" type="css" href="google-youtube-upload.css">
+  <template>
+    <script src="../cors-upload-sample/upload.js"></script>
+    <google-client-loader on-js-api-load="_clientLoaded"></google-client-loader>
+    <div id="login-logout">
+      <img id="channel-image" src="{{_channel.thumbnail}}" style$="{{_computeChannelImageStyle(_channel.thumbnail)}}">
+      <span id="channel-name">{{_channel.name}}</span>
+
+      <google-signin
+        client-id="{{clientId}}"
+        scopes="https://www.googleapis.com/auth/youtube.upload https://www.googleapis.com/auth/youtube.readonly">
+      </google-signin>
+    </div>
+
+    <div style="_computeUploadDivStyle(authenticated)}}">
+      <input type="file" id="file" class="button" accept="video/*" on-change="_handleFileChanged">
+
+      <button on-click="_handleUploadClicked" style$="{{_computeUploadButtonStyle(auto}}" disabled="{{!_selectedFile}}">Upload Video</button>
+
+      <p id="disclaimer">By uploading a video, you certify that you own all rights to the content or that you are authorized by the owner to make the content publicly available on YouTube, and that it otherwise complies with the YouTube Terms of Service located at <a href="http://www.youtube.com/t/terms" target="_blank">http://www.youtube.com/t/terms</a></p>
+    </div>
+  </template>
+</dom-module>
+<script>
   (function() {
     // One minute.
     var STATUS_POLLING_ITERVAL_MILLIS = 60 * 1000;

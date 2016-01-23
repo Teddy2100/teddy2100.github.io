@@ -1,4 +1,24 @@
-<!doctype html><html><head><meta name=viewport content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes"><title>google-plusone Basic Tests</title><script src=../../webcomponentsjs/webcomponents.min.js></script><link rel=import href=../../polymer-test-tools/tools.html><script src=../../polymer-test-tools/htmltest.js></script><script src=../../sinon-browser-only/sinon.js></script><link rel=import href=../google-hangout-button.html></head><body><google-hangout-button type=party apps="[{'app_id': '184219133185', 'start_data': 'dQw4w9WgXcQ', 'app_type': 'ROOM_APP' }]" topic="test topic" invites="[{ id: 'foo@example.com', invite_type: 'EMAIL' }]" width=72></google-hangout-button><script>
+<!doctype html>
+<!-- Copyright (c) 2014 Google Inc. All rights reserved. -->
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <title>google-plusone Basic Tests</title>
+    <script src="../../webcomponentsjs/webcomponents.min.js"></script>
+    <link rel="import" href="../../polymer-test-tools/tools.html">
+    <script src="../../polymer-test-tools/htmltest.js"></script>
+    <script src="../../sinon-browser-only/sinon.js"></script>
+    <link rel="import" href="../google-hangout-button.html">
+  </head>
+  <body>
+    <google-hangout-button
+        type="party"
+        apps="[{'app_id': '184219133185', 'start_data': 'dQw4w9WgXcQ', 'app_type': 'ROOM_APP' }]"
+        topic="test topic"
+        invites="[{ id: 'foo@example.com', invite_type: 'EMAIL' }]"
+        width="72">
+    </google-hangout-button>
+    <script>
       function testIframeCreated(hangoutButton) {
         chai.assert.ok(hangoutButton.shadowRoot.querySelector('iframe'));
       }
@@ -48,4 +68,6 @@
           done();
         });
       });
-    </script></body></html>
+    </script>
+  </body>
+</html>

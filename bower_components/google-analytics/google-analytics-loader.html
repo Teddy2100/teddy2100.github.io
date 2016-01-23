@@ -1,4 +1,35 @@
-<link rel=import href=../polymer/polymer.html><link rel=import href=../google-signin/google-signin-aware.html><link rel=import href=../google-apis/google-client-loader.html><link rel=import href=../promise-polyfill/promise-polyfill-lite.html><dom-module id=google-analytics-loader><template><google-client-loader id=api name=analytics version=v3 on-google-api-load=handleApiLoad on-google-api-load-error=handleApiFailedToLoad></google-client-loader><google-signin-aware scopes=https://www.googleapis.com/auth/analytics.readonly on-google-signin-aware-success=handleAuthSuccess on-google-signin-aware-signed-out=handleAuthSignout></google-signin-aware></template></dom-module><script>
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../google-signin/google-signin-aware.html">
+<link rel="import" href="../google-apis/google-client-loader.html">
+<link rel="import" href="../promise-polyfill/promise-polyfill-lite.html">
+
+<!--
+google-analytics-loader is used internally by elements that need to know api state, and user state.
+
+Loads gapi.client.analytics, and watches user signed-in state.
+
+@element google-analytics-loader
+@demo
+@homepage https://googlewebcomponents.github.io/google-analytics
+-->
+
+<dom-module id="google-analytics-loader">
+
+  <template>
+    <google-client-loader id="api"
+      name="analytics"
+      version="v3"
+      on-google-api-load="handleApiLoad"
+      on-google-api-load-error="handleApiFailedToLoad"></google-client-loader>
+    <google-signin-aware
+      scopes="https://www.googleapis.com/auth/analytics.readonly"
+      on-google-signin-aware-success="handleAuthSuccess"
+      on-google-signin-aware-signed-out="handleAuthSignout"></google-signin-aware>
+  </template>
+
+</dom-module>
+
+<script>
 
   (function() {
 

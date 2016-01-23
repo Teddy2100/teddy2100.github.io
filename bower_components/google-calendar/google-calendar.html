@@ -1,4 +1,21 @@
-<link rel=import href=../polymer/polymer.html><link rel=import href=../google-signin/google-signin-aware.html><link rel=import href=../google-apis/google-client-loader.html><dom-module id=google-calendar-list><style>
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../google-signin/google-signin-aware.html">
+<link rel="import" href="../google-apis/google-client-loader.html">
+
+
+<!--
+Element providing a list of Google Calendars for a signed in user.
+Needs a google-signin element included somewhere on the same page
+that handles authentication.
+
+##### Example
+
+    <google-calendar-list title="What I'm up to"></google-calendar-list>
+
+@demo
+-->
+<dom-module id="google-calendar-list">
+  <style>
     :host, span {
       display: inline-block;
     }
@@ -23,7 +40,26 @@
       display: block;
       text-decoration: none;
     }
-  </style><template><google-client-loader id=calendar name=calendar version=v3 on-google-api-load=displayCalendars></google-client-loader><google-signin-aware scopes=https://www.googleapis.com/auth/calendar.readonly is-authorized={{_signedIn}}></google-signin-aware><ul id=calendars><li>{{title}}</li><template is=dom-repeat items={{calendars}}><li style$={{_computeCalStyle(item.backgroundColor)}}><a href="{{_computeCalHref(item.id, item.timeZone)}}" target=_blank>{{item.summary}}</a></li></template></ul></template></dom-module><script>
+  </style>
+  <template>
+    <google-client-loader id="calendar" name="calendar" version="v3"
+      on-google-api-load="displayCalendars"></google-client-loader>
+    <google-signin-aware
+      scopes="https://www.googleapis.com/auth/calendar.readonly"
+      is-authorized="{{_signedIn}}"></google-signin-aware>
+
+    <ul id="calendars">
+      <li>{{title}}</li>
+      <template is="dom-repeat" items="{{calendars}}">
+        <li style$="{{_computeCalStyle(item.backgroundColor)}}">
+          <a href="{{_computeCalHref(item.id, item.timeZone)}}" target="_blank">{{item.summary}}</a>
+        </li>
+      </template>
+    </ul>
+  </template>
+</dom-module>
+
+<script>
   Polymer({
 
     is: 'google-calendar-list',
@@ -84,7 +120,11 @@
       }
     }
   });
-</script><dom-module id=google-calendar-busy-now><style>
+</script>
+
+
+<dom-module id="google-calendar-busy-now">
+  <style>
     span {
       font-family: Arial, sans-serif;
       display: inline-block;
@@ -105,7 +145,18 @@
     .na {
       background-color: #999;
     }
-  </style><template><google-client-loader id=calendar name=calendar version=v3 on-google-api-load=displayBusy></google-client-loader><google-signin-aware scopes=https://www.googleapis.com/auth/calendar.readonly is-authorized={{_isAuthorized}}></google-signin-aware><span class$={{_labelClass}}>{{_label}}</span></template><script>
+  </style>
+  <template>
+      <google-client-loader id="calendar" name="calendar" version="v3"
+        on-google-api-load="displayBusy"></google-client-loader>
+      <google-signin-aware
+        scopes="https://www.googleapis.com/auth/calendar.readonly"
+        is-authorized="{{_isAuthorized}}"></google-signin-aware>
+
+    <span class$="{{_labelClass}}">{{_label}}</span>
+  </template>
+</dom-template>
+<script>
   (function() {
     var MS_PER_MINUTE = 60000;
     var TIME_SPAN = 30;
@@ -254,4 +305,5 @@ A badge showing the free/busy status based on the events in a given calendar.
       }
     });
   })();
-</script></dom-module>
+</script>
+

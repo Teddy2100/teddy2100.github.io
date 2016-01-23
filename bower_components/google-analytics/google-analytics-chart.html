@@ -1,4 +1,32 @@
-<link rel=import href=../polymer/polymer.html><link rel=import href=../google-chart/google-chart.html><link rel=import href=../promise-polyfill/promise-polyfill-lite.html><link rel=import href=google-analytics-query.html><link rel=import href=google-analytics-loader.html><dom-module is=google-analytics-chart><style>
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../google-chart/google-chart.html">
+<link rel="import" href="../promise-polyfill/promise-polyfill-lite.html">
+<link rel="import" href="google-analytics-query.html">
+<link rel="import" href="google-analytics-loader.html">
+
+<!--
+Element for displaying the results of a Google Analytics query in a
+Google Chart.
+
+##### Example
+
+    <google-analytics-chart
+      type="column"
+      ids="ga:1174"
+      metrics="ga:sessions"
+      dimensions="ga:country"
+      sort="-ga:sessions"
+      max-results="5">
+    </google-analytics-chart>
+
+@element google-analytics-chart
+@demo
+@homepage https://googlewebcomponents.github.io/google-analytics
+-->
+
+<dom-module is="google-analytics-chart">
+
+  <style>
     :host {
       display: -webkit-flex;
       display: -ms-flexbox;
@@ -20,7 +48,39 @@
       flex: 1 0 0%;
       width: auto;
     }
-  </style><template><google-analytics-loader all-ready={{setupReady}}></google-analytics-loader><google-analytics-query id=query loading={{loading}} get-data-response-handler={{_boundResponseHandler}} data={{data}} ids={{ids}} start-date={{startDate}} end-date={{endDate}} metrics={{metrics}} dimensions={{dimensions}} sort={{sort}} filters={{filters}} segment={{segment}} sampling-level={{samplingLevel}} start-index={{startIndex}} max-results={{maxResults}} output=dataTable src-param=gwc-ga-chart></google-analytics-query><content select=header,h1,h2,h3,h4,h5,h6></content><google-chart id=chart type={{type}} data={{data.dataTable}}></google-chart><content select=footer></content></template></dom-module><script>
+  </style>
+
+  <template>
+    <google-analytics-loader all-ready="{{setupReady}}"></google-analytics-loader>
+    <google-analytics-query id="query"
+      loading="{{loading}}"
+      get-data-response-handler="{{_boundResponseHandler}}"
+      data="{{data}}"
+      ids="{{ids}}"
+      start-date="{{startDate}}"
+      end-date="{{endDate}}"
+      metrics="{{metrics}}"
+      dimensions="{{dimensions}}"
+      sort="{{sort}}"
+      filters="{{filters}}"
+      segment="{{segment}}"
+      sampling-level="{{samplingLevel}}"
+      start-index="{{startIndex}}"
+      max-results="{{maxResults}}"
+      output="dataTable"
+      src-param="gwc-ga-chart"
+      ></google-analytics-query>
+    <content select="header,h1,h2,h3,h4,h5,h6"></content>
+    <google-chart id="chart"
+      type="{{type}}"
+      data="{{data.dataTable}}">
+    </google-chart>
+    <content select="footer"></content>
+  </template>
+
+</dom-module>
+
+<script>
 
   (function() {
 

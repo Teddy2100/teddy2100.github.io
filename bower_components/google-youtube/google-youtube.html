@@ -1,4 +1,36 @@
-<link rel=import href=../polymer/polymer.html><link rel=import href=../iron-localstorage/iron-localstorage.html><link rel=import href=../google-apis/google-youtube-api.html><dom-module id=google-youtube><style>
+<!--
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at https://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at https://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at https://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at https://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-localstorage/iron-localstorage.html">
+<link rel="import" href="../google-apis/google-youtube-api.html">
+
+<!--
+`google-youtube` encapsulates the YouTube player into a web component.
+
+    <google-youtube
+      video-id="..."
+      height="270px"
+      width="480px"
+      rel="0"
+      start="5"
+      autoplay="1">
+    </google-youtube>
+
+`google-youtube` supports all of the [embedded player parameters](https://developers.google.com/youtube/player_parameters). Each can be set as an attribute on `google-youtube`.
+
+The standard set of [YouTube player events](https://developers.google.com/youtube/iframe_api_reference#Events) are exposed, as well as methods for playing, pausing, seeking to a specific time, and loading a new video.
+
+@demo
+-->
+<dom-module id="google-youtube">
+  <style>
     :host {
       display: block;
     }
@@ -29,7 +61,36 @@
       height: 100%;
       cursor: pointer;
     }
-  </style><template><div id=container style$="{{_computeContainerStyle(width, height)}}"><template is=dom-if if={{thumbnail}}><img id=thumbnail src$={{thumbnail}} title="YouTube video thumbnail." alt="YouTube video thumbnail." on-tap=_handleThumbnailTap></template><template is=dom-if if={{!thumbnail}}><google-youtube-api on-api-load=_apiLoad></google-youtube-api></template><iron-localstorage name=google-youtube-playsupported value={{_playsupportedLocalStorage}} on-iron-localstorage-load=_useExistingPlaySupportedValue on-iron-localstorage-load-empty=_determinePlaySupported></iron-localstorage><div id=player></div></div></template></dom-module><script>
+  </style>
+
+  <template>
+    <div id="container" style$="{{_computeContainerStyle(width, height)}}">
+      <template is="dom-if" if="{{thumbnail}}">
+        <img id="thumbnail"
+           src$="{{thumbnail}}"
+           title="YouTube video thumbnail."
+           alt="YouTube video thumbnail."
+           on-tap="_handleThumbnailTap">
+      </template>
+
+      <template is="dom-if" if="{{!thumbnail}}">
+        <google-youtube-api on-api-load="_apiLoad"></google-youtube-api>
+      </template>
+
+      <!-- Use this._playsupportedLocalStorage as the value, since this.playsupported is set to
+           true as soon as initial playback has started, and we don't want that cached. -->
+      <iron-localstorage name="google-youtube-playsupported"
+                         value="{{_playsupportedLocalStorage}}"
+                         on-iron-localstorage-load="_useExistingPlaySupportedValue"
+                         on-iron-localstorage-load-empty="_determinePlaySupported">
+      </iron-localstorage>
+
+      <div id="player"></div>
+    </div>
+  </template>
+</dom-module>
+
+<script>
   Polymer({
     is: 'google-youtube',
     /**

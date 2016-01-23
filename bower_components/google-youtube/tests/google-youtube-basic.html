@@ -1,4 +1,18 @@
-<!doctype html><html><head><meta name=viewport content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes"><title>google-youtube Basic Tests</title><script src=../../platform/platform.js></script><link rel=import href=../../polymer-test-tools/tools.html><script src=../../polymer-test-tools/htmltest.js></script><link rel=import href=../google-youtube.html></head><body><google-youtube></google-youtube><script>
+<!doctype html>
+<!-- Copyright (c) 2014 Google Inc. All rights reserved. -->
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <title>google-youtube Basic Tests</title>
+    <script src="../../platform/platform.js"></script>
+    <link rel="import" href="../../polymer-test-tools/tools.html">
+    <script src="../../polymer-test-tools/htmltest.js"></script>
+    <link rel="import" href="../google-youtube.html">
+  </head>
+  <body>
+    <google-youtube></google-youtube>
+
+    <script>
       function testToHHMMSS(googleYouTube) {
         // Durations in seconds and the formatted string that's expected for each.
         var durationsToFormattedStrings = {
@@ -50,4 +64,6 @@
           testPlayMethodAndStateTransitions(googleYouTube);
         });
       });
-    </script></body></html>
+    </script>
+  </body>
+</html>

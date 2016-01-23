@@ -1,4 +1,53 @@
-<link rel=import href=../polymer/polymer.html><link rel=import href=../google-apis/google-client-loader.html><dom-module id=google-url-shortener><template><google-client-loader id=urlshortener name=urlshortener version=v1 on-google-api-load=_readyForAction on-google-api-load-error=_apiLoadError></google-client-loader></template></dom-module><script>
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../google-apis/google-client-loader.html">
+
+<!--
+`google-url-shortener` is a web component that shortens URLs with the
+<a href="https://developers.google.com/url-shortener/">Google URL Shortener API
+</a>.
+
+##### Example
+
+    <google-url-shortener id="shortener"></google-url-shortener>
+
+    <script>
+      var shortener = document.getElementById('shortener');
+
+      shortener.addEventListener('google-url-shorten', function(event) {
+        console.log(event.detail.shortUrl);
+      });
+
+      // Shorten the current page URL.
+      shortener.longUrl = document.URL;
+      shortener.shorten();
+    </script>
+
+##### Example using `auto` and binding.
+
+    <google-url-shortener id="shortener" longUrl="{{longUrl}}" auto>
+    </google-url-shortener>
+
+    <script>
+      var shortener = document.getElementById('shortener');
+
+      shortener.addEventListener('google-url-shorten', function(event) {
+        // This will be called automatically every time `longUrl` changes.
+        console.log(event.detail.shortUrl);
+      });
+    </script>
+
+@demo
+-->
+<dom-module id="google-url-shortener">
+  <template>
+    <google-client-loader id="urlshortener" name="urlshortener" version="v1"
+      on-google-api-load="_readyForAction"
+      on-google-api-load-error="_apiLoadError">
+    </google-api-loader>
+  </template>
+</dom-module>
+
+<script>
 
   (function() {
     'use strict';
