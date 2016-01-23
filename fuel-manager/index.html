@@ -9,10 +9,14 @@
  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
  <script type="text/javascript" src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
  <script type="text/javascript" src="../bower_components/jquery/dist/jquery.min.js"></script>
+ <script type="text/javascript" src="./elements/jquery-phpjs-datetime.js"></script>
+ <script type="text/javascript" src="./elements/jquery-phpjs-strings.js"></script>
+ <script type="text/javascript" src="./elements/jquery-phpjs-array.js"></script>
  <script type="text/javascript" src="./elements/jquery-cookie.min.js"></script>
  <script type="text/javascript" src="./elements/hmac-sha1.min.js"></script>
  <link rel="import" href="../bower_components/vulcanized-full.html"/>
  <link rel="import" href="./elements/event-listener.html"/>
+ <link rel="import" href="./elements/dual-card.html"/>
  <link rel="import" href="./app-setup.html"/>
 </head>
 <body unresolved>
@@ -44,35 +48,35 @@
    </paper-toolbar>
    <neon-animated-pages selected="0" class="fit">
     <neon-animatable page="view-overview" icon="cached">
-     <paper-card heading="Calculating" image="./images/electric.png" size="half"></paper-card>
-     <paper-card heading="Calculating" image="./images/gas.png" size="half"></paper-card>
-     <paper-card heading="Average Daily Cost"><div class="content"></div></paper-card>
+     <dual-card heading="Calculating Usage" strong="--" image="./images/electric.png" size="half"></dual-card>
+     <dual-card heading="Calculating Usage" strong="--" image="./images/gas.png" size="half"></dual-card>
+     <dual-card heading="Average Daily Cost" id="chart"></dual-card>
     </neon-animatable>    
     <neon-animatable page="view-electric" icon="cached">
-     <paper-card heading="Loading" image="./images/electric.png"><div class="content"></div></paper-card>
+     <dual-card heading="Loading" image="./images/electric.png"></dual-card>
     </neon-animatable>
     <neon-animatable page="view-gas" icon="cached">
-     <paper-card heading="Loading" image="./images/gas.png"><div class="content"></div></paper-card>
+     <dual-card heading="Loading" image="./images/gas.png"></dual-card>
     </neon-animatable>    
     
     <neon-animatable page="add-reading" icon="save">
      <input type="hidden" name="action" value="READING"/>
-     <paper-card heading="Add Electric Reading" image="./images/electric.png" size="half"><div class="content">
+     <dual-card heading="Enter Electric Reading" image="./images/electric.png" size="half">
       <paper-input type="number" name="electric" placeholder="0.00" no-label-float><div prefix>&nbsp;£</div></paper-input>
-     </div></paper-card>
-     <paper-card heading="Add Gas Reading" image="./images/gas.png" size="half"><div class="content">
+     </dual-card>
+     <dual-card heading="Enter Gas Reading" image="./images/gas.png" size="half">
       <paper-input type="number" name="gas" placeholder="0.00" no-label-float><div prefix>&nbsp;£</div></paper-input>
-     </div></paper-card>
+     </dual-card>
     </neon-animatable>
     
     <neon-animatable page="add-credit" icon="save">
      <input type="hidden" name="action" value="CREDIT"/>
-     <paper-card heading="Add Electric Credit" image="./images/electric.png" size="half"><div class="content">
+     <dual-card heading="Add Electric Credit" image="./images/electric.png" size="half">
       <paper-input type="number" name="electric" placeholder="0.00" no-label-float><div prefix>&nbsp;£</div></paper-input>
-     </div></paper-card>
-     <paper-card heading="Add Gas Credit" image="./images/gas.png" size="half"><div class="content">
+     </dual-card>
+     <dual-card heading="Add Gas Credit" image="./images/gas.png" size="half">
       <paper-input type="number" name="gas" placeholder="0.00" no-label-float><div prefix>&nbsp;£</div></paper-input>
-     </div></paper-card>
+     </dual-card>
     </neon-animatable>    
    </neon-animated-pages>
   </paper-header-panel>
@@ -84,7 +88,7 @@
  </paper-dialog>
 </event-listener>
 <script type="text/javascript">
-var data=[],rows=[],records=25;
+var data=[],rows=[],average={};
 $(window).on("load",function(){var cs={expires:28};
  $("paper-card#drawer div#placeholder").removeAttr("hidden");
  $("paper-card#drawer div#placeholder").html($("<div id='tabs-end'>&nbsp;</div>"));
@@ -118,38 +122,42 @@ $(window).on("logout",function(e,results){
 });
 
 $(window).on("update",function(e,obj){try{
- if(obj!=null){data=$(obj.data).get();rows=[];}
+ if(obj!=null){data=$(obj.data).get(),rows=[],average={};}
  $("neon-animatable[page='view-overview']").each(function(e,holder){
   var options={chartArea:{width:'100%',height:'100%',top:0},curveType:'function'};
-  if(data.length<3){$("paper-card",holder).attr("heading","Not Enough Readings");return;}  
-  var hoursPast=function(s,f){return Number(((new Date(f)-new Date(s))/1000)/3600).toFixed(1);};
-   options=$.extend(options,{vAxis:{format:'£#'},hAxis:{format:'DD/MM'},backgroundColor:'transparent',colors:['orange','blue'],legend:'none'});
-  var chart=$("<google-chart>").attr("type","line").attr("options",JSON.stringify(options)).width("100%");while(rows.length>records){rows.shift();}//CUT DATA
-  var cols=[{label:'Date',type:'string'},{label:'Gas £',type:'number'},{type:'string',role:'tooltip'},{label:'Electric £',type:'number'},{type:'string',role:'tooltip'}];
-  $.each(data,function(k){if(data[k-1]){var curr=data[k],last=data[k-1],gas=((last[2]-curr[2])/hoursPast(last[0],curr[0])*24),electric=((last[3]-curr[3])/hoursPast(last[0],curr[0])*24);   
-   if(electric>0){$("paper-card[image*='electric'] div.title-text",holder).html("<center>Average Weekly Electric Usage</center><strong>£"+(electric*7).toFixed(2)+"</strong>");}
-   if(gas>0){$("paper-card[image*='gas'] div.title-text",holder).html("<center>Average Weekly Gas Usage</center><strong>£"+(gas*7).toFixed(2)+"</strong>");}
-   if(gas>0&&electric>0){rows.push([getDate(curr[0]),gas,"Gas £"+gas.toFixed(2),electric,"Electric £"+electric.toFixed(2)]);}   
-  }});//$("paper-card[image] div.title-text",holder).css({top:"0px",left:"0px",right:"0px",bottom:"0px",padding:"5px"});
-  chart.attr("cols",JSON.stringify(cols)).attr("rows",JSON.stringify(rows)).height("200px");
-  $("paper-card[image] div.title-text",holder).addClass("strong");
+  if(data.length<3){$("dual-card",holder).attr("heading","Not Enough Readings");return;}  
+  var hoursPast=function(s,f){return Number(((new Date(f)-new Date(s))/1000)/3600).toFixed(1);};  
+  var averageWeekly=function(ar){return Number(Number($.php.array_sum(ar)/ar.length).toFixed(2)*7).toFixed(2);};
+   options=$.extend(options,{vAxis:{format:'£#'},backgroundColor:'transparent',colors:['orange','blue'],legend:'none'});
+  var chart=$("<google-chart>").attr("type","line").attr("options",JSON.stringify(options)).width("100%");average={gas:[],electric:[]};
+  var cols=[{label:'Record',type:'number'},{label:'Gas £',type:'number'},{type:'string',role:'tooltip'},{label:'Electric £',type:'number'},{type:'string',role:'tooltip'}];
+  $.each(data,function(k){if(data[k-1]){var curr=data[k],last=data[k-1],electric=((last[2]-curr[2])/hoursPast(last[0],curr[0])*24),gas=((last[3]-curr[3])/hoursPast(last[0],curr[0])*24);
+   if(gas>0&&electric>0){average.gas.push(gas);average.electric.push(electric);average.gas=average.gas.slice(-5);average.electric=average.electric.slice(-5);}
+   if(gas>0&&electric>0){rows.push([k,gas,"Gas £"+gas.toFixed(2)+'\n'+getDate(curr[0]),electric,"Electric £"+electric.toFixed(2)+'\n'+getDate(curr[0])]);} 
+  }});chart.attr("cols",JSON.stringify(cols)).attr("rows",JSON.stringify(rows)).height("200px");//GENERATE GOOGLE CURVE TYPE CHART
+  $("dual-card[image*='electric']",holder).attr({heading:"Estimated Weekly Usage",strong:"£"+averageWeekly(average.electric)});
+  $("dual-card[image*='gas']",holder).attr({heading:"Estimated Weekly Usage",strong:"£"+averageWeekly(average.gas)});
   $("div.content",holder).last().html(chart);
  });
- 
- $("neon-animatable[page='view-electric']").each(function(e,holder){
-  $.each(data,function(k,record){if(data[k-1]&&record[1]=="READING"){$("div.content",holder).prepend($("<div>").html(getDate(record[0],true)+" - £"+getPrice(record[3])));}});
-  $("paper-card div.title-text",holder).html("<strong>"+Number($(data).last().get(0)[3]/$(rows).last().get(0)[3]).toFixed(1)+" Days</strong>");
-  $("paper-card div.title-text",holder).prepend("<center>Estimated Electric Remaining</center>").addClass("strong");
- }); 
 
  $("neon-animatable[page='view-gas']").each(function(e,holder){
+  var estimateCost=Number($.php.array_sum(average.gas)/average.gas.length).toFixed(2);$("div.content",holder).empty();
+  $.each(data,function(k,record){if(data[k-1]&&record[1]=="READING"){$("div.content",holder).prepend($("<div>").html(getDate(record[0],true)+" - £"+getPrice(record[3])));}});
+  $("dual-card[image*='gas']",holder).attr({strong:Number($(data).last().get(0)[3]/estimateCost).toFixed(1)+" Days"});
+  $("dual-card[image*='gas']",holder).attr({heading:"Estimated Days Remaining"});
+  console.debug("Current Gas Average: £"+estimateCost);
+ }); 
+ 
+ $("neon-animatable[page='view-electric']").each(function(e,holder){
+  var estimateCost=Number($.php.array_sum(average.electric)/average.electric.length).toFixed(2);$("div.content",holder).empty();
   $.each(data,function(k,record){if(data[k-1]&&record[1]=="READING"){$("div.content",holder).prepend($("<div>").html(getDate(record[0],true)+" - £"+getPrice(record[2])));}});
-  $("paper-card div.title-text",holder).html("<strong>"+Number($(data).last().get(0)[2]/$(rows).last().get(0)[1]).toFixed(1)+" Days</strong>");
-  $("paper-card div.title-text",holder).prepend("<center>Estimated Gas Remaining</center>").addClass("strong");
+  $("dual-card[image*='electric']",holder).attr({strong:Number($(data).last().get(0)[2]/estimateCost).toFixed(1)+" Days"});
+  $("dual-card[image*='electric']",holder).attr({heading:"Estimated Days Remaining"});
+  console.debug("Current Electric Average: £"+estimateCost);
  });
-
+ 
  var logout="<paper-item goto='logout'><iron-icon icon='exit-to-app'></iron-icon>Logout ("+obj.username+")</paper-item>";
- $("paper-card[image] div.title-text:has(center)").parent().find("iron-image").css({marginTop:"35px"});
+ $("dual-card[image] div.title-text:has(center)").parent().find("iron-image").css({marginTop:"35px"});
  $("paper-dialog#connect").get(0).close();$("paper-menu").eq(1).html(logout).show();
 }catch(error){alert("Update Error:\n"+error.message);}finally{
  $("paper-icon-button#actionButton").removeAttr("disabled");
@@ -188,6 +196,7 @@ $.getScript("./elements/hammer.min.js",function(){
  new Hammer($("neon-animated-pages").get(0)).on("swipe",function(e){
   if(e.direction==2){var swipeTo=$("paper-tab.iron-selected").next().index();}
   if(e.direction==4){var swipeTo=$("paper-tab.iron-selected").prev().index();}
+  if($("neon-animated-pages").get(0).selected>2){return false;}
   $("paper-tabs").get(0).selected=setRange(swipeTo,0,2);
   $("paper-tab").get(setRange(swipeTo,0,2)).click();
   $("div#mainContainer").animate({scrollTop:0});

@@ -5,11 +5,8 @@ $.ajaxSetup({
 });
 
 function getDate(stamp,full){
- var today=new Date(stamp),dd=today.getDate();
- var mm=today.getMonth()+1,yyyy=today.getFullYear();
- if(dd<10){dd='0'+dd;}if(mm<10){mm='0'+mm;}
- if(full){return dd+'/'+mm+'/'+yyyy;}
- else{return dd+'/'+mm;}
+ var stamp=$.php.strtotime(stamp);
+ return $.php.date("dS F Y, H:i",stamp);
 };
 
 function getPrice(x){
@@ -70,28 +67,19 @@ paper-menu.stretch{position:absolute;bottom:0px;left:0px;right:0px;}
 paper-menu.stretch paper-item{font-weight:normal!important;}
 paper-item[goto='add-credit']{display:none;}
 
-neon-animatable paper-card::shadow{border-radius:6px;}
-neon-animatable paper-card::shadow div.content{padding:5px;}
-neon-animatable paper-card:last-of-type::shadow{margin-bottom:25px;}
-neon-animatable{text-align:center;padding:5px;height:auto;font-size:16px;}
-neon-animatable paper-card::shadow div.header img{-webkit-filter:drop-shadow(0px 0px 5px #FFF);}
-neon-animatable paper-card{margin:5px;width:calc(100% - 10px);max-width:800px;box-sizing:border-box;}
-neon-animatable paper-card::shadow div.header img{margin:10px auto;width:auto!important;height:75px!important;margin-right:15px;}
-neon-animatable paper-card[image*='gas']::shadow div.header{background:linear-gradient(to bottom,#FFE082 0%,#FFC107 100%,rgba(0,0,0,0) 100%);}
-neon-animatable paper-card[image*='electric']::shadow div.header{background:linear-gradient(to bottom,#81D4FA 0%,#03A9F4 100%,rgba(0,0,0,0) 100%);}
-neon-animatable paper-card[image]::shadow div.title-text.strong strong{position:absolute;bottom:15px;left:0px;right:90px;}
-neon-animatable paper-card[image]::shadow div.title-text.strong{top:0px;left:0px;right:0px;bottom:0px;padding:5px;}
+neon-animatable[page='view-gas'] div.content div{font-size:18px;margin-bottom:10px;}
+neon-animatable[page='view-electric'] div.content div{font-size:18px;margin-bottom:10px;}
+neon-animatable[page='view-gas'] div.content div:first-of-type{font-size:25px;font-weight:bold;}
+neon-animatable[page='view-electric'] div.content div:first-of-type{font-size:25px;font-weight:bold;}
+neon-animatable dual-card[image*='electric']::shadow div.header{background:linear-gradient(to bottom,#81D4FA 0%,#03A9F4 100%,rgba(0,0,0,0) 100%);}
+neon-animatable dual-card[image*='gas']::shadow div.header{background:linear-gradient(to bottom,#FFE082 0%,#FFC107 100%,rgba(0,0,0,0) 100%);}
+neon-animatable dual-card{margin:5px;width:calc(100% - 10px);min-width:393px;max-width:800px;box-sizing:border-box;}
 neon-animatable paper-input::shadow input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 neon-animatable paper-input::shadow input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
 neon-animatable paper-input::shadow input.paper-input{font-size:50px;line-height:60px;}
 neon-animatable paper-input::shadow div[prefix]{font-size:50px;line-height:60px;}
-neon-animatable paper-card::shadow strong{font-size:60px;font-weight:normal;}
-neon-animatable paper-card::shadow div.header{border-radius:inherit;}
-
-neon-animatable[page='view-electric'] div.content div:first-of-type{font-size:30px;font-weight:bold;}
-neon-animatable[page='view-gas'] div.content div:first-of-type{font-size:30px;font-weight:bold;}
-neon-animatable[page='view-electric'] div.content div{font-size:20px;margin-bottom:10px;}
-neon-animatable[page='view-gas'] div.content div{font-size:20px;margin-bottom:10px;}
+neon-animatable{text-align:center;padding:5px;height:auto;font-size:16px;}
+neon-animatable *:last{margin-bottom:25px;}
 
 div#toolbar-end{
  position:absolute;top:0px;right:-15px;
@@ -118,5 +106,6 @@ paper-header-panel::shadow #mainContainer::-webkit-scrollbar-thumb{
 
 @media screen and (min-width:1076px){
  neon-animatable paper-card[size='half']{max-width:393px;}
+ neon-animatable dual-card[size='half']{max-width:393px;}
 }
 </style>
