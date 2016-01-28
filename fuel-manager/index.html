@@ -56,8 +56,7 @@
     </neon-animatable>
     <neon-animatable page="view-gas" icon="cached">
      <dual-card heading="Loading" image="./images/gas.png"></dual-card>
-    </neon-animatable>
-    
+    </neon-animatable>    
     <neon-animatable page="add-reading" icon="save">
      <input type="hidden" name="action" value="READING"/>
      <dual-card heading="Enter Electric Reading" image="./images/electric.png" size="half">
@@ -66,8 +65,7 @@
      <dual-card heading="Enter Gas Reading" image="./images/gas.png" size="half">
       <paper-input type="number" name="gas" placeholder="0.00" no-label-float><div prefix>&nbsp;£</div></paper-input>
      </dual-card>
-    </neon-animatable>
-    
+    </neon-animatable>    
     <neon-animatable page="add-credit" icon="save">
      <input type="hidden" name="action" value="CREDIT"/>
      <dual-card heading="Add Electric Credit" image="./images/electric.png" size="half">
@@ -83,7 +81,7 @@
  <paper-dialog id="connect" entry-animation="scale-up-animation" exit-animation="fade-out-animation" modal>
   <paper-input name="message" type="username" placeholder="username" data-index="1" no-label-float autofocus></paper-input>
   <paper-input name="secret" type="password" placeholder="password" data-index="2" no-label-float></paper-input>
-  <small style="color:red;"></small><div class="buttons"><paper-button>Login</paper-button></div>
+  <small></small><div class="buttons"><paper-button>Login</paper-button></div>
  </paper-dialog>
 </event-listener>
 <script type="text/javascript">
@@ -136,8 +134,6 @@ $(window).on("update",function(e,obj){try{
   }});chart.attr("cols",JSON.stringify(cols)).attr("rows",JSON.stringify(rows)).height("200px");//GENERATE GOOGLE CURVE TYPE CHART
   $("dual-card[image*='electric']",holder).attr({heading:"Estimated Weekly Usage",strong:"£"+averageWeekly(average.electric)});
   $("dual-card[image*='gas']",holder).attr({heading:"Estimated Weekly Usage",strong:"£"+averageWeekly(average.gas)});
-  
-  //$("*#chart div.content",holder).find("strong").remove();
   $("*#chart div.content",holder).last().html(chart).parent().find("strong").remove();
  });
 
@@ -194,12 +190,8 @@ $("body").on("click","*#actionButton",function(e){var temp={};
 
 $("paper-dialog#connect").on("keydown","input",function(event){
  var key=Number($(this).closest("paper-input").get(0).dataset.index);
- 
- 
- if(event.which==13){$("*[data-index='"+(key+1)+"']").focus();}
- 
  if(event.which==13 && key==2){$("paper-dialog paper-button").click();}
- 
+ if(event.which==13){$("*[data-index='"+(key+1)+"']").focus();}
  if(event.which==13){event.preventDefault();}
 });
 

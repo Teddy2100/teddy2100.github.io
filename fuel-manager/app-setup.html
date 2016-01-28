@@ -46,10 +46,27 @@ paper-drawer-panel::shadow{
  };
 }
 
+div#toolbar-end{
+ position:absolute;top:0px;right:-15px;
+ background:var(--paper-toolbar-background);
+ box-shadow:5px 5px 6px -3px rgba(0,0,0,0.4);z-index:10;
+ border-bottom-left-radius:calc(var(--paper-toolbar-sm-height)/2);
+ height:var(--paper-toolbar-sm-height);
+ width:var(--paper-toolbar-sm-height);
+}
+
+div#tabs-end{
+ position:absolute;top:0px;right:-20px;
+ background:var(--paper-tabs-background);
+ box-shadow:5px 5px 6px -3px rgba(0,0,0,0.4);z-index:0;
+ border-bottom-left-radius:calc(var(--paper-tabs-height)/2);
+ height:calc(var(--paper-tabs-height) + var(--paper-toolbar-sm-height));
+ width:var(--paper-tabs-height);
+}
+
 paper-card{width:100%;}
 paper-item{cursor:pointer;}
 body{-webkit-user-select:none;}
-google-chart{margin:auto;width:100%;}
 paper-item{padding:0px 10px!important;}
 paper-item iron-icon{margin-right:10px;}
 paper-card#drawer::shadow{border-radius:0px;}
@@ -57,7 +74,8 @@ paper-icon-item{padding:5px!important;height:48px;}
 paper-spinner{width:75px;height:75px;margin-top:10px;}
 paper-icon-button#actionButton:not([icon]){display:none;}
 paper-card#drawer::shadow div.title-text{top:0px!important;}
-div#mainContainer.paper-header-panel{overflow-y:scroll!important;}
+paper-dialog::shadow small{line-height:30px!important;color:red;}
+paper-dialog::shadow{width:300px;text-align:center;border-radius:8px;}
 paper-card::shadow div.title-text{-webkit-filter:drop-shadow(0px 0px 5px #FFF);}
 paper-toolbar#tabs::shadow paper-ripple{color:var(--paper-toolbar-background);opacity:0.4;}
 paper-toolbar#tabs::shadow div#selectionBar{background:var(--paper-toolbar-background);height:4px;}
@@ -84,32 +102,15 @@ neon-animatable paper-input::shadow input::-webkit-outer-spin-button{-webkit-app
 neon-animatable paper-input::shadow input.paper-input{font-size:50px;line-height:60px;}
 neon-animatable paper-input::shadow div[prefix]{font-size:50px;line-height:60px;}
 neon-animatable{text-align:center;padding:5px;height:auto;font-size:16px;}
-neon-animatable *:last{margin-bottom:25px;}
+neon-animatable dual-card:last-of-type{margin-bottom:10px;}
 
-div#toolbar-end{
- position:absolute;top:0px;right:-15px;
- background:var(--paper-toolbar-background);
- box-shadow:5px 5px 6px -3px rgba(0,0,0,0.4);z-index:10;
- border-bottom-left-radius:calc(var(--paper-toolbar-sm-height)/2);
- height:var(--paper-toolbar-sm-height);
- width:var(--paper-toolbar-sm-height);
-}
-div#tabs-end{
- position:absolute;top:0px;right:-20px;
- background:var(--paper-tabs-background);
- box-shadow:5px 5px 6px -3px rgba(0,0,0,0.4);z-index:0;
- border-bottom-left-radius:calc(var(--paper-tabs-height)/2);
- height:calc(var(--paper-tabs-height) + var(--paper-toolbar-sm-height));
- width:var(--paper-tabs-height);
-}
-
-paper-header-panel::shadow #mainContainer::-webkit-scrollbar{width:14px;}
-paper-header-panel::shadow #mainContainer::-webkit-scrollbar-thumb{
- border:2px solid var(--primary-background-color);
- background-color:var(--paper-toolbar-background);
-}
+paper-header-panel::shadow #mainContainer{overflow-y:overlay!important;}
+paper-header-panel::shadow #mainContainer::-webkit-scrollbar{width:4px;max-width:8px;}
+paper-header-panel::shadow #mainContainer::-webkit-scrollbar *{background:transparent!important;}
+paper-header-panel::shadow #mainContainer::-webkit-scrollbar-thumb{background-color:var(--paper-toolbar-background);}
 
 @media screen and (min-width:1076px){
+ paper-header-panel::shadow #mainContainer::-webkit-scrollbar{width:8px;}
  neon-animatable paper-card[size='half']{max-width:393px;}
  neon-animatable dual-card[size='half']{max-width:393px;}
 }

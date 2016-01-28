@@ -24,9 +24,7 @@
    var isNarrow=$("paper-drawer-panel").is("[narrow]");
    $("paper-card#drawer").attr("elevation",isNarrow?"0":"0");
    $("div#placeholder").css("display",isNarrow?"none":"block");
-
-   //$("google-chart").each(function(){this.drawChart();});
-   
+   $("google-chart").each(function(){this.drawChart();});
    $("paper-dialog").each(function(){if(this.opened){
     this.resetFit();this.refit();this.fit();
    }});   
@@ -39,10 +37,8 @@
   <style include="paper-card">
    :host div.header{border-radius:inherit;}
    :host div.content:not(:empty){padding:5px;}
-   :host div.header div.title-text b{font-weight:normal;}
-   
-   :host div.header div.title-text strong:empty{height:30px;}
-   
+   :host div.header div.title-text b{font-weight:normal;}   
+   :host div.header div.title-text strong:empty{height:30px;}   
    :host{background:var(--paper-drawer-background);border-radius:6px;}
    :host div.header div.title-text{left:0px;right:0px;bottom:0px;padding:5px;}   
    :host div.header div.title-text strong{font-size:60px;line-height:60px;display:inherit;}   
