@@ -4,6 +4,11 @@ $.ajaxSetup({
  url:"https://script.google.com/macros/s/AKfycbz6uzzzZOL_Vw-z-2zRtgYwBMApe2dNvM_30BEpZqpLtjEjhxs/exec", 
 });
 
+$.fn.extend({
+ openDialog:function(){$("event-listener").addClass("noblur");$(this).get(0).open();return $(this);},
+ closeDialog:function(){$("event-listener").removeClass("noblur");$(this).get(0).close();return $(this);}
+});
+
 function getDate(stamp,full){
  var stamp=$.php.strtotime(stamp);
  return $.php.date("dS F Y, H:i",stamp);

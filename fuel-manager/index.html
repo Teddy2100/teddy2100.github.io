@@ -7,22 +7,21 @@
  <meta name="theme-color" content="#E00421">
  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
- <script type="text/javascript" src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
  <script type="text/javascript" src="../bower_components/jquery/dist/jquery.min.js"></script>
+ <script type="text/javascript" src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
  <script type="text/javascript" src="./elements/jquery-phpjs-datetime.js"></script>
  <script type="text/javascript" src="./elements/jquery-phpjs-strings.js"></script>
  <script type="text/javascript" src="./elements/jquery-phpjs-array.js"></script>
  <script type="text/javascript" src="./elements/jquery-cookie.min.js"></script>
  <script type="text/javascript" src="./elements/hmac-sha1.min.js"></script>
  <link rel="import" href="../bower_components/vulcanized-full.html"/>
- <link rel="import" href="./elements/event-listener.html"/>
- <link rel="import" href="./elements/dual-card.html"/>
+ <link rel="import" href="./element-setup.html"/>
  <link rel="import" href="./app-setup.html"/>
 </head>
 <body unresolved>
 <event-listener id="fuel-gui">
  <paper-drawer-panel id="page" responsive-width="800px">
-  <paper-card id="drawer" elevation="0" heading="Fuel Manager" image="./images/header.png" fadeImage drawer>
+  <paper-card id="drawer" elevation="0" heading="Fuel Manager" image="./images/header.png" drawer>
    <paper-menu class="list" style="padding:0px;">
     <paper-item goto="view-overview"><iron-icon icon="assessment"></iron-icon>View Your Usage</paper-item>
     <paper-item goto="add-reading"><iron-icon icon="social:whatshot"></iron-icon>Add Reading</paper-item>
@@ -57,7 +56,7 @@
     </neon-animatable>
     <neon-animatable page="view-gas" icon="cached">
      <dual-card heading="Loading" image="./images/gas.png"></dual-card>
-    </neon-animatable>    
+    </neon-animatable>
     
     <neon-animatable page="add-reading" icon="save">
      <input type="hidden" name="action" value="READING"/>
@@ -82,9 +81,9 @@
   </paper-header-panel>
  </paper-drawer-panel>
  <paper-dialog id="connect" entry-animation="scale-up-animation" exit-animation="fade-out-animation" modal>
-  <paper-input name="message" type="username" placeholder="username" no-label-float></paper-input>
-  <paper-input name="secret" type="password" placeholder="password" no-label-float></paper-input>
-  <div class="buttons"><paper-button>Login</paper-button></div>
+  <paper-input name="message" type="username" placeholder="username" data-index="1" no-label-float autofocus></paper-input>
+  <paper-input name="secret" type="password" placeholder="password" data-index="2" no-label-float></paper-input>
+  <small style="color:red;"></small><div class="buttons"><paper-button>Login</paper-button></div>
  </paper-dialog>
 </event-listener>
 <script type="text/javascript">
@@ -105,7 +104,7 @@ $(window).on("load",function(){var cs={expires:28};
 $(window).on("connect",function(e,extra){
  var send={token:$.cookie("token"),username:$.cookie("username")};
  if(send && extra && typeof extra=="object"){send=$.extend(send,extra);}
- if(!send.token&&!send.username){$("paper-dialog#connect").get(0).open();return;}
+ if(!send.token&&!send.username){$("paper-dialog#connect").openDialog();return;}
  $.ajax({data:$.param(send),dataType:"jsonp",timeout:2000,crossDomain:true,async:false,
   beforeSend:function(){$("paper-button","paper-dialog#connect").attr("disabled","disabled");},
   complete:function(){$("paper-button","paper-dialog#connect").removeAttr("disabled");},
@@ -114,9 +113,9 @@ $(window).on("connect",function(e,extra){
 });
 
 $(window).on("logout",function(e,results){
+ if(results&&results.msg){$("paper-dialog small").html(results.msg);}
  $("paper-item").eq(0).click();$("paper-menu").eq(1).hide();
  $.each($.cookie(),function(k,v){$.cookie(k,"");});
- if(results && results.msg){alert(results.msg);}
  if(results){$(window).trigger("connect");}
  else{location.reload();}
 });
@@ -137,7 +136,9 @@ $(window).on("update",function(e,obj){try{
   }});chart.attr("cols",JSON.stringify(cols)).attr("rows",JSON.stringify(rows)).height("200px");//GENERATE GOOGLE CURVE TYPE CHART
   $("dual-card[image*='electric']",holder).attr({heading:"Estimated Weekly Usage",strong:"£"+averageWeekly(average.electric)});
   $("dual-card[image*='gas']",holder).attr({heading:"Estimated Weekly Usage",strong:"£"+averageWeekly(average.gas)});
-  $("div.content",holder).last().html(chart);
+  
+  //$("*#chart div.content",holder).find("strong").remove();
+  $("*#chart div.content",holder).last().html(chart).parent().find("strong").remove();
  });
 
  $("neon-animatable[page='view-gas']").each(function(e,holder){
@@ -158,7 +159,7 @@ $(window).on("update",function(e,obj){try{
  
  var logout="<paper-item goto='logout'><iron-icon icon='exit-to-app'></iron-icon>Logout ("+obj.username+")</paper-item>";
  $("dual-card[image] div.title-text:has(center)").parent().find("iron-image").css({marginTop:"35px"});
- $("paper-dialog#connect").get(0).close();$("paper-menu").eq(1).html(logout).show();
+ $("paper-dialog#connect").closeDialog();$("paper-menu").eq(1).html(logout).show();
 }catch(error){alert("Update Error:\n"+error.message);}finally{
  $("paper-icon-button#actionButton").removeAttr("disabled");
  $("paper-input","neon-animatable,paper-dialog").val("");  
@@ -191,15 +192,28 @@ $("body").on("click","*#actionButton",function(e){var temp={};
  }catch(error){alert("Submision Error:\n"+error.message);}
 });
 
+$("paper-dialog#connect").on("keydown","input",function(event){
+ var key=Number($(this).closest("paper-input").get(0).dataset.index);
+ 
+ 
+ if(event.which==13){$("*[data-index='"+(key+1)+"']").focus();}
+ 
+ if(event.which==13 && key==2){$("paper-dialog paper-button").click();}
+ 
+ if(event.which==13){event.preventDefault();}
+});
+
 $.getScript("./elements/hammer.min.js",function(){
  var setRange=function(v,n,x){return Math.min(Math.max(v,n),x);}
  new Hammer($("neon-animated-pages").get(0)).on("swipe",function(e){
   if(e.direction==2){var swipeTo=$("paper-tab.iron-selected").next().index();}
-  if(e.direction==4){var swipeTo=$("paper-tab.iron-selected").prev().index();}
+  if(e.direction==4){var swipeTo=$("paper-tab.iron-selected").prev().index();}  
+  if($("iron-selector div#drawer").hasClass("iron-selected")){return false;}
   if($("neon-animated-pages").get(0).selected>2){return false;}
+  if($("iron-selector").hasClass("dragging")){return false;}  
   $("paper-tabs").get(0).selected=setRange(swipeTo,0,2);
   $("paper-tab").get(setRange(swipeTo,0,2)).click();
-  $("div#mainContainer").animate({scrollTop:0});
+  $("div#mainContainer").animate({scrollTop:0});  
  });console.debug("Gestures: Active");
 });
 </script>

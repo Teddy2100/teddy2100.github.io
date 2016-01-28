@@ -1,0 +1,77 @@
+<dom-module id="event-listener">
+ <template>
+  <style>
+   :host.blur{filter:blur(2px);-webkit-filter:blur(2px);}
+  </style>
+  <content></content>
+ </template>
+ <script>
+ Polymer({
+  is:"event-listener",
+  behaviors:[
+   Polymer.IronResizableBehavior,
+   Polymer.IronSelectableBehavior
+  ],
+  listeners:{
+   "iron-resize":"resized"
+  },
+  registered:function(){
+   $("neon-animated-pages").on("neon-animation-finish",function(){
+    $("paper-drawer-panel").get(0).closeDrawer();
+   });
+  },
+  resized:function(){
+   var isNarrow=$("paper-drawer-panel").is("[narrow]");
+   $("paper-card#drawer").attr("elevation",isNarrow?"0":"0");
+   $("div#placeholder").css("display",isNarrow?"none":"block");
+
+   //$("google-chart").each(function(){this.drawChart();});
+   
+   $("paper-dialog").each(function(){if(this.opened){
+    this.resetFit();this.refit();this.fit();
+   }});   
+  }
+ });
+ </script>
+</dom-module>
+<dom-module id="dual-card">
+ <template>
+  <style include="paper-card">
+   :host div.header{border-radius:inherit;}
+   :host div.content:not(:empty){padding:5px;}
+   :host div.header div.title-text b{font-weight:normal;}
+   
+   :host div.header div.title-text strong:empty{height:30px;}
+   
+   :host{background:var(--paper-drawer-background);border-radius:6px;}
+   :host div.header div.title-text{left:0px;right:0px;bottom:0px;padding:5px;}   
+   :host div.header div.title-text strong{font-size:60px;line-height:60px;display:inherit;}   
+   :host iron-image::shadow img{margin:10px auto!important;width:auto!important;height:75px!important;}
+   :host iron-image::shadow img{-webkit-filter:brightness(0%) invert(100%);opacity:0.5;float:none!important;}
+  </style>
+  <div class="header">
+   <iron-image hidden$="[[!image]]" src="[[image]]" preload$="[[preloadImage]]" fade$="[[fadeImage]]"></iron-image>
+   <div hidden$="[[!heading]]" class$="[[_computeHeadingClass(image)]]"><b>[[heading]]</b><strong>[[strong]]</strong></div>
+  </div><div class="content"><content></content></div>
+ </template>
+ <script>
+ Polymer({
+  is:"dual-card",
+  properties:{
+   image:{type:String,value:""},
+   strong:{type:String,value:""},
+   heading:{type:String,value:""},
+  },
+  registered:function(){
+   //this.
+  },
+  ready:function(){
+   //this.
+  },
+  _computeHeadingClass:function(image){
+   if(image){return "title-text over-image";}
+   else{return "title-text";}
+  }
+ });
+ </script>
+</dom-module>
