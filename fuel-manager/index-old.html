@@ -9,13 +9,18 @@
  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
  <script type="text/javascript" src="../bower_components/jquery/dist/jquery.min.js"></script>
  <script type="text/javascript" src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
- <link rel="import" content="required" href="../bower_components/vulcanized-full.html"/>
- <link rel="import" content="required" href="./application-setup.html"/>
+ <script type="text/javascript" src="./elements/jquery-phpjs-datetime.js"></script>
+ <script type="text/javascript" src="./elements/jquery-phpjs-strings.js"></script>
+ <script type="text/javascript" src="./elements/jquery-phpjs-array.js"></script>
+ <script type="text/javascript" src="./elements/jquery-cookie.min.js"></script>
+ <script type="text/javascript" src="./elements/hmac-sha1.min.js"></script>
+ <link rel="import" href="../bower_components/vulcanized-full.html"/>
+ <link rel="import" href="./application-setup.html"/>
 </head>
 <body unresolved>
 <event-listener id="fuel-gui">
- <paper-drawer-panel id="page" responsive-width="800px" drawer-width="256px" force-narrow>
-  <paper-card elevation="0" heading="Fuel Manager" image="./images/header.png" class="narrow-layout" drawer>
+ <paper-drawer-panel id="page" responsive-width="800px">
+  <paper-card id="drawer" elevation="0" heading="Fuel Manager" image="./images/header.png" drawer>
    <paper-menu class="list" style="padding:0px;">
     <paper-item goto="view-overview"><iron-icon icon="assessment"></iron-icon>View Your Usage</paper-item>
     <paper-item goto="add-reading"><iron-icon icon="social:whatshot"></iron-icon>Add Reading</paper-item>
@@ -23,25 +28,22 @@
    </paper-menu>
    <paper-menu class="list stretch" style="padding:0px;display:none;">
     <paper-item goto="logout"><iron-icon icon="exit-to-app"></iron-icon>Logout</paper-item>
-   </paper-menu>
+   </paper-menu>   
   </paper-card>
-  <paper-header-panel mode="standard" main>
+  <paper-header-panel id="main" mode="standard" main>
    <paper-toolbar id="title">
     <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
     <span class="title" style="display:block;">Fuel Manager</span>
     <paper-icon-button id="actionButton"></paper-icon-button>
    </paper-toolbar>
    <paper-toolbar id="tabs">
-    <paper-tabs class="fit" selected="9">
+    <paper-tabs class="fit" selected="0">
      <paper-tab goto="view-overview">Overview</paper-tab>
      <paper-tab goto="view-electric">Electric</paper-tab>
      <paper-tab goto="view-gas">Gas</paper-tab>
     </paper-tabs>
    </paper-toolbar>
    <neon-animated-pages selected="0" class="fit">
-    <neon-animatable page="user-login">
-    
-    </neon-animatable>    
     <neon-animatable page="view-overview" icon="cached">
      <dual-card heading="Calculating Usage" strong="--" image="./images/electric.png" size="half"></dual-card>
      <dual-card heading="Calculating Usage" strong="--" image="./images/gas.png" size="half"></dual-card>
@@ -70,7 +72,7 @@
      <dual-card heading="Add Gas Credit" image="./images/gas.png" size="half">
       <paper-input type="number" name="gas" placeholder="0.00" no-label-float><div prefix>&nbsp;£</div></paper-input>
      </dual-card>
-    </neon-animatable>
+    </neon-animatable>    
    </neon-animated-pages>
   </paper-header-panel>
  </paper-drawer-panel>
@@ -84,35 +86,15 @@
 var data=[],rows=[],average={};
 $(window).on("load",function(){var cs={expires:28};
  $("paper-card#drawer div#placeholder").removeAttr("hidden");
+ //$("paper-card#drawer div#placeholder").html($("<div id='tabs-end'>&nbsp;</div>"));
+ //$("paper-card#drawer div#placeholder").append($("<div id='toolbar-end'>&nbsp;</div>"));
  $("paper-button","paper-dialog#connect").on("click",function(){
   var secret=$("*[name='secret']").get(0).value.toString().toUpperCase();
   var username=$("*[name='message']").get(0).value.toString().toUpperCase();  
   $.cookie("token",CryptoJS.HmacSHA1(username,secret).toString().toUpperCase(),cs);
   $.cookie("username",username,cs);$(window).trigger("connect","retry");
- });//$("paper-item[goto='view-overview']").click();
- //$(window).trigger("connect","auto");
- $(window).trigger("init");
-});
-
-$(window).on("init",function(){
- var required=[
-  "./elements/hmac-sha1.min.js",
-  "./elements/jquery-cookie.min.js",
-  "./elements/jquery-keyframes.min.js",
-  "./elements/jquery-phpjs-array.js",
-  "./elements/jquery-phpjs-strings.js",
-  "./elements/jquery-phpjs-datetime.js"
- ];
- $.getScripts(required,function(err){
-  $("paper-toolbar#title").css({position:"relative"});console.log(err);
-  $.keyframe.define({from:{'min-height':'100%'},to:{'min-height':'0%'},name:'shrink'}); 
-  $("paper-toolbar#title").playKeyframe({name:'shrink',duration:'1s',complete:function(){
-   $("paper-drawer-panel").removeAttr("force-narrow");$(window).trigger("connect");  
-   if(window.matchMedia("(max-width:800px)").matches){return false;}
-   $("iron-selector").removeClass("narrow-layout");
-   $("div#main").css("left","256px");  
-  }});
- });
+ });$("paper-item[goto='view-overview']").click();
+ $(window).trigger("connect","auto");
 });
 
 $(window).on("connect",function(e,extra){
@@ -171,8 +153,7 @@ $(window).on("update",function(e,obj){try{
  
  var logout="<paper-item goto='logout'><iron-icon icon='exit-to-app'></iron-icon>Logout ("+obj.username+")</paper-item>";
  $("dual-card[image] div.title-text:has(center)").parent().find("iron-image").css({marginTop:"35px"});
- $("paper-item[goto='logout']").replaceWith(logout);$("paper-menu.stretch").show();
- $("paper-dialog#connect").closeDialog();
+ $("paper-dialog#connect").closeDialog();$("paper-menu").eq(1).html(logout).show();
 }catch(error){alert("Update Error:\n"+error.message);}finally{
  $("paper-icon-button#actionButton").removeAttr("disabled");
  $("paper-input","neon-animatable,paper-dialog").val("");  
@@ -181,17 +162,16 @@ $(window).on("update",function(e,obj){try{
 }});
 
 $("body").on("click","*[goto]",function(e){
- var tabs=$("paper-toolbar#tabs,div#tabs-end");
  try{var pageHandle=$("neon-animated-pages").get(0),obj=$(this);
   if(obj.attr("goto")=="logout"){$(window).trigger("logout");return;}
   var requestedPage=$("neon-animatable[page='"+obj.attr("goto")+"']").index();
-  if($.inArray(requestedPage,[1,2,3])!=-1){tabs.slideDown();}else{tabs.slideUp();} 
-  if($.inArray(requestedPage,[1,2,3])!=-1){$("paper-tabs").get(0).selected=requestedPage-1;}  
+  $("paper-toolbar#tabs,div#tabs-end").css("display",(requestedPage<3)?"block":"none");
    pageHandle.exitAnimation="slide-"+(requestedPage<pageHandle.selected?"right":"left")+"-animation";
    pageHandle.entryAnimation="slide-from-"+(requestedPage<pageHandle.selected?"left":"right")+"-animation";  
   if(this.nodeName=="PAPER-ITEM" && obj.text().length!=0){$("span.title").html(obj.text().trim());}
-  $("#actionButton").attr("icon",$("neon-animatable").eq(requestedPage).attr("icon"));  
-  if(requestedPage!=pageHandle.selected){pageHandle.selected=requestedPage;}
+  $("#actionButton").attr("icon",$("neon-animatable").eq(requestedPage).attr("icon"));
+  if(requestedPage!=pageHandle.selected){pageHandle.selected=requestedPage;}  
+  if(requestedPage<3){$("paper-tabs").get(0).selected=requestedPage;}
  }catch(error){alert("Navigation Error:\n"+error.message);}
  $("div#mainContainer").animate({scrollTop:0});
 });
@@ -219,10 +199,10 @@ $.getScript("./elements/hammer.min.js",function(){
   if(e.direction==2){var swipeTo=$("paper-tab.iron-selected").next().index();}
   if(e.direction==4){var swipeTo=$("paper-tab.iron-selected").prev().index();}  
   if($("iron-selector div#drawer").hasClass("iron-selected")){return false;}
-  if($("neon-animated-pages").get(0).selected>3){return false;}
+  if($("neon-animated-pages").get(0).selected>2){return false;}
   if($("iron-selector").hasClass("dragging")){return false;}  
   $("paper-tabs").get(0).selected=setRange(swipeTo,0,2);
-  $("paper-tab").get(setRange(swipeTo,0,2)).click();
+  //$("paper-tab").get(setRange(swipeTo,0,2)).click();
   $("div#mainContainer").animate({scrollTop:0});  
  });console.debug("Gestures: Active");
 });
