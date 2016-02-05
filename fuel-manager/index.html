@@ -17,10 +17,10 @@
 </head>
 <body unresolved>
 <event-listener id="fuel-gui">
- <paper-drawer-panel id="page" responsive-width="800px" drawer-width="256px" force-narrow>
-  <paper-card elevation="0" heading="Fuel Manager" image="./images/header.png" class="narrow-layout" drawer>
+ <paper-drawer-panel id="page" responsive-width="800px" drawer-width="256px" force-narrow disable-swipe>
+  <paper-card heading="Fuel Manager" image="./images/header.png" class="narrow-layout" drawer>
    <paper-menu class="list" style="padding:0px;">
-    <paper-item goto="view-overview"><iron-icon icon="assessment"></iron-icon>View Your Usage</paper-item>
+    <paper-item goto="view-overview" is="neon-page-link"><iron-icon icon="assessment"></iron-icon>View Your Usage</paper-item>
     <paper-item goto="add-reading"><iron-icon icon="social:whatshot"></iron-icon>Add Reading</paper-item>
    </paper-menu>
    <paper-menu class="list stretch" style="padding:0px;">
@@ -116,6 +116,7 @@ $(window).on("logout",function(e,obj){
  $.each($.cookie(),function(k){$.removeCookie(k);});
  $("dual-card#loginForm").show();$("paper-spinner").hide();
  if(obj){$("paper-item[goto='logged-out']").click();} 
+ $("paper-drawer-panel").attr("disable-swipe",1);
  $("paper-toolbar#title").addClass("loading");
  if(obj&&obj.msg){alert(obj.msg);}
 });
@@ -143,7 +144,7 @@ $(window).on("update",function(e,obj){try{
 
  $("neon-animatable[page='view-gas']").each(function(e,holder){
   var estimateCost=Number($.php.array_sum(average.gas)/average.gas.length).toFixed(2);$("div.content",holder).empty();
-  $.each(temp,function(k,record){if(temp[k-1]&&record[1]=="READING"){$("div.content",holder).prepend($("<div>").html(getDate(record[0],true)+" - £"+getPrice(record[3])));}});
+  $.each(temp,function(k,record){if(temp[k-1]&&record[1]=="READING"){$("div.content",holder).prepend($("<div>").html(getDate(record[0],true)+"<span> - </span>£"+getPrice(record[3])));}});
   $("dual-card[image*='gas']",holder).attr({strong:Number($(temp).last().get(0)[3]/estimateCost).toFixed(1)+" Days"});
   $("dual-card[image*='gas']",holder).attr({heading:"Estimated Days Remaining"});
   console.debug("Current Gas Average: £"+estimateCost);
@@ -151,18 +152,19 @@ $(window).on("update",function(e,obj){try{
  
  $("neon-animatable[page='view-electric']").each(function(e,holder){
   var estimateCost=Number($.php.array_sum(average.electric)/average.electric.length).toFixed(2);$("div.content",holder).empty();
-  $.each(temp,function(k,record){if(temp[k-1]&&record[1]=="READING"){$("div.content",holder).prepend($("<div>").html(getDate(record[0],true)+" - £"+getPrice(record[2])));}});
+  $.each(temp,function(k,record){if(temp[k-1]&&record[1]=="READING"){$("div.content",holder).prepend($("<div>").html(getDate(record[0],true)+"<span> - </span>£"+getPrice(record[2])));}});
   $("dual-card[image*='electric']",holder).attr({strong:Number($(temp).last().get(0)[2]/estimateCost).toFixed(1)+" Days"});
   $("dual-card[image*='electric']",holder).attr({heading:"Estimated Days Remaining"});
   console.debug("Current Electric Average: £"+estimateCost);
  });
  
  $("paper-item[goto='logged-out']").show().find("b").css("font-weight","normal").html("("+obj.username+")");
- if($.isBetween(selected,1,3)==false){$("paper-tab[goto='view-overview']").click();}
+ if($.isBetween(selected,1,3)==false){$("paper-item[goto='view-overview']").click();}
  $("span.title").html($("neon-animatable.iron-selected").attr("title"));
 }catch(error){alert("Update Error:\n"+error.message);}finally{
  $("paper-icon-button#actionButton").removeAttr("disabled");
  $("paper-input","neon-animatable,paper-dialog").val("");  
+ $("paper-drawer-panel").removeAttr("disable-swipe");
  $("paper-toolbar#title").removeClass("loading");
  console.debug("Updated At: "+new Date());
 }});
