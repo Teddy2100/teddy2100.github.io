@@ -7,16 +7,12 @@
  <meta name="theme-color" content="#E00421">
  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
- <script type="text/javascript" src="../bower_components/jquery/dist/jquery.min.js"></script>
  <script type="text/javascript" src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
- <script type="text/javascript" content="required" src="./elements/jquery-keyframes.min.js"></script>
- <script type="text/javascript" content="required" src="./elements/jquery-cookie.min.js"></script>
- <script type="text/javascript" content="required" src="./elements/hmac-sha1.min.js"></script> 
  <link rel="import" content="required" href="../bower_components/vulcanized-full.html"/>
  <link rel="import" content="required" href="./application-setup.html"/>
 </head>
 <body unresolved>
-<event-listener id="fuel-gui">
+<app-content id="fuel-gui">
  <paper-drawer-panel id="page" responsive-width="800px" drawer-width="256px" force-narrow disable-swipe>
   <paper-card heading="Fuel Manager" image="./images/header.png" class="narrow-layout" drawer>
    <paper-menu class="list" style="padding:0px;">
@@ -28,7 +24,7 @@
    </paper-menu>
   </paper-card>
   <paper-header-panel mode="standard" main>
-   <paper-toolbar id="title" style="min-height:100%;" class="loading">
+   <paper-toolbar id="title" class="fill loading">
     <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
     <span class="title" style="display:block;">Loading</span>
     <paper-icon-button id="actionButton"></paper-icon-button>
@@ -73,149 +69,177 @@
    </neon-animated-pages>
   </paper-header-panel>
  </paper-drawer-panel>
-</event-listener>
+</app-content>
 <script type="text/javascript">
-var rawdata=[],average={};
-$(window).on("load",function(){var cs={expires:28};
- $("paper-button","dual-card#loginForm").on("click",function(){
-  var secret=$("*[name='secret']").get(0).value.toString().toUpperCase();
-  var username=$("*[name='message']").get(0).value.toString().toUpperCase();
-  $.cookie("token",CryptoJS.HmacSHA1(username,secret).toString().toUpperCase(),cs);
-  $.cookie("username",username,cs);$(window).trigger("connect");
- });$(window).trigger("startup");
-});
+var required=[],rawdata=[],average={},readings=3;
+window.getScripts("../bower_components/jquery/dist/jquery.min.js",function(){
+ Array.prototype.pushEach=function(a){var t=this;a.forEach(function(x){t.push(x);})}; 
+ //$.ajaxSetup({url:"https://script.google.com/macros/s/AKfycbxY7f1d4yj4mnY_8xVwBfsce8-GEGSiH0UahQpuDMc/dev"});
+ $.ajaxSetup({url:"https://script.google.com/macros/s/AKfycbz6uzzzZOL_Vw-z-2zRtgYwBMApe2dNvM_30BEpZqpLtjEjhxs/exec"});
+ 
+ $.extend({
+  //getScripts:function(f,c){if(typeof f=="string"){f=[f];}if(!f[0]){c();return false;}$.getScript(f[0]).done(function(){f.shift();$.getScripts(f,c);}).fail(function(x,e,m){c(m);});},
+  getPrice:function(x){var p=x.toString().split(".");if(!p[1]){p[1]="00";}if(p[1] && p[1].length==1){p[1]=p[1]+"0";}return parseFloat(p.join(".")).toFixed(2);},
+  isBetween:function(x,a,b){var min=Math.min.apply(Math,[a,b]),max=Math.max.apply(Math,[a,b]);return x>=min && x<=max;},
+  getDate:function(stamp,full){var stamp=$.php.strtotime(stamp);return $.php.date("dS F Y, H:i",stamp);},
+  setRange:function(v,n,x){return Math.min(Math.max(v,n),x);}
+ });
+ 
+ $("app-content").on("app-resized",function(){
+  var tabHolder=$("paper-tabs").width();
+  var tabCount=$("paper-tab","paper-tabs").size();  
+  $("paper-tab","paper-tabs").width(tabHolder/tabCount); 
+  $("google-chart").each(function(){this.drawChart();});   
+  $("paper-dialog").each(function(){if(this.opened){
+   this.resetFit();this.refit();this.fit();
+  }});
+ });
 
-$(window).on("startup",function(){
- var drawer=$("paper-drawer-panel").attr("drawer-width");
- var minsize=$("paper-drawer-panel").attr("responsive-width");
- $.keyframe.define({from:{"min-height":"100%"},to:{"min-height":"0%"},name:"shrink"});
- $("paper-toolbar#title").playKeyframe({name:"shrink",delay:"500ms",duration:"500ms",complete:function(){
-  $.getScripts(["./elements/jquery-phpjs-array.js","./elements/jquery-phpjs-strings.js","./elements/jquery-phpjs-datetime.js"],function(err){
-   $("paper-drawer-panel").removeAttr("force-narrow");$(window).trigger("connect");
-   if(window.matchMedia("(max-width:"+minsize+")").matches){return false;}
-   $("iron-selector").removeClass("narrow-layout");
-   $("div#main").css("left",drawer);
-  });return;
+ $(window).on("load",function(){var cs={expires:28};
+  $("paper-button","dual-card#loginForm").on("click",function(){
+   var secret=$("*[name='secret']").get(0).value.toString().toUpperCase();
+   var username=$("*[name='message']").get(0).value.toString().toUpperCase();
+   $.cookie("token",CryptoJS.HmacSHA1(username,secret).toString().toUpperCase(),cs);
+   $.cookie("username",username,cs);$(window).trigger("connect","submit");
+  });$(window).trigger("startup");
+ });
+
+ $(window).on("startup",function(){
+  var drawer=$("paper-drawer-panel").attr("drawer-width");
+  var minsize=$("paper-drawer-panel").attr("responsive-width");
+   required.pushEach(["./elements/hammer.min.js","./elements/hmac-sha1.min.js","./elements/jquery-cookie.min.js"]);
+   required.pushEach(["./elements/jquery-phpjs-array.js","./elements/jquery-phpjs-strings.js","./elements/jquery-phpjs-datetime.js"]);
+  $("paper-toolbar#title").delay(1000).queue(function(next){$(this).removeClass("fill");next();}).delay(1000).queue(function(){  
+   window.getScripts(required,function(err){$("paper-drawer-panel").removeAttr("force-narrow");$(window).trigger("connect");
+    $(window).trigger("gestures");if(window.matchMedia("(max-width:"+minsize+")").matches){return false;}
+    $("iron-selector").removeClass("narrow-layout");$("div#main").css("left",drawer);
+   });
+  });
+ });
+ 
+ $(window).on("gestures",function(){
+  var setRange=function(v,n,x){return Math.min(Math.max(v,n),x);}
+  new Hammer($("neon-animated-pages").get(0)).on("swipe",function(e){
+   if(e.direction==2){var swipeTo=$("paper-tab.iron-selected").next().index();}
+   if(e.direction==4){var swipeTo=$("paper-tab.iron-selected").prev().index();}  
+   if($("iron-selector div#drawer").hasClass("iron-selected")){return false;}
+   if($("neon-animated-pages").get(0).selected>3){return false;}
+   if($("iron-selector").hasClass("dragging")){return false;}  
+   $("paper-tabs").get(0).selected=setRange(swipeTo,0,2);
+   $("paper-tab").get(setRange(swipeTo,0,2)).click();
+   $("div#mainContainer").animate({scrollTop:0});  
+  });console.debug("Gestures: Active");
+ });
+
+ $(window).on("connect",function(e,extra){
+  $("dual-card#loginForm").hide();$("paper-spinner").show();
+  var connect=($("neon-animatable.iron-selected").index()==0);
+  var send={token:$.cookie("token"),username:$.cookie("username")};
+  if(send&&extra&& typeof extra=="object"){send=$.extend(send,extra);}
+  if(!send.token&&!send.username){$(window).trigger("logout","now");return false;}
+  $.ajax({data:$.param(send),dataType:"jsonp",timeout:2000,crossDomain:true,async:false,
+   beforeSend:function(){$("span.title").html(connect?"Connecting":"Updating");},
+   success:function(responce){$(window).trigger(responce.action,responce);}
+  });
+ });
+
+ $(window).on("logout",function(e,obj){
+  $("paper-item[goto='logged-out']").hide();
+  $.each($.cookie(),function(k){$.removeCookie(k);});
+  $("dual-card#loginForm").show();$("paper-spinner").hide();
+  if(obj){$("paper-item[goto='logged-out']").click();} 
+  $("paper-drawer-panel").attr("disable-swipe",1);
+  $("paper-toolbar#title").addClass("loading");
+  if(obj&&obj.msg){alert(obj.msg);}
+ });
+
+ $(window).on("update",function(e,obj){try{
+  if(obj==null){throw new Error("Invalid Data");}
+  var selected=$("neon-animated-pages")[0].selected;
+  if(obj){var temp=$(obj.data).get();rawdata=$(obj).get();}
+  $("neon-animatable[page='view-overview']").each(function(e,holder){
+   var options={chartArea:{width:'100%',height:'100%',top:0},curveType:'function'};
+   var hoursPast=function(s,f){return Number(((new Date(f)-new Date(s))/1000)/3600).toFixed(1);};
+   var averageWeekly=function(ar){return Number(Number($.php.array_sum(ar)/ar.length).toFixed(2)*7).toFixed(2);};
+    options=$.extend(options,{vAxis:{format:'£#'},backgroundColor:'transparent',colors:['orange','blue'],legend:'none'});
+   var chart=$("<google-chart>").attr("type","line").attr("options",JSON.stringify(options)).width("100%");average={gas:[],electric:[]},rows=[];
+   var cols=[{label:'Record',type:'number'},{label:'Gas £',type:'number'},{type:'string',role:'tooltip'},{label:'Electric £',type:'number'},{type:'string',role:'tooltip'}];
+   $.each(temp,function(k){if(temp[k-1]){var curr=temp[k],last=temp[k-1],electric=((last[2]-curr[2])/hoursPast(last[0],curr[0])*24),gas=((last[3]-curr[3])/hoursPast(last[0],curr[0])*24);
+    if(gas>0&&electric>0){average.gas.push(gas);average.electric.push(electric);average.gas=average.gas.slice(-readings);average.electric=average.electric.slice(-readings);}
+    if(gas>0&&electric>0){rows.push([k,gas,"Gas £"+gas.toFixed(2)+'\n'+$.getDate(curr[0]),electric,"Electric £"+electric.toFixed(2)+'\n'+$.getDate(curr[0])]);}
+   }});chart.attr("cols",JSON.stringify(cols)).attr("rows",JSON.stringify(rows)).height("200px");var stop=Boolean((rows.length>=readings)?false:true);
+   $("dual-card[image*='electric']",holder).attr({heading:"Estimated Weekly Usage",strong:(stop?"--":"£"+averageWeekly(average.electric))});
+   $("dual-card[image*='gas']",holder).attr({heading:"Estimated Weekly Usage",strong:(stop?"--":"£"+averageWeekly(average.gas))});
+   var stopMsg="<h3>You require "+(readings-rows.length)+" more reading(s).</h3>";
+   $("*#chart div.content",holder).last().html(stop?stopMsg:chart);   
+   $("*#chart",holder).find("strong").remove();
+   //$(chart).on("google-chart-render",function(){
+   // var img=$("<img>").attr("src",this.getImageURI());
+   // $(this).replaceWith(img.width("100%").height("200px"));
+   //});
+  });
+
+  $("neon-animatable[page='view-gas']").each(function(e,holder){
+   var estimateCost=Number($.php.array_sum(average.gas)/average.gas.length).toFixed(2);$("div.content",holder).empty();
+   $.each(temp,function(k,record){if(temp[k-1]&&record[1]=="READING"){$("div.content",holder).prepend($("<div>").html($.getDate(record[0],true)+"<span> - </span>£"+$.getPrice(record[3])));}});
+   $("dual-card[image*='gas']",holder).attr({strong:Number($(temp).last().get(0)[3]/estimateCost).toFixed(1)+" Days"});
+   $("dual-card[image*='gas']",holder).attr({heading:"Estimated Days Remaining"});
+   console.debug("Current Gas Average: £"+estimateCost);
+  }); 
+  
+  $("neon-animatable[page='view-electric']").each(function(e,holder){
+   var estimateCost=Number($.php.array_sum(average.electric)/average.electric.length).toFixed(2);$("div.content",holder).empty();
+   $.each(temp,function(k,record){if(temp[k-1]&&record[1]=="READING"){$("div.content",holder).prepend($("<div>").html($.getDate(record[0],true)+"<span> - </span>£"+$.getPrice(record[2])));}});
+   $("dual-card[image*='electric']",holder).attr({strong:Number($(temp).last().get(0)[2]/estimateCost).toFixed(1)+" Days"});
+   $("dual-card[image*='electric']",holder).attr({heading:"Estimated Days Remaining"});
+   console.debug("Current Electric Average: £"+estimateCost);
+  });
+  
+  $("paper-item[goto='logged-out']").show().find("b").css("font-weight","normal").html("("+obj.username+")");
+  if($.isBetween(selected,1,3)==false){$("paper-item[goto='view-overview']").click();}
+  $("span.title").html($("neon-animatable.iron-selected").attr("title"));
+ }catch(error){alert("Update Error:\n"+error.message);}finally{
+  $("paper-icon-button#actionButton").removeAttr("disabled");
+  $("paper-input","neon-animatable,paper-dialog").val("");  
+  $("paper-drawer-panel").removeAttr("disable-swipe");
+  $("paper-toolbar#title").removeClass("loading");
+  console.debug("Updated At: "+new Date());
  }});
-});
 
-$(window).on("connect",function(e,extra){
- $("dual-card#loginForm").hide();$("paper-spinner").show();
- var connect=($("neon-animatable.iron-selected").index()==0);
- var send={token:$.cookie("token"),username:$.cookie("username")};
- if(send&&extra&& typeof extra=="object"){send=$.extend(send,extra);}
- if(!send.token&&!send.username){$(window).trigger("logout","now");return false;}
- $.ajax({data:$.param(send),dataType:"jsonp",timeout:2000,crossDomain:true,async:false,
-  beforeSend:function(){$("span.title").html(connect?"Connecting":"Updating");},
-  success:function(responce){$(window).trigger(responce.action,responce);}
- });
-});
-
-$(window).on("logout",function(e,obj){
- $("paper-item[goto='logged-out']").hide();
- $.each($.cookie(),function(k){$.removeCookie(k);});
- $("dual-card#loginForm").show();$("paper-spinner").hide();
- if(obj){$("paper-item[goto='logged-out']").click();} 
- $("paper-drawer-panel").attr("disable-swipe",1);
- $("paper-toolbar#title").addClass("loading");
- if(obj&&obj.msg){alert(obj.msg);}
-});
-
-$(window).on("update",function(e,obj){try{
- if(obj==null){throw new Error("Invalid Data");}
- var selected=$("neon-animated-pages")[0].selected;
- if(obj){var temp=$(obj.data).get();rawdata=$(obj).get();}
- $("neon-animatable[page='view-overview']").each(function(e,holder){
-  var options={chartArea:{width:'100%',height:'100%',top:0},curveType:'function'};
-  if(temp.length<3){$("dual-card",holder).attr("heading","Not Enough Readings");return;}
-  var hoursPast=function(s,f){return Number(((new Date(f)-new Date(s))/1000)/3600).toFixed(1);};
-  var averageWeekly=function(ar){return Number(Number($.php.array_sum(ar)/ar.length).toFixed(2)*7).toFixed(2);};
-   options=$.extend(options,{vAxis:{format:'£#'},backgroundColor:'transparent',colors:['orange','blue'],legend:'none'});
-  var chart=$("<google-chart>").attr("type","line").attr("options",JSON.stringify(options)).width("100%");average={gas:[],electric:[]},rows=[];
-  var cols=[{label:'Record',type:'number'},{label:'Gas £',type:'number'},{type:'string',role:'tooltip'},{label:'Electric £',type:'number'},{type:'string',role:'tooltip'}];
-  $.each(temp,function(k){if(temp[k-1]){var curr=temp[k],last=temp[k-1],electric=((last[2]-curr[2])/hoursPast(last[0],curr[0])*24),gas=((last[3]-curr[3])/hoursPast(last[0],curr[0])*24);
-   if(gas>0&&electric>0){average.gas.push(gas);average.electric.push(electric);average.gas=average.gas.slice(-5);average.electric=average.electric.slice(-5);}
-   if(gas>0&&electric>0){rows.push([k,gas,"Gas £"+gas.toFixed(2)+'\n'+getDate(curr[0]),electric,"Electric £"+electric.toFixed(2)+'\n'+getDate(curr[0])]);}
-  }});chart.attr("cols",JSON.stringify(cols)).attr("rows",JSON.stringify(rows)).height("200px");//GENERATE GOOGLE CURVE TYPE CHART
-  $("dual-card[image*='electric']",holder).attr({heading:"Estimated Weekly Usage",strong:"£"+averageWeekly(average.electric)});
-  $("dual-card[image*='gas']",holder).attr({heading:"Estimated Weekly Usage",strong:"£"+averageWeekly(average.gas)});
-  $("*#chart div.content",holder).last().html(chart).parent().find("strong").remove();
+ $("body").on("click","*[goto]",function(e){
+  var pageHolder=$("neon-animated-pages").get(0);
+  var tabs=$("paper-toolbar#tabs"),page=$(this).attr("goto");
+  try{if($.cookie("token")&&$.cookie("username")){loggedIn=true;}else{loggedIn=false;} 
+   var requestedPage=$("neon-animatable[page='"+(loggedIn?page:"logged-out")+"']").index();
+   var requestedTitle=$("neon-animatable[page='"+(loggedIn?page:"logged-out")+"']").attr("title");
+    pageHolder.exitAnimation="slide-"+(requestedPage<pageHolder.selected?"right":"left")+"-animation";
+    pageHolder.entryAnimation="slide-from-"+(requestedPage<pageHolder.selected?"left":"right")+"-animation";   
+   $("#actionButton").attr("icon",$("neon-animatable").eq(requestedPage).attr("icon"));
+   if($.inArray(requestedPage,[1,2,3])!=-1){tabs.slideDown();}else{tabs.slideUp();}
+   if(requestedPage!=pageHolder.selected){pageHolder.selected=requestedPage;}  
+   if(requestedTitle.length!=0){$("span.title").html(requestedTitle);}
+   $("paper-tabs")[0].selected=$.setRange(requestedPage-1,0,2);
+   if(page=="logged-out"){$(window).trigger("logout");}
+  }catch(e){alert("Navigation Error:\n"+e.message);}
+  $("div#mainContainer").animate({scrollTop:0});
  });
 
- $("neon-animatable[page='view-gas']").each(function(e,holder){
-  var estimateCost=Number($.php.array_sum(average.gas)/average.gas.length).toFixed(2);$("div.content",holder).empty();
-  $.each(temp,function(k,record){if(temp[k-1]&&record[1]=="READING"){$("div.content",holder).prepend($("<div>").html(getDate(record[0],true)+"<span> - </span>£"+getPrice(record[3])));}});
-  $("dual-card[image*='gas']",holder).attr({strong:Number($(temp).last().get(0)[3]/estimateCost).toFixed(1)+" Days"});
-  $("dual-card[image*='gas']",holder).attr({heading:"Estimated Days Remaining"});
-  console.debug("Current Gas Average: £"+estimateCost);
- }); 
- 
- $("neon-animatable[page='view-electric']").each(function(e,holder){
-  var estimateCost=Number($.php.array_sum(average.electric)/average.electric.length).toFixed(2);$("div.content",holder).empty();
-  $.each(temp,function(k,record){if(temp[k-1]&&record[1]=="READING"){$("div.content",holder).prepend($("<div>").html(getDate(record[0],true)+"<span> - </span>£"+getPrice(record[2])));}});
-  $("dual-card[image*='electric']",holder).attr({strong:Number($(temp).last().get(0)[2]/estimateCost).toFixed(1)+" Days"});
-  $("dual-card[image*='electric']",holder).attr({heading:"Estimated Days Remaining"});
-  console.debug("Current Electric Average: £"+estimateCost);
+ $("body").on("click","*#actionButton",function(e){var temp={};
+  try{var actionHandle=$("neon-animatable.iron-selected[page!='']");
+   $("input",actionHandle).map(function(){temp[this.name]=this.value;});
+   $.each(temp,function(k,v){if(v==""){throw new Error("Invalid "+k+" value");}});
+   if(temp['action']=="CREDIT"){temp['gas']=parseFloat(temp['gas'])+data[data.length-1][2];}
+   if(temp['action']=="CREDIT"){temp['electric']=parseFloat(temp['electric'])+data[data.length-1][3];}
+   $("#actionButton").attr("disabled","disabled");$(window).trigger("connect",temp);
+  }catch(error){alert("Submision Error:\n"+error.message);}
  });
- 
- $("paper-item[goto='logged-out']").show().find("b").css("font-weight","normal").html("("+obj.username+")");
- if($.isBetween(selected,1,3)==false){$("paper-item[goto='view-overview']").click();}
- $("span.title").html($("neon-animatable.iron-selected").attr("title"));
-}catch(error){alert("Update Error:\n"+error.message);}finally{
- $("paper-icon-button#actionButton").removeAttr("disabled");
- $("paper-input","neon-animatable,paper-dialog").val("");  
- $("paper-drawer-panel").removeAttr("disable-swipe");
- $("paper-toolbar#title").removeClass("loading");
- console.debug("Updated At: "+new Date());
-}});
 
-$("body").on("click","*[goto]",function(e){
- var pageHolder=$("neon-animated-pages").get(0);
- var tabs=$("paper-toolbar#tabs"),page=$(this).attr("goto");
- try{if($.cookie("token")&&$.cookie("username")){loggedIn=true;}else{loggedIn=false;} 
-  var requestedPage=$("neon-animatable[page='"+(loggedIn?page:"logged-out")+"']").index();
-  var requestedTitle=$("neon-animatable[page='"+(loggedIn?page:"logged-out")+"']").attr("title");
-   pageHolder.exitAnimation="slide-"+(requestedPage<pageHolder.selected?"right":"left")+"-animation";
-   pageHolder.entryAnimation="slide-from-"+(requestedPage<pageHolder.selected?"left":"right")+"-animation";   
-  $("#actionButton").attr("icon",$("neon-animatable").eq(requestedPage).attr("icon"));
-  if($.inArray(requestedPage,[1,2,3])!=-1){tabs.slideDown();}else{tabs.slideUp();}
-  if(requestedPage!=pageHolder.selected){pageHolder.selected=requestedPage;}  
-  if(requestedTitle.length!=0){$("span.title").html(requestedTitle);}
-  $("paper-tabs")[0].selected=$.setRange(requestedPage-1,0,2);
-  if(page=="logged-out"){$(window).trigger("logout");}  
- }catch(e){alert("Navigation Error:\n"+e.message);}
- $("div#mainContainer").animate({scrollTop:0});
-});
-
-$("body").on("click","*#actionButton",function(e){var temp={};
- try{var actionHandle=$("neon-animatable.iron-selected[page!='']");
-  $("input",actionHandle).map(function(){temp[this.name]=this.value;});
-  $.each(temp,function(k,v){if(v==""){throw new Error("Invalid "+k+" value");}});
-  if(temp['action']=="CREDIT"){temp['gas']=parseFloat(temp['gas'])+data[data.length-1][2];}
-  if(temp['action']=="CREDIT"){temp['electric']=parseFloat(temp['electric'])+data[data.length-1][3];}
-  $("#actionButton").attr("disabled","disabled");$(window).trigger("connect",temp);
- }catch(error){alert("Submision Error:\n"+error.message);}
-});
-
-$("dual-card#loginForm").on("keydown","input",function(event){
- var key=Number($(this).closest("paper-input").get(0).dataset.index);
- if(event.which==13 && key==2){$("paper-dialog paper-button").click();}
- if(event.which==13){$("*[data-index='"+(key+1)+"']").focus();}
- if(event.which==13){event.preventDefault();}
-});
-
-$.getScript("./elements/hammer.min.js",function(){
- var setRange=function(v,n,x){return Math.min(Math.max(v,n),x);}
- new Hammer($("neon-animated-pages").get(0)).on("swipe",function(e){
-  if(e.direction==2){var swipeTo=$("paper-tab.iron-selected").next().index();}
-  if(e.direction==4){var swipeTo=$("paper-tab.iron-selected").prev().index();}  
-  if($("iron-selector div#drawer").hasClass("iron-selected")){return false;}
-  if($("neon-animated-pages").get(0).selected>3){return false;}
-  if($("iron-selector").hasClass("dragging")){return false;}  
-  $("paper-tabs").get(0).selected=setRange(swipeTo,0,2);
-  $("paper-tab").get(setRange(swipeTo,0,2)).click();
-  $("div#mainContainer").animate({scrollTop:0});  
- });console.debug("Gestures: Active");
+ $("dual-card#loginForm").on("keydown","input",function(event){
+  var key=Number($(this).closest("paper-input").get(0).dataset.index);
+  if(event.which==13 && key==2){$("paper-dialog paper-button").click();}
+  if(event.which==13){$("*[data-index='"+(key+1)+"']").focus();}
+  if(event.which==13){event.preventDefault();}
+ });
 });
 </script>
 </body>

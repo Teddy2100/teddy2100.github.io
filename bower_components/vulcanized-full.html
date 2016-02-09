@@ -9558,6 +9558,266 @@ if (!window.Promise) {
 
   });
 </script>
+
+
+<script>
+
+  /**
+   * @implements {Polymer.Iconset}
+   */
+  Polymer({
+
+    is: 'iron-iconset',
+
+    properties: {
+
+      /**
+       * The URL of the iconset image.
+       */
+      src: {
+        type: String,
+        observer: '_srcChanged'
+      },
+
+      /**
+       * The name of the iconset.
+       */
+      name: {
+        type: String,
+        observer: '_nameChanged'
+      },
+
+      /**
+       * The width of the iconset image. This must only be specified if the
+       * icons are arranged into separate rows inside the image.
+       *
+       * @attribute width
+       * @type number
+       * @default 0
+       */
+      width: {
+        type: Number,
+        value: 0
+      },
+
+      /**
+       * A space separated list of names corresponding to icons in the iconset
+       * image file. This list must be ordered the same as the icon images
+       * in the image file.
+       */
+      icons: {
+        type: String
+      },
+
+      /**
+       * The size of an individual icon. Note that icons must be square.
+       */
+      size: {
+        type: Number,
+        value: 24
+      },
+
+      /**
+       * The horizontal offset of the icon images in the inconset src image.
+       * This is typically used if the image resource contains additional images
+       * beside those intended for the iconset.
+       */
+      _offsetX: {
+        type: Number,
+        value: 0
+      },
+
+      /**
+       * The vertical offset of the icon images in the inconset src image.
+       * This is typically used if the image resource contains additional images
+       * beside those intended for the iconset.
+       */
+      _offsetY: {
+        type: Number,
+        value: 0
+      },
+
+      /**
+       * Array of fully-qualified names of icons in this set.
+       */
+      iconNames: {
+        type: Array,
+        notify: true
+      }
+
+    },
+
+    hostAttributes: {
+      // non-visual
+      style: 'display: none;'
+    },
+
+    ready: function() {
+      // theme data must exist at ready-time
+      this._themes = this._mapThemes();
+    },
+
+    /**
+     * Applies an icon to the given element as a css background image. This
+     * method does not size the element, and it's usually necessary to set
+     * the element's height and width so that the background image is visible.
+     *
+     * @param {Element} element The element to which the icon is applied.
+     * @param {string|number} icon The name or index of the icon to apply.
+     * @param {string=} theme (optional) The name or index of the icon to apply.
+     * @param {number=} scale (optional, defaults to 1) Icon scaling factor.
+     */
+    applyIcon: function(element, icon, theme, scale) {
+      this._validateIconMap();
+      var offset = this._getThemedOffset(icon, theme);
+      if (element && offset) {
+        this._addIconStyles(element, this._srcUrl, offset, scale || 1,
+          this.size, this.width);
+      }
+    },
+
+    /**
+     * Remove an icon from the given element by undoing the changes effected
+     * by `applyIcon`.
+     *
+     * @param {Element} element The element from which the icon is removed.
+     */
+    removeIcon: function(element) {
+      this._removeIconStyles(element.style);
+    },
+
+    _mapThemes: function() {
+      var themes = Object.create(null);
+      Polymer.dom(this).querySelectorAll('property[theme]')
+        .forEach(function(property) {
+          var offsetX = window.parseInt(
+            property.getAttribute('offset-x'), 10
+          ) || 0;
+          var offsetY = window.parseInt(
+            property.getAttribute('offset-y'), 10
+          ) || 0;
+          themes[property.getAttribute('theme')] = {
+            offsetX: offsetX,
+            offsetY: offsetY
+          };
+        });
+      return themes;
+    },
+
+    _srcChanged: function(src) {
+      // ensure `srcUrl` is always relative to the main document
+      this._srcUrl = this.ownerDocument !== document
+        ? this.resolveUrl(src) : src;
+      this._prepareIconset();
+    },
+
+    _nameChanged: function(name) {
+      this._prepareIconset();
+    },
+
+    _prepareIconset: function() {
+      new Polymer.IronMeta({type: 'iconset', key: this.name, value: this});
+      this.async(function() {
+        this.fire('iron-iconset-added', this, {node: window});
+      });
+    },
+
+    _invalidateIconMap: function() {
+      this._iconMapValid = false;
+    },
+
+    _validateIconMap: function() {
+      if (!this._iconMapValid) {
+        this._recomputeIconMap();
+        this._iconMapValid = true;
+      }
+    },
+
+    _recomputeIconMap: function() {
+      this.iconNames = this._computeIconNames(this.icons);
+      this.iconMap = this._computeIconMap(this._offsetX, this._offsetY,
+        this.size, this.width, this.iconNames);
+    },
+
+    _computeIconNames: function(icons) {
+      return icons.split(/\s+/g);
+    },
+
+    _computeIconMap: function(offsetX, offsetY, size, width, iconNames) {
+      var iconMap = {};
+      if (offsetX !== undefined && offsetY !== undefined) {
+        var x0 = offsetX;
+        iconNames.forEach(function(iconName) {
+          iconMap[iconName] = {
+            offsetX: offsetX,
+            offsetY: offsetY
+          };
+          if ((offsetX + size) < width) {
+            offsetX += size;
+          } else {
+            offsetX = x0;
+            offsetY += size;
+          }
+        }, this);
+      }
+      return iconMap;
+    },
+
+    /**
+     * Returns an object containing `offsetX` and `offsetY` properties which
+     * specify the pixel location in the iconset's src file for the given
+     * `icon` and `theme`. It's uncommon to call this method. It is useful,
+     * for example, to manually position a css backgroundImage to the proper
+     * offset. It's more common to use the `applyIcon` method.
+     *
+     * @param {string|number} identifier The name of the icon or the index of
+     * the icon within in the icon image.
+     * @param {string=} theme The name of the theme.
+     * @returns {?{offsetX: number, offsetY: number}} An object specifying the
+     *     offset of the given icon within the icon resource file; `offsetX` is
+     *     the horizontal offset and `offsetY` is the vertical offset. Both
+     *     values are in pixel units.
+     */
+    _getThemedOffset: function(identifier, theme) {
+      var iconOffset = this._getIconOffset(identifier);
+      var themeOffset = this._themes[theme];
+      if (iconOffset && themeOffset) {
+        return {
+          offsetX: iconOffset.offsetX + themeOffset.offsetX,
+          offsetY: iconOffset.offsetY + themeOffset.offsetY
+        };
+      }
+      return iconOffset;
+    },
+
+    _getIconOffset: function(identifier) {
+      // TODO(sjmiles): consider creating offsetArray (indexed by Number)
+      // and having iconMap map names to indices, then and index is just
+      // iconMap[identifier] || identifier (be careful of zero, store indices
+      // as 1-based)
+      return this.iconMap[identifier] ||
+             this.iconMap[this.iconNames[Number(identifier)]];
+    },
+
+    _addIconStyles: function(element, url, offset, scale, size, width) {
+      var style = element.style;
+      style.backgroundImage = 'url(' + url + ')';
+      style.backgroundPosition =
+        (-offset.offsetX * scale + 'px') + ' ' +
+        (-offset.offsetY * scale + 'px');
+      style.backgroundSize = (scale === 1) ? 'auto' : width * scale + 'px';
+      style.width = size + 'px';
+      style.height = size + 'px';
+      element.setAttribute('role', 'img');
+    },
+
+    _removeIconStyles: function(style) {
+      style.background = '';
+    }
+
+  });
+
+</script>
 <script>
 
   /**
@@ -13756,6 +14016,18 @@ context. You should place this element as a child of `<body>` whenever possible.
         value: function() {
           return this._onCaptureKeydown.bind(this);
         }
+      },
+
+      _boundOnCaptureFocus: {
+        type: Function,
+        value: function() {
+          return this._onCaptureFocus.bind(this);
+        }
+      },
+
+      /** @type {?Node} */
+      _focusedChild: {
+        type: Object
       }
 
     },
@@ -13773,10 +14045,13 @@ context. You should place this element as a child of `<body>` whenever possible.
     },
 
     get _focusNode() {
-      return Polymer.dom(this).querySelector('[autofocus]') || this;
+      return this._focusedChild || Polymer.dom(this).querySelector('[autofocus]') || this;
     },
 
     ready: function() {
+      // with-backdrop need tabindex to be set in order to trap the focus.
+      // If it is not set, IronOverlayBehavior will set it, and remove it if with-backdrop = false.
+      this.__shouldRemoveTabIndex = false;
       this._ensureSetup();
     },
 
@@ -13886,6 +14161,14 @@ context. You should place this element as a child of `<body>` whenever possible.
     },
 
     _withBackdropChanged: function() {
+      // If tabindex is already set, no need to override it.
+      if (this.withBackdrop && !this.hasAttribute('tabindex')) {
+        this.setAttribute('tabindex', '-1');
+        this.__shouldRemoveTabIndex = true;
+      } else if (this.__shouldRemoveTabIndex) {
+        this.removeAttribute('tabindex');
+        this.__shouldRemoveTabIndex = false;
+      }
       if (this.opened) {
         this._manager.trackBackdrop(this);
         if (this.withBackdrop) {
@@ -13919,6 +14202,7 @@ context. You should place this element as a child of `<body>` whenever possible.
     _toggleListeners: function () {
       this._toggleListener(this.opened, document, 'tap', this._boundOnCaptureClick, true);
       this._toggleListener(this.opened, document, 'keydown', this._boundOnCaptureKeydown, true);
+      this._toggleListener(this.opened, document, 'focus', this._boundOnCaptureFocus, true);
     },
 
     // tasks which must occur before opening; e.g. making the element visible
@@ -13964,6 +14248,7 @@ context. You should place this element as a child of `<body>` whenever possible.
       this.style.display = 'none';
       this._manager.removeOverlay(this);
 
+      this._focusedChild = null;
       this._applyFocus();
 
       this.notifyResize();
@@ -13997,9 +14282,12 @@ context. You should place this element as a child of `<body>` whenever possible.
 
     _onCaptureClick: function(event) {
       if (this._manager.currentOverlay() === this &&
-          !this.noCancelOnOutsideClick &&
           Polymer.dom(event).path.indexOf(this) === -1) {
-        this.cancel();
+        if (this.noCancelOnOutsideClick) {
+          this._applyFocus();
+        } else {
+          this.cancel();
+        }
       }
     },
 
@@ -14009,6 +14297,19 @@ context. You should place this element as a child of `<body>` whenever possible.
           !this.noCancelOnEscKey &&
           event.keyCode === ESC) {
         this.cancel();
+      }
+    },
+
+    _onCaptureFocus: function (event) {
+      if (this._manager.currentOverlay() === this &&
+          this.withBackdrop) {
+        var path = Polymer.dom(event).path;
+        if (path.indexOf(this) === -1) {
+          event.stopPropagation();
+          this._applyFocus();
+        } else {
+          this._focusedChild = path[0];
+        }
       }
     },
 
@@ -14103,39 +14404,28 @@ The `aria-labelledby` attribute will be set to the header element, if one exists
     properties: {
 
       /**
-       * If `modal` is true, this implies `no-cancel-on-outside-click` and `with-backdrop`.
+       * If `modal` is true, this implies `no-cancel-on-outside-click`, `no-cancel-on-esc-key` and `with-backdrop`.
        */
       modal: {
-        observer: '_modalChanged',
         type: Boolean,
         value: false
-      },
-
-      /** @type {?Node} */
-      _lastFocusedElement: {
-        type: Object
-      },
-
-      _boundOnFocus: {
-        type: Function,
-        value: function() {
-          return this._onFocus.bind(this);
-        }
-      },
-
-      _boundOnBackdropClick: {
-        type: Function,
-        value: function() {
-          return this._onBackdropClick.bind(this);
-        }
       }
 
     },
 
+    observers: [
+      '_modalChanged(modal, _readied)'
+    ],
+
     listeners: {
-      'tap': '_onDialogClick',
-      'iron-overlay-opened': '_onIronOverlayOpened',
-      'iron-overlay-closed': '_onIronOverlayClosed'
+      'tap': '_onDialogClick'
+    },
+
+    ready: function () {
+      // Only now these properties can be read.
+      this.__prevNoCancelOnOutsideClick = this.noCancelOnOutsideClick;
+      this.__prevNoCancelOnEscKey = this.noCancelOnEscKey;
+      this.__prevWithBackdrop = this.withBackdrop;
     },
 
     attached: function() {
@@ -14148,17 +14438,34 @@ The `aria-labelledby` attribute will be set to the header element, if one exists
       Polymer.dom(this).unobserveNodes(this._ariaObserver);
     },
 
-    _modalChanged: function() {
-      if (this.modal) {
+    _modalChanged: function(modal, readied) {
+      if (modal) {
         this.setAttribute('aria-modal', 'true');
       } else {
         this.setAttribute('aria-modal', 'false');
       }
-      // modal implies noCancelOnOutsideClick and withBackdrop if true, don't overwrite
-      // those properties otherwise.
-      if (this.modal) {
+
+      // modal implies noCancelOnOutsideClick, noCancelOnEscKey and withBackdrop.
+      // We need to wait for the element to be ready before we can read the
+      // properties values.
+      if (!readied) {
+        return;
+      }
+
+      if (modal) {
+        this.__prevNoCancelOnOutsideClick = this.noCancelOnOutsideClick;
+        this.__prevNoCancelOnEscKey = this.noCancelOnEscKey;
+        this.__prevWithBackdrop = this.withBackdrop;
         this.noCancelOnOutsideClick = true;
+        this.noCancelOnEscKey = true;
         this.withBackdrop = true;
+      } else {
+        // If the value was changed to false, let it false.
+        this.noCancelOnOutsideClick = this.noCancelOnOutsideClick &&
+          this.__prevNoCancelOnOutsideClick;
+        this.noCancelOnEscKey = this.noCancelOnEscKey &&
+          this.__prevNoCancelOnEscKey;
+        this.withBackdrop = this.withBackdrop && this.__prevWithBackdrop;
       }
     },
 
@@ -14188,57 +14495,21 @@ The `aria-labelledby` attribute will be set to the header element, if one exists
       this.closingReason.confirmed = confirmed;
     },
 
+    /**
+     * Will dismiss the dialog if user clicked on an element with dialog-dismiss
+     * or dialog-confirm attribute.
+     */
     _onDialogClick: function(event) {
-      var target = Polymer.dom(event).rootTarget;
-      while (target && target !== this) {
-        if (target.hasAttribute) {
-          if (target.hasAttribute('dialog-dismiss')) {
-            this._updateClosingReasonConfirmed(false);
-            this.close();
-            event.stopPropagation();
-            break;
-          } else if (target.hasAttribute('dialog-confirm')) {
-            this._updateClosingReasonConfirmed(true);
-            this.close();
-            event.stopPropagation();
-            break;
-          }
-        }
-        target = Polymer.dom(target).parentNode;
-      }
-    },
-
-    _onIronOverlayOpened: function() {
-      if (this.modal) {
-        document.body.addEventListener('focus', this._boundOnFocus, true);
-        document.body.addEventListener('click', this._boundOnBackdropClick, true);
-      }
-    },
-
-    _onIronOverlayClosed: function() {
-      this._lastFocusedElement = null;
-      document.body.removeEventListener('focus', this._boundOnFocus, true);
-      document.body.removeEventListener('click', this._boundOnBackdropClick, true);
-    },
-
-    _onFocus: function(event) {
-      if (this.modal && this._manager.currentOverlay() === this) {
-        if (Polymer.dom(event).path.indexOf(this) !== -1) {
-          this._lastFocusedElement = event.target;
-        } else if (this._lastFocusedElement) {
-          this._lastFocusedElement.focus();
-        } else {
-          this._focusNode.focus();
-        }
-      }
-    },
-
-    _onBackdropClick: function(event) {
-      if (this.modal && this._manager.currentOverlay() === this && Polymer.dom(event).path.indexOf(this) === -1) {
-        if (this._lastFocusedElement) {
-          this._lastFocusedElement.focus();
-        } else {
-          this._focusNode.focus();
+      // Search for the element with dialog-confirm or dialog-dismiss,
+      // from the root target until this (excluded).
+      var path = Polymer.dom(event).path;
+      for (var i = 0; i < path.indexOf(this); i++) {
+        var target = path[i];
+        if (target.hasAttribute && (target.hasAttribute('dialog-dismiss') || target.hasAttribute('dialog-confirm'))) {
+          this._updateClosingReasonConfirmed(target.hasAttribute('dialog-confirm'));
+          this.close();
+          event.stopPropagation();
+          break;
         }
       }
     }
@@ -15412,6 +15683,11 @@ is separate from validation, and `allowed-pattern` does not affect how the input
        * @param {HTMLElement} element The element that should lock scroll.
        */
       pushScrollLock: function(element) {
+        // Prevent pushing the same element twice
+        if (this._lockingElements.indexOf(element) >= 0) {
+          return;
+        }
+
         if (this._lockingElements.length === 0) {
           this._lockScrollInteractions();
         }
@@ -15505,7 +15781,7 @@ is separate from validation, and `allowed-pattern` does not affect how the input
       _scrollInteractionHandler: function(event) {
         if (Polymer
               .IronDropdownScrollManager
-              .elementIsScrollLocked(event.target)) {
+              .elementIsScrollLocked(Polymer.dom(event).rootTarget)) {
           if (event.type === 'keydown' &&
               !Polymer.IronDropdownScrollManager._isScrollingKeypress(event)) {
             return;
@@ -15532,13 +15808,13 @@ is separate from validation, and `allowed-pattern` does not affect how the input
         document.body.style.overflowY = 'hidden';
 
         // Modern `wheel` event for mouse wheel scrolling:
-        window.addEventListener('wheel', this._scrollInteractionHandler, true);
+        document.addEventListener('wheel', this._scrollInteractionHandler, true);
         // Older, non-standard `mousewheel` event for some FF:
-        window.addEventListener('mousewheel', this._scrollInteractionHandler, true);
+        document.addEventListener('mousewheel', this._scrollInteractionHandler, true);
         // IE:
-        window.addEventListener('DOMMouseScroll', this._scrollInteractionHandler, true);
+        document.addEventListener('DOMMouseScroll', this._scrollInteractionHandler, true);
         // Mobile devices can scroll on touch move:
-        window.addEventListener('touchmove', this._scrollInteractionHandler, true);
+        document.addEventListener('touchmove', this._scrollInteractionHandler, true);
         // Capture keydown to prevent scrolling keys (pageup, pagedown etc.)
         document.addEventListener('keydown', this._scrollInteractionHandler, true);
       },
@@ -15548,10 +15824,10 @@ is separate from validation, and `allowed-pattern` does not affect how the input
         document.body.style.overflowX = this._originalBodyStyles.overflowX;
         document.body.style.overflowY = this._originalBodyStyles.overflowY;
 
-        window.removeEventListener('wheel', this._scrollInteractionHandler, true);
-        window.removeEventListener('mousewheel', this._scrollInteractionHandler, true);
-        window.removeEventListener('DOMMouseScroll', this._scrollInteractionHandler, true);
-        window.removeEventListener('touchmove', this._scrollInteractionHandler, true);
+        document.removeEventListener('wheel', this._scrollInteractionHandler, true);
+        document.removeEventListener('mousewheel', this._scrollInteractionHandler, true);
+        document.removeEventListener('DOMMouseScroll', this._scrollInteractionHandler, true);
+        document.removeEventListener('touchmove', this._scrollInteractionHandler, true);
         document.removeEventListener('keydown', this._scrollInteractionHandler, true);
       }
     };
@@ -15917,6 +16193,13 @@ is separate from validation, and `allowed-pattern` does not affect how the input
     _onFocus: function(event) {
       if (Polymer.IronMenuBehaviorImpl._shiftTabPressed) {
         // do not focus the menu itself
+        return;
+      }
+
+      // Do not focus the selected tab if the deepest target is part of the
+      // menu element's local DOM and is focusable.
+      var rootTarget = Polymer.dom(event).rootTarget;
+      if (rootTarget !== this && typeof rootTarget.tabIndex !== "undefined" && !this.isLightDescendant(rootTarget)) {
         return;
       }
 
@@ -22147,7 +22430,7 @@ window.PolymerGestures = {};
         }
         this.$.sizedImgDiv.style.backgroundImage = src ? 'url("' + src + '")' : '';
 
-        this._setLoading(true);
+        this._setLoading(!!src);
         this._setLoaded(false);
         this._setError(false);
       },
@@ -22735,10 +23018,14 @@ window.PolymerGestures = {};
       this.style.zIndex = this._manager.backdropZ();
       // close only if no element with backdrop is left
       if (this._manager.getBackdrops().length === 0) {
+        // Read style before setting opened.
+        var cs = getComputedStyle(this);
+        var noAnimation = (cs.transitionDuration === '0s' || cs.opacity == 0);
         this._setOpened(false);
-        // complete() will be called after the transition is done.
-        // If animations are disabled via custom-styles, user is expected to call
-        // complete() after close()
+        // In case of no animations, complete
+        if (noAnimation) {
+          this.complete();
+        }
       }
     },
 
@@ -22842,6 +23129,7 @@ window.PolymerGestures = {};
     },
 
     _renderOpened: function() {
+      this.cancelAnimation();
       if (this.withBackdrop) {
         this.backdropElement.open();
       }
@@ -22849,6 +23137,7 @@ window.PolymerGestures = {};
     },
 
     _renderClosed: function() {
+      this.cancelAnimation();
       if (this.withBackdrop) {
         this.backdropElement.close();
       }
@@ -22873,8 +23162,12 @@ window.PolymerGestures = {};
   <style>
 
     :host {
-      display: block;
-      position: relative;
+      /* Needed for correct flex rendering on Firefox & Chrome Canary */
+      min-height: 0;
+      max-height: 100%;
+
+      @apply(--layout);
+      @apply(--layout-relative);
     }
 
     :host(.is-scrolled:not(:first-child))::before {
@@ -22900,12 +23193,9 @@ window.PolymerGestures = {};
     .scrollable {
       padding: 0 24px;
 
+      @apply(--layout-flex);
       @apply(--layout-scroll);
       @apply(--paper-dialog-scrollable);
-    }
-
-    .fit {
-      @apply(--layout-fit);
     }
   </style>
 
@@ -22919,8 +23209,6 @@ window.PolymerGestures = {};
 
 <script>
 
-(function() {
-
   Polymer({
 
     is: 'paper-dialog-scrollable',
@@ -22932,17 +23220,13 @@ window.PolymerGestures = {};
        * @type {?Node}
        */
       dialogElement: {
-        type: Object,
-        value: function() {
-          return this.parentNode;
-        }
+        type: Object
       }
 
     },
 
     listeners: {
-      'scrollable.scroll': '_onScroll',
-      'iron-resize': '_onIronResize'
+      'scrollable.scroll': '_scroll'
     },
 
     /**
@@ -22952,18 +23236,14 @@ window.PolymerGestures = {};
       return this.$.scrollable;
     },
 
+    ready: function () {
+      this._ensureTarget();
+    },
+
     attached: function() {
       this.classList.add('no-padding');
-      // Set itself to the overlay sizing target
-      this.dialogElement.sizingTarget = this.scrollTarget;
-      // If the host is sized, fit the scrollable area to the container. Otherwise let it be
-      // its natural size.
-      requestAnimationFrame(function() {
-        if (this.offsetHeight > 0) {
-          this.$.scrollable.classList.add('fit');
-        }
-        this._scroll();
-      }.bind(this));
+      this._ensureTarget();
+      requestAnimationFrame(this._scroll.bind(this));
     },
 
     _scroll: function() {
@@ -22973,13 +23253,17 @@ window.PolymerGestures = {};
         this.scrollTarget.scrollTop + this.scrollTarget.offsetHeight >= this.scrollTarget.scrollHeight);
     },
 
-    _onScroll: function() {
-      this._scroll();
+    _ensureTarget: function () {
+      // read parentNode on attached because if dynamically created,
+      // parentNode will be null on creation.
+      this.dialogElement = this.dialogElement || Polymer.dom(this).parentNode;
+      // Set itself to the overlay sizing target
+      if (this.dialogElement) {
+        this.dialogElement.sizingTarget = this.scrollTarget;
+      }
     }
 
-  })
-
-})();
+  });
 
 </script>
 <dom-module id="paper-drawer-panel" assetpath="paper-drawer-panel/">
@@ -24458,6 +24742,7 @@ window.PolymerGestures = {};
 
         /**
          * The element that should be focused when the dropdown opens.
+         * @deprecated
          */
         get _focusTarget() {
           return this.focusTarget || this.containedElement;
@@ -24557,10 +24842,6 @@ window.PolymerGestures = {};
             this._prepareDropdown();
             Polymer.IronOverlayBehaviorImpl._openedChanged.apply(this, arguments);
           }
-
-          if (this.opened) {
-            this._focusContent();
-          }
         },
 
         /**
@@ -24615,7 +24896,7 @@ window.PolymerGestures = {};
           var scrollTop;
           var scrollLeft;
 
-          if (containedElement) {
+          if (this.opened && containedElement) {
             scrollTop = containedElement.scrollTop;
             scrollLeft = containedElement.scrollLeft;
           }
@@ -24626,7 +24907,7 @@ window.PolymerGestures = {};
 
           Polymer.IronOverlayBehaviorImpl._onIronResize.apply(this, arguments);
 
-          if (containedElement) {
+          if (this.opened && containedElement) {
             containedElement.scrollTop = scrollTop;
             containedElement.scrollLeft = scrollLeft;
           }
@@ -24711,16 +24992,15 @@ window.PolymerGestures = {};
         },
 
         /**
-         * Focuses the configured focus target.
+         * Apply focus to focusTarget or containedElement
          */
-        _focusContent: function() {
-          // NOTE(cdata): This is async so that it can attempt the focus after
-          // `display: none` is removed from the element.
-          this.async(function() {
-            if (this._focusTarget) {
-              this._focusTarget.focus();
-            }
-          });
+        _applyFocus: function () {
+          var focusTarget = this.focusTarget || this.containedElement;
+          if (focusTarget && this.opened && !this.noAutoFocus) {
+            focusTarget.focus();
+          } else {
+            Polymer.IronOverlayBehaviorImpl._applyFocus.apply(this, arguments);
+          }
         }
       });
     })();
@@ -25728,6 +26008,7 @@ window.PolymerGestures = {};
           atTop: {
             type: Boolean,
             value: true,
+            notify: true,
             readOnly: true
           }
         },
@@ -29408,14 +29689,6 @@ window.PolymerGestures = {};
           value: false
         },
 
-        /**
-         * Gets or sets the selected element. The default is to use the index of the item.
-         */
-        selected: {
-          type: String,
-          notify: true
-        },
-
         selectable: {
           type: String,
           value: 'paper-tab'
@@ -29617,7 +29890,13 @@ window.PolymerGestures = {};
         // bar animation: expand
         this.$.selectionBar.classList.add('expand');
 
-        if (oldIndex < index) {
+        var moveRight = oldIndex < index;
+        var isRTL = this._isRTL;
+        if (isRTL) {
+          moveRight = !moveRight;
+        }
+
+        if (moveRight) {
           this._positionBar(this._calcPercent(tabRect.left + tabRect.width - oldRect.left, w) - m,
               this._left);
         } else {
