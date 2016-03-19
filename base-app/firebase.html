@@ -1,0 +1,100 @@
+<!doctype html>
+<html>
+<head>
+ <script type="text/javascript" src="../bower_components/jquery/dist/jquery.min.js"></script>
+ <script type="text/javascript" src="http://cdn.firebase.com/js/client/2.2.1/firebase.js"></script>
+ <script type="text/javascript" src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+ <link rel="import" content="required" href="../bower_components/vulcanized-full.html">
+</head>
+<body>
+
+<div id="loggedOut" style="display:none;">
+ <input type="email" value="aronfeerick@gmail.com"/>
+ <input type="password" value="Penny1987$"/>
+ <button id="login-btn">Login</button>
+</div>
+<div id="loggedIn" style="display:none;">
+ <button id="logout-btn">Logout</button>
+</div>
+
+<hr>
+
+<input type='text' id='usage-gas' placeholder='Gas' value="1">
+<input type='text' id='usage-electric' placeholder='Electric' value="1">
+<button id="usage-btn">Log Usage</button>
+
+<hr>
+
+<input type='text' id='credit-gas' placeholder='Gas' value="1">
+<input type='text' id='credit-electric' placeholder='Electric' value="1">
+<button id="credit-btn">Log Credit</button>
+
+<script>
+var connectionData=null,grabLast=50;
+var conn=new Firebase('https://aronfeerick.firebaseio.com/');
+
+//AUTH HANDLER//
+conn.onAuth(function(authData){
+ connectionData=authData;//UPDATE CONNECTION
+ $("#loggedIn").css("display",authData?"block":"none");
+ $("#loggedOut").css("display",authData?"none":"block");
+ if(!authData){console.debug("Authenticated User:","Logged Out");} 
+ if(authData){console.debug("Authenticated User:",authData.password.email);
+  conn.child("fuelusage").child(connectionData.uid).limitToLast(grabLast).off("child_added");
+  conn.child("fuelusage").child(connectionData.uid).limitToLast(grabLast).on("child_added",function(data){
+   data.forEach(function(childSnapshot){
+   
+   
+   
+   
+    console.log(childSnapshot.key(),childSnapshot.val());
+   
+   });
+  });  
+ }
+});
+
+$(window).on("load",function(){
+ //LOG IN FUNCTION//
+ $("button#login-btn").on("click",function(){
+  var youremail=$("input[type='email']").val();
+  var yourpassword=$("input[type='password']").val();
+  conn.authWithPassword({"email":youremail,"password":yourpassword},function(error,authData){
+   if(authData){conn.child("users").child(authData.uid).update({email:authData.password.email});}
+   if(authData){conn.child("users").child(authData.uid).update({last:new Date().getTime()});}
+   if(error){console.log("Login Failed!",error);alert(error);}
+  });
+ });
+
+ //LOG OUT FUNCTION//
+ $("button#logout-btn").on("click",function(){
+  conn.unauth();
+ });
+
+ //LOG USAGE FUNCTION//
+ $("button#usage-btn").on("click",function(){
+  var outputData={timestamp:new Date().getTime()};
+  var database=conn.child("fuelusage").child(connectionData.uid);
+   outputData.electric=(Number($("#usage-electric").val())||0).toFixed(2);
+   outputData.gas=(Number($("#usage-gas").val())||0).toFixed(2);
+   outputData.action="reading".toUpperCase();
+  database.push(outputData);
+ });
+
+ //LOG CREDIT FUNCTION//
+ $("button#credit-btn").on("click",function(){
+  var outputData={timestamp:new Date().getTime()};
+  var database=conn.child("fuelusage").child(connectionData.uid);
+  database.limitToLast(1).once("child_added",function(x){var last=x.val();  
+   outputData.electric=Number(last.electric)+Number($("#credit-electric").val())||0;
+   outputData.gas=Number(last.gas)+Number($("#credit-gas").val())||0;  
+   outputData.electric=Number(outputData.electric).toFixed(2);
+   outputData.gas=Number(outputData.gas).toFixed(2);  
+   outputData.action="credit".toUpperCase();  
+   database.push(outputData);
+  });
+ });
+});
+</script>
+</body>
+</html>

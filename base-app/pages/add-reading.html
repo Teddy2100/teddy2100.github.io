@@ -1,0 +1,15 @@
+<input type='text' id='usage-gas' placeholder='Gas' value="1">
+<input type='text' id='usage-electric' placeholder='Electric' value="1">
+<button id="usage-btn">Log Usage</button>
+
+<script>
+$("paper-toolbar[tabs]").addClass("close");
+$("button#usage-btn").on("click",function(){
+ var outputData={timestamp:new Date().getTime()};
+ var database=connect.child("fuelusage").child(connectionData.uid);
+  outputData.electric=(Number($("#usage-electric").val())||0).toFixed(2);
+  outputData.gas=(Number($("#usage-gas").val())||0).toFixed(2);
+  outputData.action="reading".toUpperCase();
+ database.push(outputData);
+});
+</script>

@@ -1,0 +1,19 @@
+<input type='text' id='credit-gas' placeholder='Gas' value="1">
+<input type='text' id='credit-electric' placeholder='Electric' value="1">
+<button id="credit-btn">Log Credit</button>
+
+<script>
+$("paper-toolbar[tabs]").addClass("close");
+$("button#credit-btn").on("click",function(){
+ var outputData={timestamp:new Date().getTime()};
+ var database=connect.child("fuelusage").child(connectionData.uid);
+ database.limitToLast(1).once("child_added",function(x){var last=x.val();  
+  outputData.electric=Number(last.electric)+Number($("#credit-electric").val())||0;
+  outputData.gas=Number(last.gas)+Number($("#credit-gas").val())||0;  
+  outputData.electric=Number(outputData.electric).toFixed(2);
+  outputData.gas=Number(outputData.gas).toFixed(2);  
+  outputData.action="credit".toUpperCase();  
+  database.push(outputData);
+ });
+});
+</script>

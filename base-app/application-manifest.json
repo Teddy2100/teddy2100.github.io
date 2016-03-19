@@ -1,0 +1,11 @@
+{
+ "short_name":"Fuel Manager",
+ "display":"standalone",
+ "name":"Fuel Manager",
+ "orientation": "portrait", 
+ "theme_color":"#E00421",
+ "background_color":"#E00421", 
+ "icons":[
+  {"src":"./project.png","sizes":"192x192","type":"image/png","density":"4.0"}
+ ]
+}

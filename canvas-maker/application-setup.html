@@ -1,0 +1,47 @@
+<script type="text/javascript">
+window.getScripts=function(f,c){
+ if(f && typeof f=="string"){f=[f];}
+ var newscript=document.createElement('script');newscript.setAttribute("async",true);
+ var base=(document.getElementsByTagName('head')[0]||document.getElementsByTagName('body')[0]);
+  newscript.setAttribute("type","text/javascript");newscript.src=f[0]+'?nc='+new Date().getTime();
+  newscript.onload=function(){f.shift();if(!f[0]){c();}else{window.getScripts(f,c);}};
+  newscript.onerror=function(){console.error("Can't load resource file");};
+ return base.appendChild(newscript);
+};
+
+Array.prototype.remove=function(){
+ var what,a=arguments,L=a.length,ax;
+ while(L && this.length){what=a[--L];
+  while((ax=this.indexOf(what))!==-1){
+   this.splice(ax,1);
+  }
+ }return this;
+};
+</script>
+<style is="custom-style">
+body *{
+ box-sizing: border-box;
+}
+
+img{
+ background: #fff;
+  display: inline;
+  float: left;
+  margin: 0 0 27px 30px;
+  padding: 10px 10px 50px;
+  text-align: center;
+  font-family: "Marker Felt",sans-serif;
+  text-decoration: none;
+  color:#333;
+  font-size: 18px;
+  -webkit-transition: -webkit-transform .15s linear;
+  -webkit-box-shadow: 0 3px 6px rgba(0,0,0,.25);
+  no-webkit-transform: rotate(-2deg);
+}
+
+canvas{
+ /*width:1280px;height:720px;*/
+ width:750px;height:500px;
+ border:1px solid black;
+}
+</style>

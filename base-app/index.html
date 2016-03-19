@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en" data-framework="polymer">
+<head>
+ <meta charset="utf-8">
+ <title>Loading Application</title>
+ <meta name="language" content="english"/>
+ <base nohref="https://aronfeerick.github.io/"/>
+ <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+ <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+ <script type="text/javascript" src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+ <link rel="import" content="required" href="../bower_components/vulcanized-full.html">
+ <link rel="import" content="required" href="application-init.html">
+ <link rel="manifest" href="./application-manifest.json"/>
+</head>
+<body unresolved>
+<init-application>
+ <div id="main-holder">
+  <div id="content-holder">
+   <div id="document-content">
+    <div page="loading" style="display:block;">
+     <paper-spinner style="width:100px;height:100px;margin:20px;" active></paper-spinner>
+    </div>
+    <div page="login">
+     <paper-card id="login-card">
+      <paper-input type="email" label="Email Address" always-float-label></paper-input>
+      <paper-input type="password" label="Password" always-float-label></paper-input>
+      <paper-button action="login" raised>Login</paper-button>
+     </paper-card>
+    </div>
+    <div page="overview">
+     <paper-card heading="Usage Overview">
+     </paper-card>
+    </div>
+    <div page="gas">
+     <paper-card heading="Gas Readings">
+      <a href="https://www.google.com/design/spec/components/bottom-navigation.html#bottom-navigation-specs" target="new">bottom-navigation-specs</a>
+     </paper-card>
+    </div>
+    <div page="electric">
+     <paper-card heading="Electric Readings">
+      <a href="https://www.google.com/design/spec/components/bottom-navigation.html#bottom-navigation-specs" target="new">bottom-navigation-specs</a>
+     </paper-card>
+    </div>
+    <div page="settings">
+     <paper-card heading="Settings">
+      <paper-button action="logout" style="float:right;" raised>Logout</paper-button>
+     </paper-card>
+    </div>
+   </div>
+  </div>
+  <div id="fab-holder" class="closed">
+   <paper-tooltip for="fab-1" position="left">Add Fuel Credit</paper-tooltip>
+   <paper-tooltip for="fab-2" position="left">Add Fuel Reading</paper-tooltip>
+   <paper-fab id="fab-1" action="credit" icon="icons:add-shopping-cart" mini></paper-fab>
+   <paper-fab id="fab-2" action="reading" icon="icons:create" mini></paper-fab>   
+   <paper-tooltip for="fab-0" position="left">More Options</paper-tooltip>
+   <paper-fab id="fab-0" action="menu" icon="icons:add"></paper-fab>
+  </div>
+ </div>
+ <paper-material elevation="4" id="navigation-holder">
+  <div page="overview"><iron-icon icon="editor:insert-chart"></iron-icon><div>Overview</div></div>
+  <div page="gas"><iron-icon icon="social:whatshot"></iron-icon><div>Gas</div></div>
+  <div page="electric"><iron-icon icon="notification:power"></iron-icon><div>Electric</div></div>
+  <div page="settings"><iron-icon icon="icons:settings"></iron-icon><div>Settings</div></div>
+  <paper-ripple id="ripple" style="pointer-events:none;"></paper-ripple>
+ </paper-material>
+ <paper-material elevation="4" id="toolbar-holder">
+  <paper-toolbar style="max-height:56px;">
+   <paper-icon-button icon="menu" paper-drawer-toggle hidden></paper-icon-button>
+   <div id="apptitle" class="title">Loading</div>
+   <paper-icon-button id="actionButton"></paper-icon-button>
+  </paper-toolbar>
+ </paper-material>
+</init-application>
+<script type="text/javascript">
+window.when("onload",function(e){var title="Fuel Manager";
+ if(typeof Polymer=="function" && Polymer.version!=""){var runner=null;
+  window.getCodes("https://cdn.firebase.com/js/client/2.2.1/firebase.js",function(){
+   window.getCodes(["../bower_components/jquery/dist/jquery.min.js","./scripts/jquery-plugins.js"],function(){
+    var connection=new Firebase("https://aronfeerick.firebaseio.com/"),connectionData=null;
+   
+    $("#fab-holder > paper-fab").on("click",function(e){
+     //console.debug("Action:",$(this).attr("action"));
+    
+     if($(this).attr("action")=="credit"){console.log("Add Credit");}
+     if($(this).attr("action")=="reading"){console.log("Add Reading");}
+     $(this).parent().toggleClass("closed");
+    });
+   
+    $("paper-button[action='login']").on("click",function(){
+     var youremail=$("paper-input[type='email']").val();//EMAIL ADDRESS
+     var yourpassword=$("paper-input[type='password']").val();//YOUR PASSWORD
+     connection.authWithPassword({"email":youremail,"password":yourpassword},function(error,authData){
+      if(authData){connection.child("users").child(authData.uid).update({email:authData.password.email});}
+      if(authData){connection.child("users").child(authData.uid).update({last:new Date().getTime()});}
+      if(error){console.log("Login Failed!",error);alert(error);}
+     });
+    });
+
+    $("paper-button[action='logout']").on("click",function(){
+     connection.unauth();
+    });
+    
+    $("#navigation-holder > div").on("click",function(){$(this).showPage();});
+    
+    $.fn.extend({
+     showPage:function(page){
+      if(!connectionData){page="login";}
+      if(connectionData){page=page||$(this).attr("page");}      
+      $("#fab-holder").css("display",connectionData?"block":"none");      
+      $("#navigation-holder > *[page!="+page+"]").removeClass("active");
+      $("#navigation-holder > *[page="+page+"]").addClass("active");
+      $("#document-content > *[page!="+page+"]").fadeOut();
+      $("#document-content > *[page="+page+"]").fadeIn();     
+     }
+    });
+    
+    connection.onAuth(function(authData){
+     if(authData!=""){connectionData=authData;}
+     //$.getJSON('http://ipinfo.io',function(ipData){
+      $("title, div#apptitle").text(title);
+      console.debug("authDate:",authData);
+      //console.debug("ipData:",ipData);
+      $().showPage("overview");
+     //});
+    });
+   },function(){alert("Failed to load jQuery library plugins");});
+  },function(){alert("Failed to load Firebase library");});
+ }else{alert("Failed to load Polymer modules");}
+});
+</script>
+</body>
+</html>

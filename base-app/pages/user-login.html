@@ -1,0 +1,18 @@
+<paper-input type="email" placeholder="username" data-index="1" no-label-float autofocus></paper-input>
+<br>
+<paper-input type="password" placeholder="password" data-index="2" no-label-float></paper-input>
+<paper-button data-index="3" class="green" raised>Login</paper-button>
+<paper-item action="log-in"><iron-icon icon="exit-to-app"></iron-icon>Login&nbsp;<b></b></paper-item>
+      
+<script>
+$("paper-toolbar[tabs]").addClass("close");
+$("paper-item[action='log-in']").on("click",function(){
+ var youremail=$("paper-input[type='email']").val();//EMAIL ADDRESS
+ var yourpassword=$("paper-input[type='password']").val();//YOUR PASSWORD
+ connect.authWithPassword({"email":youremail,"password":yourpassword},function(error,authData){
+  if(authData){connect.child("users").child(authData.uid).update({email:authData.password.email});}
+  if(authData){connect.child("users").child(authData.uid).update({last:new Date().getTime()});}
+  if(error){console.log("Login Failed!",error);alert(error);}
+ });
+});
+</script>

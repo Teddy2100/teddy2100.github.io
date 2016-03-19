@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+ <meta charset="utf-8">
+ <title>Canvas Maker</title>
+ <meta name="language" content="english"/>
+ <meta name="theme-color" content="#E00421">
+ <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+ <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+ <link rel="import" href="./application-setup.html"/>
+</head>
+<body>
+
+<div id="inputArea" style="display:block;">
+ Select images: <input type="file" name="img" multiple>
+</div>
+<div id="outputArea" style="display:none;">
+ <canvas id="output" width="3165" height="2106"></canvas>
+ <img src="./images/title.png" style="display:none;"/>
+ <img src="./images/bg.png" style="display:none;"/>
+</div>
+
+<script>
+var rows=5,columns=9;
+var canvas=document.querySelector("canvas");
+var grid=[],files=[],added=0,angle=-5,portfolio={};
+var ctx=document.querySelector("canvas").getContext('2d');
+var gradient=ctx.createLinearGradient(0,0,canvas.width,canvas.height);
+gradient.addColorStop(1.0,"lightblue");gradient.addColorStop(0.0,"pink");
+//ctx.fillStyle=gradient;ctx.fillRect(0,0,canvas.width,canvas.height);//BASE
+
+portfolio.top=(canvas.height*0.25);
+portfolio.left=(canvas.width*0.050);
+portfolio.right=(canvas.width-portfolio.left);
+portfolio.bottom=(canvas.height-portfolio.left);
+
+var usableHeight=((portfolio.bottom-portfolio.top)/rows);
+var usableWidth=((portfolio.right-portfolio.left)/columns);
+var placeHold=Math.min(usableWidth,usableHeight),size=placeHold*0.9;
+
+window.getScripts("../bower_components/jquery/dist/jquery.min.js",function(){
+ window.getScripts(["jquery-phpjs-math.js","./jquery-phpjs-array.js"],function(){
+
+  $(window).on("load",function(){
+   var title=resizeImage($("img[src*='title']")[0],canvas.height*0.15);
+   ctx.setTransform(1,0,0,1,0,0);ctx.translate(canvas.width*0.5,canvas.height*0.15);ctx.drawImage(title,-(title.width/2),-(title.height/2));
+   for(var c=0,x=portfolio.left+(usableWidth/2);c<columns;c++,x=x+usableWidth){for(var r=0,y=portfolio.top+(usableHeight/2);r<rows;r++,y=y+usableHeight){
+    grid.push(x+"x"+y);//console.log(x,y);
+   }}return true;
+  });
+  
+  $("input[type='file'][name='img']").on("change",function(){files=[];
+   for(var i=0;i<$(this).get(0).files.length;i++){if(grid.length!=0){   
+    if((added+1/rows%2)+(added+1/rows%2)!=1){angle=(angle==5?-5:5);};
+    $(this).get(0).files[i].left=grid[0].split("x").map(Number)[0];
+    $(this).get(0).files[i].top=grid[0].split("x").map(Number)[1];    
+    $(this).get(0).files[i].rotate=angle;grid.shift();
+    files.push($(this).get(0).files[i]);added++;
+   }}$(window).trigger("importFiles");
+   $("div#outputArea").show();   
+  });  
+  
+  $(window).on("importFiles",function(event){
+   if(files==0){console.log("All Files Imported");return;}
+   var shade=ctx.createLinearGradient(0,0,canvas.width,canvas.height);
+   var temp=document.createElement("canvas"),tempctx=temp.getContext("2d");
+    temp.width=size;temp.height=size;margin=((size-(size*0.9))/2);//FIX SIZINGS
+   var file=new FileReader();file.readAsDataURL(files[0]);file.onload=function(event){
+    var image=new Image();image.src=file.result;image.onload=function(event){//IMAGES LOADED
+     var scale=(image.width/image.height);shade.addColorStop(0,"white");shade.addColorStop(1,"grey");
+      tempctx.fillStyle=shade;tempctx.fillRect(0,0,temp.width,temp.height);tempctx.strokeStyle="#ffffff";
+     var diff=((Math.max(image.width,image.height)-Math.min(image.width,image.height))/2);tempctx.lineWidth=(margin*2);
+     var tempImage=resizeImage(image,size*0.9);tempctx.translate((size/2),(size/2));tempctx.drawImage(tempImage,-(tempImage.width/2),-(tempImage.height/2));
+     tempctx.setTransform(1,0,0,1,0,0);tempctx.strokeRect(0,0,temp.width,temp.height);tempctx.strokeStyle="#c0c0c0";tempctx.lineWidth=1;
+     tempctx.strokeRect(margin,margin,size*0.9,size*0.9);tempctx.strokeRect(0,0,temp.width,temp.height);     
+     ctx.shadowColor="rgba(000,000,000,0.75)";ctx.shadowBlur=25;ctx.setTransform(1,0,0,1,0,0);
+     ctx.translate(files[0].left,files[0].top);ctx.rotate(files[0].rotate*Math.PI/180);
+     ctx.drawImage(temp,-(size/2),-(size/2));files.shift();//DRAW AND REMOVE
+     if(files.length==0){$(window).trigger("finishCanvas");}
+     else{$(window).trigger("importFiles");}
+    };    
+   };
+  });
+  
+  $(window).on("finishCanvas",function(){
+   var margin=200,bg=$("img[src*='bg']")[0];
+   var output=new Image();output.src=canvas.toDataURL("image/png");
+   var temp=document.createElement("canvas"),tempctx=temp.getContext("2d");   
+    temp.width=canvas.width+(margin*2.0);temp.height=canvas.height+(margin*2.0);
+    
+   var pattern=tempctx.createPattern(bg,"repeat");
+    
+   var gradient=tempctx.createLinearGradient(0,0,temp.width,temp.height);//GRADIENT
+    gradient.addColorStop(1.0,"lightblue");gradient.addColorStop(0.0,"pink");
+   tempctx.fillStyle=pattern;tempctx.fillRect(0,0,temp.width,temp.height);
+   tempctx.drawImage(output,margin,margin);//INJECTED
+   window.open(temp.toDataURL("image/jpeg",1));
+  });  
+ });
+});
+
+function resizeImage(img,size){
+ var temp=document.createElement("canvas"),tempctx=temp.getContext("2d");
+ var scale=Number((img.naturalWidth/img.naturalHeight)||1);temp.width=size;temp.height=size;
+  if(scale>1){temp.width=size*scale;temp.height=size;}if(scale<1){temp.width=size;temp.height=size/scale;}
+  tempctx.drawImage(img,0,0,img.naturalWidth,img.naturalHeight,0,0,temp.width,temp.height);
+ return temp;
+}
+</script>
+
+</body>
+</html>

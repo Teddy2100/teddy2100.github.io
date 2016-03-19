@@ -2,9 +2,10 @@
   "name": "my-github-projects",
   "dependencies": {
     "jquery": "~2.1.4",
+    "fabric.js": "kangax/fabric.js",
     "polymer-gestures": "Polymer/polymer-gestures",
-    "iron-elements": "PolymerElements/iron-elements#~1.0.0",
-    "paper-elements": "PolymerElements/paper-elements#~1.0.1",
-    "google-web-components": "GoogleWebComponents/google-web-components#~1.0.1"
+    "iron-elements": "PolymerElements/iron-elements",
+    "paper-elements": "PolymerElements/paper-elements",
+    "google-web-components": "GoogleWebComponents/google-web-components"
   }
 }

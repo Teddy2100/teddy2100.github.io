@@ -1,0 +1,15 @@
+<script>
+$("paper-toolbar[tabs]").removeClass("close");
+var database=connect.child("fuelusage").child(connectionData.uid);
+database.off("child_added");database.limitToLast(50).on("child_added",function(data){
+ var temp=$("<paper-card>").attr({heading:"TEST",size:"1"}).append(JSON.stringify(data.val()));
+ 
+ $("#applicationContent[page='view-overview']").append(temp);
+});
+
+["child_changed","child_removed","child_moved"].map(function(i){
+ var page="view-overview";database.once(i,function(){
+  $(window).trigger("loadpage",page);
+ });
+});
+</script>
