@@ -105,21 +105,22 @@ html, body{
 #document-content paper-button[action="login"]::shadow{background:var(--google-green-500);color:#FFFFFF;}
 #document-content paper-button[action="logout"]::shadow{background:var(--google-red-500);color:#FFFFFF;}
 
-#sub-fab-holder{overflow:hidden;transition:height 250ms ease-in-out;}
+
+#sub-fab-holder{overflow:hidden;transition:height 250ms ease-in-out;pointer-events:none;}
 #sub-fab-holder paper-fab{width:40px;height:40px;margin:0px auto 16px;}
 
 #fab-holder:not(.closed) #sub-fab-holder{height:auto;}
 #fab-holder.closed #sub-fab-holder{height:0px;}
 
-#fab-holder:not(.closed) paper-fab:nth-of-type(1){opacity:1;transform:translateY(0px);transition:all 250ms ease 100ms;}
-#fab-holder:not(.closed) paper-fab:nth-of-type(2){opacity:1;transform:translateY(0px);transition:all 250ms ease 00ms;}
-#fab-holder.closed paper-fab:nth-of-type(1){opacity:0;transform:translateY(120px);transition:all 250ms ease 000ms;}
-#fab-holder.closed paper-fab:nth-of-type(2){opacity:0;transform:translateY(64px);transition:all 250ms ease 100ms;}
+n#fab-holder:not(.closed) paper-fab:nth-of-type(1){opacity:1;transform:translateY(0px);transition:all 250ms ease 100ms;}
+n#fab-holder:not(.closed) paper-fab:nth-of-type(2){opacity:1;transform:translateY(0px);transition:all 250ms ease 00ms;}
+n#fab-holder.closed paper-fab:nth-of-type(1){opacity:0;transform:translateY(120px);transition:all 250ms ease 000ms;}
+n#fab-holder.closed paper-fab:nth-of-type(2){opacity:0;transform:translateY(64px);transition:all 250ms ease 100ms;}
 #fab-holder paper-fab[action="credit"]::shadow{background:var(--paper-green-500);color:#FFFFFF;}
 #fab-holder paper-fab[action="reading"]::shadow{background:var(--paper-blue-500);color:#FFFFFF;}
 #fab-holder paper-fab[action="menu"]::shadow{background:var(--paper-amber-700);color:#FFFFFF;}
-no#fab-holder paper-fab:not(:last-of-type){width:40px;height:40px;margin:0px auto 16px;}
-no#fab-holder:not(.closed) paper-fab:last-of-type iron-icon{transform:rotate(45deg);}
+n#fab-holder paper-fab:not(:last-of-type){width:40px;height:40px;margin:0px auto 16px;}
+n#fab-holder:not(.closed) paper-fab:last-of-type iron-icon{transform:rotate(45deg);}
 #fab-holder paper-fab:last-of-type{width:56px;height:56px;margin:0px auto;}
 #fab-holder paper-fab:last-of-type iron-icon{width:35px;height:35px;}
 
