@@ -3,6 +3,8 @@
   <style is="custom-style">
    :root{
     --primary-color:#E00421;
+    --paper-toolbar-height:56px;
+    --paper-toolbar-sm-height:56px;
    }
    :host{
     @apply(--paper-toolbar-background);
@@ -89,7 +91,7 @@ html, body{
  outline:none;
 }
 
-#toolbar-holder{position:absolute;top:0px;left:0px;right:0px;height:56px;}
+#toolbar-holder{position:absolute;top:0px;left:0px;right:0px;max-height:56px;}
 
 #main-holder{position:absolute;top:56px;left:0px;right:0px;bottom:0px;overflow:hidden;}
 
