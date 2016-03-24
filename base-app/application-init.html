@@ -7,8 +7,6 @@
     --paper-toolbar-sm-height:56px;
    }
    :host{
-    @apply(--paper-toolbar-background);
-    @apply(--paper-drawer-background);
     @apply(--primary-color);
    }
   </style>
@@ -105,24 +103,17 @@ html, body{
 #document-content paper-button[action="login"]::shadow{background:var(--google-green-500);color:#FFFFFF;}
 #document-content paper-button[action="logout"]::shadow{background:var(--google-red-500);color:#FFFFFF;}
 
-
+#fab-holder #sub-fab-holder{overflow:hidden;transition:all 250ms ease;}
 #fab-holder #sub-fab-holder paper-fab{width:40px;height:40px;margin:0px auto 16px;}
-#fab-holder #sub-fab-holder{overflow:hidden;transition:all 250ms ease;pointer-events:none;}
 #fab-holder #sub-fab-holder{padding-bottom:56px;position:absolute;bottom:0px;left:0px;right:0px;}
-
-#fab-holder.closed #sub-fab-holder{height:0px!important;opacity:0;}
-
-n#fab-holder:not(.closed) paper-fab:nth-of-type(1){opacity:1;transform:translateY(0px);transition:all 250ms ease 100ms;}
-n#fab-holder:not(.closed) paper-fab:nth-of-type(2){opacity:1;transform:translateY(0px);transition:all 250ms ease 00ms;}
-n#fab-holder.closed paper-fab:nth-of-type(1){opacity:0;transform:translateY(120px);transition:all 250ms ease 000ms;}
-n#fab-holder.closed paper-fab:nth-of-type(2){opacity:0;transform:translateY(64px);transition:all 250ms ease 100ms;}
 #fab-holder paper-fab[action="credit"]::shadow{background:var(--paper-green-500);color:#FFFFFF;}
 #fab-holder paper-fab[action="reading"]::shadow{background:var(--paper-blue-500);color:#FFFFFF;}
 #fab-holder paper-fab[action="menu"]::shadow{background:var(--paper-amber-700);color:#FFFFFF;}
-
 #fab-holder:not(.closed) > paper-fab iron-icon{transform:rotate(45deg);}
+#fab-holder.closed #sub-fab-holder{height:0px!important;opacity:0;}
 #fab-holder > paper-fab{width:56px;height:56px;margin:0px auto;}
 #fab-holder > paper-fab iron-icon{width:35px;height:35px;}
+
 
 paper-toolbar::shadow div.title{text-align:center;position:absolute;left:0px;right:0px;top:0px;bottom:0px;line-height:56px!important;}
 paper-toolbar::shadow{border-bottom-left-radius:28px;text-align:center;padding-left:40px;box-shadow:5px 5px 6px -3px rgba(0,0,0,0.7);}
