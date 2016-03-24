@@ -109,7 +109,7 @@ html, body{
 #fab-holder #sub-fab-holder paper-fab{width:40px;height:40px;margin:0px auto 16px;}
 #fab-holder #sub-fab-holder{overflow:hidden;transition:height 250ms ease-in-out;pointer-events:none;}
 
-#fab-holder.closed #sub-fab-holder{height:0px;}
+#fab-holder.closed #sub-fab-holder{height:0px!important;}
 
 n#fab-holder:not(.closed) paper-fab:nth-of-type(1){opacity:1;transform:translateY(0px);transition:all 250ms ease 100ms;}
 n#fab-holder:not(.closed) paper-fab:nth-of-type(2){opacity:1;transform:translateY(0px);transition:all 250ms ease 00ms;}
@@ -118,9 +118,8 @@ n#fab-holder.closed paper-fab:nth-of-type(2){opacity:0;transform:translateY(64px
 #fab-holder paper-fab[action="credit"]::shadow{background:var(--paper-green-500);color:#FFFFFF;}
 #fab-holder paper-fab[action="reading"]::shadow{background:var(--paper-blue-500);color:#FFFFFF;}
 #fab-holder paper-fab[action="menu"]::shadow{background:var(--paper-amber-700);color:#FFFFFF;}
-n#fab-holder paper-fab:not(:last-of-type){width:40px;height:40px;margin:0px auto 16px;}
-n#fab-holder:not(.closed) paper-fab:last-of-type iron-icon{transform:rotate(45deg);}
 
+#fab-holder:not(.closed) paper-fab iron-icon{transform:rotate(45deg);}
 #fab-holder paper-fab{width:56px;height:56px;margin:0px auto;}
 #fab-holder paper-fab iron-icon{width:35px;height:35px;}
 
