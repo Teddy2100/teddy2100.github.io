@@ -119,9 +119,9 @@ n#fab-holder.closed paper-fab:nth-of-type(2){opacity:0;transform:translateY(64px
 #fab-holder paper-fab[action="reading"]::shadow{background:var(--paper-blue-500);color:#FFFFFF;}
 #fab-holder paper-fab[action="menu"]::shadow{background:var(--paper-amber-700);color:#FFFFFF;}
 
-#fab-holder:not(.closed) paper-fab iron-icon{transform:rotate(45deg);}
-#fab-holder paper-fab{width:56px;height:56px;margin:0px auto;}
-#fab-holder paper-fab iron-icon{width:35px;height:35px;}
+#fab-holder:not(.closed) > paper-fab iron-icon{transform:rotate(45deg);}
+#fab-holder > paper-fab{width:56px;height:56px;margin:0px auto;}
+#fab-holder > paper-fab iron-icon{width:35px;height:35px;}
 
 paper-toolbar::shadow div.title{text-align:center;position:absolute;left:0px;right:0px;top:0px;bottom:0px;line-height:56px!important;}
 paper-toolbar::shadow{border-bottom-left-radius:28px;text-align:center;padding-left:40px;box-shadow:5px 5px 6px -3px rgba(0,0,0,0.7);}
