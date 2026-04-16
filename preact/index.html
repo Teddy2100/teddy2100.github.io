@@ -1,0 +1,56 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="theme-color" content="#000000">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="xmanifest" href="./app.webmanifest" crossorigin="use-credentials" />
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <style>body { background: black; color: white;}</style>
+  <title>My Stuff &amp; Things!</title>
+</head>
+</body>
+
+<div id="unsupported" hidden>
+  <h1>Browser Not Supported</h1>
+  <p>This website requires a modern browser.</p>
+</div>
+
+<script type="module">
+window.addEventListener("error", function(event){
+  const { message, filename, lineno, colno, error } = event;
+  const formatted = JSON.stringify({ message, filename, lineno, colno, error }, "", 2);
+  if (event.preventDefault) event.preventDefault();
+  //console.error(event);
+  document.body.innerHTML = (`
+    <style>html,body{overflow:auto!important;}</style>
+    <div style="padding: 20px; font-family: sans-serif; color: red;">
+      <h1>🛑 Critical System Failure</h1>
+      <pre>${formatted}</pre>
+    </div>
+  `);
+});
+
+window.addEventListener("load", async function(){
+  if (!document.body) return alert("Application Error!!");
+  const isModern = 'noModule' in HTMLScriptElement.prototype && window.fetch;
+ 
+  if (!isModern) {
+    window.stop();
+    document.getElementById("unsupported").removeAttribute("hidden");
+    return;
+  }
+  
+  return import("/application.js").then(function(module){
+    if (!document.body) throw new Error("Application Failed!!");
+    return module ? module.default(true) : false;
+  }).catch(function(error, noop){
+    setTimeout(function() {
+      console.log(error);
+      throw error; 
+    }, 0);
+  });
+});
+</script>
+</body>
+</html>
+
