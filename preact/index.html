@@ -40,7 +40,7 @@ window.addEventListener("load", async function(){
     return;
   }
   
-  return import("/application.js").then(function(module){
+  return import("./application.js").then(function(module){
     if (!document.body) throw new Error("Application Failed!!");
     return module ? module.default(true) : false;
   }).catch(function(error, noop){
